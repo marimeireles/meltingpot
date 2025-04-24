@@ -23,7 +23,11 @@ uv pip install matplotlib shimmy gymnasium flax distrax
 ---
 
 *Mongol General: Hao! Dai ye! We won again! This is good, but what is best in life?*
+
 *Mongol: The open steppe, fleet horse, falcons at your wrist, and the wind in your hair.*
+
 *Mongol General: Wrong! Conan! What is best in life?*
+
 *Conan: To crush your enemies, see them driven before you, and to hear the lamentations of their women.*
+
 *Mongol General: That is good! That is good.*
