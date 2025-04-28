@@ -212,6 +212,10 @@ function Cleaner:registerUpdaters(updaterRegistry)
             self._coolingTimer = self._config.cooldownTime
             self.gameObject:hitBeam(
                 'cleanHit', self._config.beamLength, self._config.beamRadius)
+          elseif actions['deathRay'] == 1 then
+            self._coolingTimer = self._config.cooldownTime
+            self.gameObject:hitBeam(
+                'cleanHit', self._config.beamLength, self._config.beamRadius)
           end
         end
       end

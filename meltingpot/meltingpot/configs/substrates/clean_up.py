@@ -37,6 +37,8 @@ Castaneda, A.G., Dunning, I., Zhu, T., McKee, K., Koster, R. and Roff, H., 2018,
 Inequity aversion improves cooperation in intertemporal social dilemmas. In
 Proceedings of the 32nd International Conference on Neural Information
 Processing Systems (pp. 3330-3340).
+
+Modified version of the clean_up game with murderous capabilities.
 """
 
 from typing import Any, Dict, Mapping, Sequence
@@ -458,15 +460,16 @@ def create_dirt_prefab(initial_state):
 # Primitive action components.
 # pylint: disable=bad-whitespace
 # pyformat: disable
-NOOP        = {"move": 0, "turn":  0, "fireZap": 0, "fireClean": 0}
-FORWARD     = {"move": 1, "turn":  0, "fireZap": 0, "fireClean": 0}
-STEP_RIGHT  = {"move": 2, "turn":  0, "fireZap": 0, "fireClean": 0}
-BACKWARD    = {"move": 3, "turn":  0, "fireZap": 0, "fireClean": 0}
-STEP_LEFT   = {"move": 4, "turn":  0, "fireZap": 0, "fireClean": 0}
-TURN_LEFT   = {"move": 0, "turn": -1, "fireZap": 0, "fireClean": 0}
-TURN_RIGHT  = {"move": 0, "turn":  1, "fireZap": 0, "fireClean": 0}
-FIRE_ZAP    = {"move": 0, "turn":  0, "fireZap": 1, "fireClean": 0}
-FIRE_CLEAN  = {"move": 0, "turn":  0, "fireZap": 0, "fireClean": 1}
+NOOP        = {"move": 0, "turn":  0, "fireZap": 0,  "deathZap": 1, "fireClean": 0}
+FORWARD     = {"move": 1, "turn":  0, "fireZap": 0,  "deathZap": 1, "fireClean": 0}
+STEP_RIGHT  = {"move": 2, "turn":  0, "fireZap": 0,  "deathZap": 1, "fireClean": 0}
+BACKWARD    = {"move": 3, "turn":  0, "fireZap": 0,  "deathZap": 1, "fireClean": 0}
+STEP_LEFT   = {"move": 4, "turn":  0, "fireZap": 0,  "deathZap": 1, "fireClean": 0}
+TURN_LEFT   = {"move": 0, "turn": -1, "fireZap": 0,  "deathZap": 1, "fireClean": 0}
+TURN_RIGHT  = {"move": 0, "turn":  1, "fireZap": 0,  "deathZap": 1, "fireClean": 0}
+FIRE_ZAP    = {"move": 0, "turn":  0, "fireZap": 1,  "deathZap": 1, "fireClean": 0}
+DEATH_ZAP    = {"move": 0, "turn":  0, "fireZap": 0, "deathZap": 1, "fireClean": 0}
+FIRE_CLEAN  = {"move": 0, "turn":  0, "fireZap": 0,  "deathZap": 1, "fireClean": 1}
 # pyformat: enable
 # pylint: enable=bad-whitespace
 
@@ -479,6 +482,7 @@ ACTION_SET = (
     TURN_LEFT,
     TURN_RIGHT,
     FIRE_ZAP,
+    DEATH_ZAP,
     FIRE_CLEAN
 )
 
@@ -686,11 +690,13 @@ def create_avatar_object(player_idx: int,
                   "actionOrder": ["move",
                                   "turn",
                                   "fireZap",
+                                  "deathZap",
                                   "fireClean"],
                   "actionSpec": {
                       "move": {"default": 0, "min": 0, "max": len(_COMPASS)},
                       "turn": {"default": 0, "min": -1, "max": 1},
                       "fireZap": {"default": 0, "min": 0, "max": 1},
+                      "deathZap": {"default": 0, "min": 0, "max": 1},
                       "fireClean": {"default": 0, "min": 0, "max": 1},
                   },
                   "view": {

@@ -35,6 +35,7 @@ _ACTION_MAP = {
     'turn': level_playing_utils.get_turn_pressed,
     'fireZap': level_playing_utils.get_key_number_one_pressed,
     'fireClean': level_playing_utils.get_key_number_two_pressed,
+    'deathZap': level_playing_utils.get_enter_key_pressed,
 }
 
 
