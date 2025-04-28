@@ -38,6 +38,7 @@ _ACTION_MAP = {
     'move': level_playing_utils.get_direction_pressed,
     'turn': level_playing_utils.get_turn_pressed,
     'fireZap': level_playing_utils.get_space_key_pressed,
+    'deathZap': level_playing_utils.get_enter_key_pressed,
 }
 
 
@@ -48,7 +49,7 @@ def verbose_fn(unused_env, unused_player_index, unused_current_player_index):
 def main():
   parser = argparse.ArgumentParser(description=__doc__)
   parser.add_argument(
-      '--level_name', type=str, default='commons_harvest__closed',
+      '--level_name', type=str, default='commons_harvest__open',
       choices=environment_configs.keys(),
       help='Level name to load')
   parser.add_argument(

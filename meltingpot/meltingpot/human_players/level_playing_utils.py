@@ -17,6 +17,7 @@ Use `WASD` keys to move the character around.
 Use `Q and E` to turn the character.
 Use `SPACE` to fire the zapper.
 Use `TAB` to switch between players.
+Use `ENTER` to fire the death zapper.
 """
 
 import collections
@@ -93,6 +94,8 @@ def get_turn_pressed() -> int:
 def get_space_key_pressed() -> int:
   return 1 if pygame.key.get_pressed()[pygame.K_SPACE] else 0
 
+def get_enter_key_pressed() -> int:
+  return 1 if pygame.key.get_pressed()[pygame.K_RETURN] else 0
 
 def get_key_number_pressed() -> int:
   number_keys = [pygame.K_0, pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4,
