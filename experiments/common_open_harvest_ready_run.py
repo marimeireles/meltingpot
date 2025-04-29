@@ -16,7 +16,11 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-# ────────────────────────────────────────────────────────────────────────────────
+
+# ── Added for TensorBoard logging and progress bar ─────────────────────────────
+from torch.utils.tensorboard import SummaryWriter
+from tqdm import trange
+# ───────────────────────────────────────────────────────────────────────────────
 
 # --- Hyperparameters -----------------------------------------------------------
 DISCOUNT_FACTOR     = 0.99
@@ -146,7 +150,6 @@ def collect_batch(n_steps=STEPS_PER_UPDATE):
     return buffer, stock_hist, harvests, positions
 
 # 5) PPO loss and update
-
 def ppo_loss(params, obs, acts, old_logp, old_val, returns):
     logits, vals = ActorCritic(action_dim).apply(params, obs)
     dist   = distrax.Categorical(logits=logits)
@@ -167,19 +170,22 @@ def update_step(params, optim_state, obs, acts, old_logp, old_val, returns):
     new_params = optax.apply_updates(params, updates)
     return new_params, new_state, loss
 
-# 6) Training loop with KL-based early stopping and metrics
+# 6) Training loop with KL-based early stopping, metrics, and progress bar
 kl_counter    = {a: 0 for a in agents}
 run_id        = datetime.now().strftime("%Y%m%d_%H%M%S")
 checkpoint_dir = pathlib.Path("checkpoints")
 checkpoint_dir.mkdir(parents=True, exist_ok=True)
 
-for update in range(TOTAL_UPDATES):
+# Initialize TensorBoard writer
+writer = SummaryWriter(log_dir=f"runs/{run_id}")
+
+# Wrap updates loop with tqdm progress bar
+for update in trange(TOTAL_UPDATES, desc="PPO updates"):
     batch, stock_hist, harvests, positions = collect_batch()
     resource_stock_hist.extend(stock_hist)
 
-    # update and metrics per agent
+    # record per-agent harvest rates
     for a in agents:
-        # record harvest rates
         harvest_rate_hist[a].extend(harvests[a])
 
     # compute cumulative returns and Gini
@@ -187,31 +193,48 @@ for update in range(TOTAL_UPDATES):
     cumulative_rewards.append(cum_returns)
     gini_history.append(compute_gini(cum_returns))
 
+    # Log overall metrics to TensorBoard
+    writer.add_scalar('metrics/gini', gini_history[-1], update)
+    for idx, a in enumerate(agents):
+        writer.add_scalar(f'metrics/{a}_cum_return', cum_returns[idx], update)
+        writer.add_scalar(f'metrics/{a}_mean_harvest', np.mean(harvests[a]), update)
+
     for a in agents:
-        o   = jnp.stack(batch[a]["obs"])
-        ac  = jnp.stack(batch[a]["acts"])
-        old_lp = jnp.stack(batch[a]["logps"])
+        o       = jnp.stack(batch[a]["obs"])
+        ac      = jnp.stack(batch[a]["acts"])
+        old_lp  = jnp.stack(batch[a]["logps"])
         old_val = jnp.stack(batch[a]["vals"])
         rets    = jnp.stack(batch[a]["rets"])
 
         old_params = params[a]
         p, s = params[a], optim_states[a]
+        # collect losses over PPO epochs
+        losses = []
         for _ in range(PPO_EPOCHS):
-            p, s, _ = update_step(p, s, o, ac, old_lp, old_val, rets)
+            p, s, loss = update_step(p, s, o, ac, old_lp, old_val, rets)
+            losses.append(float(loss))
         params[a], optim_states[a] = p, s
 
-        # KL divergence
+        # log average loss for this agent/update
+        writer.add_scalar(f'loss/{a}', np.mean(losses), update)
+
+        # KL divergence and logging
         old_logits, _ = ActorCritic(action_dim).apply(old_params, o)
         new_logits, _ = ActorCritic(action_dim).apply(p, o)
         dist_old = distrax.Categorical(logits=old_logits)
         dist_new = distrax.Categorical(logits=new_logits)
         kl = jnp.mean(dist_old.kl_divergence(dist_new))
         kl_counter[a] = kl_counter[a] + 1 if kl < KL_THRESHOLD else 0
+        writer.add_scalar(f'metrics/{a}_kl', float(kl), update)
+
         print(f"Agent {a} update {update}: mean KL={kl:.6f}, patience={kl_counter[a]}")
 
     if all(count >= KL_PATIENCE for count in kl_counter.values()):
         print(f"Early stopping at update {update}: KL < {KL_THRESHOLD} for {KL_PATIENCE} updates.")
         break
+
+# Close TensorBoard writer
+writer.close()
 
 # 7) Save model and raw data
 for a, p in params.items():
