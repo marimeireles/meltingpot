@@ -34,7 +34,7 @@ KL_PATIENCE         = 10
 # 1) Create environment
 env = MeltingPotCompatibilityV0(
     substrate_name="commons_harvest__open",
-    render_mode="human"
+    render_mode="rgb_array"
 )
 agents        = env.possible_agents
 primary_agent = agents[0]
@@ -337,4 +337,5 @@ plot_zap_metric(beam_fired_hist, 'Beam Zaps Fired', 'beam_zaps_fired')
 plot_zap_metric(death_fired_hist, 'Death Zaps Fired', 'death_zaps_fired')
 plot_zap_metric(beam_received_hist, 'Beam Zaps Received', 'beam_zaps_received')
 plot_zap_metric(death_received_hist, 'Death Zaps Received', 'death_zaps_received')
+
 
