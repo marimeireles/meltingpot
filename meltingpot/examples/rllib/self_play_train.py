@@ -95,10 +95,13 @@ def get_config(
         action_space=test_env.action_space[f"player_{i}"],
         config={
             "model": {
-                "conv_filters": [[16, [8, 8], 8],
-                                 [128, [sprite_x, sprite_y], 1]],
+                "conv_filters": [
+                    [16, [8, 8], 8],
+                    [128, [sprite_x, sprite_y], 1],
+                ],
             },
-        })
+        },
+    )
     player_to_agent[f"player_{i}"] = f"agent_{i}"
 
   def policy_mapping_fn(agent_id, **kwargs):

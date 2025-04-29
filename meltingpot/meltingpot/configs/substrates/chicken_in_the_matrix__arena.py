@@ -106,7 +106,7 @@ WALL = {
                     "layer": "upperPhysical",
                     "sprite": "Wall",
                 }],
-            }
+            },
         },
         {
             "component": "Transform",
@@ -117,20 +117,17 @@ WALL = {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["Wall"],
                 "spriteShapes": [shapes.WALL],
-                "palettes": [{"*": (95, 95, 95, 255),
-                              "&": (100, 100, 100, 255),
-                              "@": (109, 109, 109, 255),
-                              "#": (152, 152, 152, 255)}],
-                "noRotates": [False]
-            }
+                "palettes": [{
+                    "*": (95, 95, 95, 255),
+                    "&": (100, 100, 100, 255),
+                    "@": (109, 109, 109, 255),
+                    "#": (152, 152, 152, 255),
+                }],
+                "noRotates": [False],
+            },
         },
-        {
-            "component": "BeamBlocker",
-            "kwargs": {
-                "beamType": "gameInteraction"
-            }
-        },
-    ]
+        {"component": "BeamBlocker", "kwargs": {"beamType": "gameInteraction"}},
+    ],
 }
 
 SPAWN_POINT = {
@@ -143,14 +140,14 @@ SPAWN_POINT = {
                 "stateConfigs": [{
                     "state": "spawnPoint",
                     "layer": "alternateLogic",
-                    "groups": ["spawnPoints"]
+                    "groups": ["spawnPoints"],
                 }],
-            }
+            },
         },
         {
             "component": "Transform",
         },
-    ]
+    ],
 }
 
 # Remove the first entry from human_readable_colors after using it for the self
@@ -171,14 +168,14 @@ for human_readable_color in human_readable_colors:
 # Primitive action components.
 # pylint: disable=bad-whitespace
 # pyformat: disable
-NOOP       = {"move": 0, "turn":  0, "interact": 0}
-FORWARD    = {"move": 1, "turn":  0, "interact": 0}
-STEP_RIGHT = {"move": 2, "turn":  0, "interact": 0}
-BACKWARD   = {"move": 3, "turn":  0, "interact": 0}
-STEP_LEFT  = {"move": 4, "turn":  0, "interact": 0}
-TURN_LEFT  = {"move": 0, "turn": -1, "interact": 0}
-TURN_RIGHT = {"move": 0, "turn":  1, "interact": 0}
-INTERACT   = {"move": 0, "turn":  0, "interact": 1}
+NOOP = {"move": 0, "turn": 0, "interact": 0}
+FORWARD = {"move": 1, "turn": 0, "interact": 0}
+STEP_RIGHT = {"move": 2, "turn": 0, "interact": 0}
+BACKWARD = {"move": 3, "turn": 0, "interact": 0}
+STEP_LEFT = {"move": 4, "turn": 0, "interact": 0}
+TURN_LEFT = {"move": 0, "turn": -1, "interact": 0}
+TURN_RIGHT = {"move": 0, "turn": 1, "interact": 0}
+INTERACT = {"move": 0, "turn": 0, "interact": 1}
 # pyformat: enable
 # pylint: enable=bad-whitespace
 
@@ -206,7 +203,7 @@ def create_scene():
                   "stateConfigs": [{
                       "state": "scene",
                   }],
-              }
+              },
           },
           {
               "component": "Transform",
@@ -231,19 +228,22 @@ def create_scene():
                   ],
                   "resultIndicatorColorIntervals": [
                       # red       # yellow    # green     # blue
-                      (0.0, 1.5), (1.5, 2.5), (2.5, 3.5), (3.5, 5.0)
+                      (0.0, 1.5),
+                      (1.5, 2.5),
+                      (2.5, 3.5),
+                      (3.5, 5.0),
                   ],
-              }
+              },
           },
           {
               "component": "StochasticIntervalEpisodeEnding",
               "kwargs": {
                   "minimumFramesPerEpisode": 1000,
                   "intervalLength": 100,  # Set equal to unroll length.
-                  "probabilityTerminationPerInterval": 0.2
-              }
-          }
-      ]
+                  "probabilityTerminationPerInterval": 0.2,
+              },
+          },
+      ],
   }
   return scene
 
@@ -259,12 +259,16 @@ def create_resource_prefab(resource_id, color_data):
               "kwargs": {
                   "initialState": resource_name,
                   "stateConfigs": [
-                      {"state": resource_name + "_wait",
-                       "groups": ["resourceWaits"]},
-                      {"state": resource_name,
-                       "layer": "lowerPhysical",
-                       "sprite": resource_name + "_sprite"},
-                  ]
+                      {
+                          "state": resource_name + "_wait",
+                          "groups": ["resourceWaits"],
+                      },
+                      {
+                          "state": resource_name,
+                          "layer": "lowerPhysical",
+                          "sprite": resource_name + "_sprite",
+                      },
+                  ],
               },
           },
           {
@@ -276,10 +280,12 @@ def create_resource_prefab(resource_id, color_data):
                   "renderMode": "ascii_shape",
                   "spriteNames": [resource_name + "_sprite"],
                   "spriteShapes": [shapes.BUTTON],
-                  "palettes": [{"*": color_data[0],
-                                "#": color_data[1],
-                                "x": (0, 0, 0, 0)}],
-                  "noRotates": [False]
+                  "palettes": [{
+                      "*": color_data[0],
+                      "#": color_data[1],
+                      "x": (0, 0, 0, 0),
+                  }],
+                  "noRotates": [False],
               },
           },
           {
@@ -301,7 +307,7 @@ def create_resource_prefab(resource_id, color_data):
                   "initialHealth": 3,
               },
           },
-      ]
+      ],
   }
   return resource_prefab
 
@@ -321,8 +327,9 @@ def create_prefabs() -> PrefabConfig:
   return prefabs
 
 
-def create_avatar_object(player_idx: int,
-                         target_sprite_self: Dict[str, Any]) -> Dict[str, Any]:
+def create_avatar_object(
+    player_idx: int, target_sprite_self: Dict[str, Any]
+) -> Dict[str, Any]:
   """Create an avatar object that always sees itself as blue."""
   # Lua is 1-indexed.
   lua_index = player_idx + 1
@@ -340,16 +347,16 @@ def create_avatar_object(player_idx: int,
               "kwargs": {
                   "initialState": live_state_name,
                   "stateConfigs": [
-                      {"state": live_state_name,
-                       "layer": "upperPhysical",
-                       "sprite": source_sprite_self,
-                       "contact": "avatar",
-                       "groups": ["players"]},
-
-                      {"state": "playerWait",
-                       "groups": ["playerWaits"]},
-                  ]
-              }
+                      {
+                          "state": live_state_name,
+                          "layer": "upperPhysical",
+                          "sprite": source_sprite_self,
+                          "contact": "avatar",
+                          "groups": ["players"],
+                      },
+                      {"state": "playerWait", "groups": ["playerWaits"]},
+                  ],
+              },
           },
           {
               "component": "Transform",
@@ -360,10 +367,11 @@ def create_avatar_object(player_idx: int,
                   "renderMode": "ascii_shape",
                   "spriteNames": [source_sprite_self],
                   "spriteShapes": [shapes.CUTE_AVATAR],
-                  "palettes": [shapes.get_palette(
-                      human_readable_colors[player_idx])],
-                  "noRotates": [True]
-              }
+                  "palettes": [
+                      shapes.get_palette(human_readable_colors[player_idx])
+                  ],
+                  "noRotates": [True],
+              },
           },
           {
               "component": "AdditionalSprites",
@@ -373,7 +381,7 @@ def create_avatar_object(player_idx: int,
                   "customSpriteShapes": [target_sprite_self["shape"]],
                   "customPalettes": [target_sprite_self["palette"]],
                   "customNoRotates": [target_sprite_self["noRotate"]],
-              }
+              },
           },
           {
               "component": "Avatar",
@@ -394,7 +402,7 @@ def create_avatar_object(player_idx: int,
                       "right": 5,
                       "forward": 9,
                       "backward": 1,
-                      "centered": False
+                      "centered": False,
                   },
                   "spriteMap": custom_sprite_map,
                   # The following kwarg makes it possible to get rewarded even
@@ -402,7 +410,7 @@ def create_avatar_object(player_idx: int,
                   # matrix games in order to correctly handle the case of two
                   # players getting hit simultaneously by the same beam.
                   "skipWaitStateRewards": False,
-              }
+              },
           },
           {
               "component": "GameInteractionZapper",
@@ -423,26 +431,22 @@ def create_avatar_object(player_idx: int,
                   # interaction result indicator, freeze, and delay delivering
                   # all results of interacting.
                   "freezeOnInteraction": 16,
-              }
+              },
           },
           {
               "component": "ReadyToShootObservation",
               "kwargs": {
                   "zapperComponent": "GameInteractionZapper",
-              }
+              },
           },
-          {
-              "component": "InventoryObserver",
-              "kwargs": {
-              }
-          },
+          {"component": "InventoryObserver", "kwargs": {}},
           {
               "component": "Taste",
               "kwargs": {
                   "mostTastyResourceClass": -1,  # -1 indicates no preference.
                   # No resource is most tasty when mostTastyResourceClass == -1.
                   "mostTastyReward": 0.1,
-              }
+              },
           },
           {
               "component": "InteractionTaste",
@@ -450,7 +454,7 @@ def create_avatar_object(player_idx: int,
                   "mostTastyResourceClass": -1,  # -1 indicates no preference.
                   "zeroDefaultInteractionReward": False,
                   "extraReward": 1.0,
-              }
+              },
           },
           {
               "component": "AvatarMetricReporter",
@@ -468,18 +472,15 @@ def create_avatar_object(player_idx: int,
                       },
                       *the_matrix.get_cumulant_metric_configs(NUM_RESOURCES),
                   ]
-              }
+              },
           },
-      ]
+      ],
   }
   if _ENABLE_DEBUG_OBSERVATIONS:
     avatar_object["components"].append(
         {
             "component": "LocationObserver",
-            "kwargs": {
-                "objectIsAvatar": True,
-                "alsoReportOrientation": True
-            }
+            "kwargs": {"objectIsAvatar": True, "alsoReportOrientation": True},
         },
     )
 
@@ -559,6 +560,6 @@ def build(
           "scene": create_scene(),
           "prefabs": create_prefabs(),
           "charPrefabMap": CHAR_PREFAB_MAP,
-      }
+      },
   )
   return substrate_definition

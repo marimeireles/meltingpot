@@ -123,6 +123,7 @@ def get_marking_palette(alpha: float) -> Dict[str, Sequence[int]]:
   assert alpha_uint8 >= 0.0 and alpha_uint8 <= 255, "Color value out of range."
   return {"x": shapes.ALPHA, "o": (0, 0, 0, alpha_uint8)}
 
+
 _NUM_DIRECTIONS = 4  # NESW
 
 FLOOR = {
@@ -137,25 +138,27 @@ FLOOR = {
                     "layer": "background",
                     "sprite": "Floor",
                 }],
-            }
+            },
         },
         {
             "component": "Appearance",
             "kwargs": {
                 "renderMode": "ascii_shape",
-                "spriteNames": ["Floor",],
+                "spriteNames": [
+                    "Floor",
+                ],
                 "spriteShapes": [shapes.DIRT_PATTERN],
                 "palettes": [{
                     "x": (55, 55, 55, 255),
                     "X": (60, 60, 60, 255),
                 }],
-                "noRotates": [True]
-            }
+                "noRotates": [True],
+            },
         },
         {
             "component": "Transform",
         },
-    ]
+    ],
 }
 
 SOIL = {
@@ -170,26 +173,29 @@ SOIL = {
                     "layer": "background",
                     "sprite": "Soil",
                 }],
-            }
+            },
         },
         {
             "component": "Appearance",
             "kwargs": {
                 "renderMode": "ascii_shape",
-                "spriteNames": ["Soil",],
+                "spriteNames": [
+                    "Soil",
+                ],
                 "spriteShapes": [shapes.SOIL],
                 "palettes": [{
                     "D": (40, 40, 40, 255),
                     "d": (50, 50, 50, 255),
                     "X": (60, 60, 60, 255),
-                    "x": (70, 70, 70, 255)}],
-                "noRotates": [False]
-            }
+                    "x": (70, 70, 70, 255),
+                }],
+                "noRotates": [False],
+            },
         },
         {
             "component": "Transform",
         },
-    ]
+    ],
 }
 
 WALL = {
@@ -204,7 +210,7 @@ WALL = {
                     "layer": "upperPhysical",
                     "sprite": "Wall",
                 }],
-            }
+            },
         },
         {
             "component": "Transform",
@@ -214,34 +220,14 @@ WALL = {
             "kwargs": {
                 "spriteNames": ["Wall"],
                 # This color is a dark shade of grey.
-                "spriteRGBColors": [(40, 40, 40)]
-            }
+                "spriteRGBColors": [(40, 40, 40)],
+            },
         },
-        {
-            "component": "BeamBlocker",
-            "kwargs": {
-                "beamType": "zapHit"
-            }
-        },
-        {
-            "component": "BeamBlocker",
-            "kwargs": {
-                "beamType": "fire_1"
-            }
-        },
-        {
-            "component": "BeamBlocker",
-            "kwargs": {
-                "beamType": "fire_2"
-            }
-        },
-        {
-            "component": "BeamBlocker",
-            "kwargs": {
-                "beamType": "fire_3"
-            }
-        },
-    ]
+        {"component": "BeamBlocker", "kwargs": {"beamType": "zapHit"}},
+        {"component": "BeamBlocker", "kwargs": {"beamType": "fire_1"}},
+        {"component": "BeamBlocker", "kwargs": {"beamType": "fire_2"}},
+        {"component": "BeamBlocker", "kwargs": {"beamType": "fire_3"}},
+    ],
 }
 
 SPAWN_POINT = {
@@ -254,14 +240,14 @@ SPAWN_POINT = {
                 "stateConfigs": [{
                     "state": "spawnPoint",
                     "layer": "logic",
-                    "groups": ["spawnPoints"]
+                    "groups": ["spawnPoints"],
                 }],
-            }
+            },
         },
         {
             "component": "Transform",
         },
-    ]
+    ],
 }
 
 
@@ -280,41 +266,41 @@ def create_berry_prefab(lua_index: int):
                           "state": "unripe_1",
                           "layer": "lowerPhysical",
                           "sprite": "UnripeBerry_1",
-                          "groups": ["unripes"]
+                          "groups": ["unripes"],
                       },
                       {
                           "state": "unripe_2",
                           "layer": "lowerPhysical",
                           "sprite": "UnripeBerry_2",
-                          "groups": ["unripes"]
+                          "groups": ["unripes"],
                       },
                       {
                           "state": "unripe_3",
                           "layer": "lowerPhysical",
                           "sprite": "UnripeBerry_3",
-                          "groups": ["unripes"]
+                          "groups": ["unripes"],
                       },
                       # Ripe states.
                       {
                           "state": "ripe_1",
                           "layer": "lowerPhysical",
                           "sprite": "RipeBerry_1",
-                          "groups": []
+                          "groups": [],
                       },
                       {
                           "state": "ripe_2",
                           "layer": "lowerPhysical",
                           "sprite": "RipeBerry_2",
-                          "groups": []
+                          "groups": [],
                       },
                       {
                           "state": "ripe_3",
                           "layer": "lowerPhysical",
                           "sprite": "RipeBerry_3",
-                          "groups": []
+                          "groups": [],
                       },
-                  ]
-              }
+                  ],
+              },
           },
           {
               "component": "Transform",
@@ -344,42 +330,42 @@ def create_berry_prefab(lua_index: int):
                       {
                           "o": COLORS[0],
                           "O": shapes.scale_color(COLORS[0], 1.5),
-                          "x": (0, 0, 0, 0)
+                          "x": (0, 0, 0, 0),
                       },
                       {
                           "o": COLORS[1],
                           "O": shapes.scale_color(COLORS[1], 1.5),
-                          "x": (0, 0, 0, 0)
+                          "x": (0, 0, 0, 0),
                       },
                       {
                           "o": COLORS[2],
                           "O": shapes.scale_color(COLORS[2], 1.5),
-                          "x": (0, 0, 0, 0)
+                          "x": (0, 0, 0, 0),
                       },
                       # Ripe colors
                       {
                           "d": COLORS[0],
                           "O": shapes.scale_color(COLORS[0], 1.5),
                           "o": shapes.scale_color(COLORS[0], 1.25),
-                          "x": (0, 0, 0, 0)
+                          "x": (0, 0, 0, 0),
                       },
                       {
                           "d": COLORS[1],
                           "O": shapes.scale_color(COLORS[1], 1.5),
                           "o": shapes.scale_color(COLORS[1], 1.25),
-                          "x": (0, 0, 0, 0)
+                          "x": (0, 0, 0, 0),
                       },
                       {
                           "d": COLORS[2],
                           "O": shapes.scale_color(COLORS[2], 1.5),
                           "o": shapes.scale_color(COLORS[2], 1.25),
-                          "x": (0, 0, 0, 0)
+                          "x": (0, 0, 0, 0),
                       },
                   ],
                   # Note: the berries do not rotate in this version (unlike in
                   # the original allelopathic_harvest version, where they do).
-                  "noRotates": [True] * (NUM_BERRY_TYPES * 2)
-              }
+                  "noRotates": [True] * (NUM_BERRY_TYPES * 2),
+              },
           },
           {
               "component": "Berry",
@@ -387,14 +373,14 @@ def create_berry_prefab(lua_index: int):
                   "unripePrefix": "unripe",
                   "ripePrefix": "ripe",
                   "colorId": lua_index,
-              }
+              },
           },
           {
               "component": "Edible",
               "kwargs": {
                   "name": "Edible",
                   "eatingSetsColorToNewborn": True,
-              }
+              },
           },
           {
               "component": "Regrowth",
@@ -402,21 +388,22 @@ def create_berry_prefab(lua_index: int):
                   "minimumTimeToRipen": 10,
                   "baseRate": 5e-6,
                   "linearGrowth": True,
-              }
+              },
           },
           {
               "component": "Coloring",
               "kwargs": {
                   "numColors": NUM_BERRY_TYPES,
-              }
+              },
           },
-      ]
+      ],
   }
   return berry
 
 
-def create_avatar_object(player_idx: int,
-                         most_tasty_berry_idx: int) -> Dict[str, Any]:
+def create_avatar_object(
+    player_idx: int, most_tasty_berry_idx: int
+) -> Dict[str, Any]:
   """Return the avatar for the player numbered `player_idx`."""
   # Lua is 1-indexed.
   lua_index = player_idx + 1
@@ -434,17 +421,17 @@ def create_avatar_object(player_idx: int,
                   "initialState": live_state_name,
                   "stateConfigs": [
                       # Initial player state.
-                      {"state": live_state_name,
-                       "layer": "upperPhysical",
-                       "sprite": avatar_sprite_name,
-                       "contact": "avatar",
-                       "groups": ["players"]},
-
+                      {
+                          "state": live_state_name,
+                          "layer": "upperPhysical",
+                          "sprite": avatar_sprite_name,
+                          "contact": "avatar",
+                          "groups": ["players"],
+                      },
                       # Player wait type for when they have been zapped out.
-                      {"state": "playerWait",
-                       "groups": ["playerWaits"]},
-                  ]
-              }
+                      {"state": "playerWait", "groups": ["playerWaits"]},
+                  ],
+              },
           },
           {
               "component": "Transform",
@@ -459,8 +446,8 @@ def create_avatar_object(player_idx: int,
                   # if a white colored avatar does appear then something is
                   # broken.
                   "palettes": [shapes.get_palette((255, 255, 255))],
-                  "noRotates": [True]
-              }
+                  "noRotates": [True],
+              },
           },
           {
               "component": "Avatar",
@@ -470,12 +457,14 @@ def create_avatar_object(player_idx: int,
                   "waitState": "playerWait",
                   "speed": 1.0,
                   "spawnGroup": "spawnPoints",
-                  "actionOrder": ["move",
-                                  "turn",
-                                  "fireZap",
-                                  "fire_1",
-                                  "fire_2",
-                                  "fire_3"],
+                  "actionOrder": [
+                      "move",
+                      "turn",
+                      "fireZap",
+                      "fire_1",
+                      "fire_2",
+                      "fire_3",
+                  ],
                   "actionSpec": {
                       "move": {"default": 0, "min": 0, "max": _NUM_DIRECTIONS},
                       "turn": {"default": 0, "min": -1, "max": 1},
@@ -489,9 +478,9 @@ def create_avatar_object(player_idx: int,
                       "right": 5,
                       "forward": 9,
                       "backward": 1,
-                      "centered": False
+                      "centered": False,
                   },
-              }
+              },
           },
           {
               "component": "Zapper",
@@ -505,7 +494,7 @@ def create_avatar_object(player_idx: int,
                   "rewardForZapping": 0,  # leave this always at 0.
                   # GraduatedSanctionsMarking handles removal instead of Zapper.
                   "removeHitPlayer": False,
-              }
+              },
           },
           {
               "component": "ReadyToShootObservation",
@@ -515,7 +504,7 @@ def create_avatar_object(player_idx: int,
               "kwargs": {
                   "mostTastyBerryId": lua_most_tasty_berry_idx,
                   "rewardMostTasty": 2,
-              }
+              },
           },
           {
               "component": "ColorZapper",
@@ -532,9 +521,9 @@ def create_avatar_object(player_idx: int,
                   # monoculture fractions yield lower probabilities of changing
                   # back to the newborn color.
                   "stochasticallyCryptic": True,
-              }
+              },
           },
-      ]
+      ],
   }
   if _ENABLE_DEBUG_OBSERVATIONS:
     avatar_object["components"].append({
@@ -570,6 +559,7 @@ def create_avatar_object(player_idx: int,
     })
   return avatar_object
 
+
 # PREFABS is a dictionary mapping names to template game objects that can
 # be cloned and placed in multiple locations accoring to an ascii map.
 PREFABS = {
@@ -592,17 +582,94 @@ for i in range(NUM_PLAYERS_UPPER_BOUND):
 # Primitive action components.
 # pylint: disable=bad-whitespace
 # pyformat: disable
-NOOP       = {"move": 0, "turn":  0, "fireZap": 0, "fire_1": 0, "fire_2": 0, "fire_3": 0}
-FORWARD    = {"move": 1, "turn":  0, "fireZap": 0, "fire_1": 0, "fire_2": 0, "fire_3": 0}
-STEP_RIGHT = {"move": 2, "turn":  0, "fireZap": 0, "fire_1": 0, "fire_2": 0, "fire_3": 0}
-BACKWARD   = {"move": 3, "turn":  0, "fireZap": 0, "fire_1": 0, "fire_2": 0, "fire_3": 0}
-STEP_LEFT  = {"move": 4, "turn":  0, "fireZap": 0, "fire_1": 0, "fire_2": 0, "fire_3": 0}
-TURN_LEFT  = {"move": 0, "turn": -1, "fireZap": 0, "fire_1": 0, "fire_2": 0, "fire_3": 0}
-TURN_RIGHT = {"move": 0, "turn":  1, "fireZap": 0, "fire_1": 0, "fire_2": 0, "fire_3": 0}
-FIRE_ZAP   = {"move": 0, "turn":  0, "fireZap": 1, "fire_1": 0, "fire_2": 0, "fire_3": 0}
-FIRE_ONE   = {"move": 0, "turn":  0, "fireZap": 0, "fire_1": 1, "fire_2": 0, "fire_3": 0}
-FIRE_TWO   = {"move": 0, "turn":  0, "fireZap": 0, "fire_1": 0, "fire_2": 1, "fire_3": 0}
-FIRE_THREE = {"move": 0, "turn":  0, "fireZap": 0, "fire_1": 0, "fire_2": 0, "fire_3": 1}
+NOOP = {
+    "move": 0,
+    "turn": 0,
+    "fireZap": 0,
+    "fire_1": 0,
+    "fire_2": 0,
+    "fire_3": 0,
+}
+FORWARD = {
+    "move": 1,
+    "turn": 0,
+    "fireZap": 0,
+    "fire_1": 0,
+    "fire_2": 0,
+    "fire_3": 0,
+}
+STEP_RIGHT = {
+    "move": 2,
+    "turn": 0,
+    "fireZap": 0,
+    "fire_1": 0,
+    "fire_2": 0,
+    "fire_3": 0,
+}
+BACKWARD = {
+    "move": 3,
+    "turn": 0,
+    "fireZap": 0,
+    "fire_1": 0,
+    "fire_2": 0,
+    "fire_3": 0,
+}
+STEP_LEFT = {
+    "move": 4,
+    "turn": 0,
+    "fireZap": 0,
+    "fire_1": 0,
+    "fire_2": 0,
+    "fire_3": 0,
+}
+TURN_LEFT = {
+    "move": 0,
+    "turn": -1,
+    "fireZap": 0,
+    "fire_1": 0,
+    "fire_2": 0,
+    "fire_3": 0,
+}
+TURN_RIGHT = {
+    "move": 0,
+    "turn": 1,
+    "fireZap": 0,
+    "fire_1": 0,
+    "fire_2": 0,
+    "fire_3": 0,
+}
+FIRE_ZAP = {
+    "move": 0,
+    "turn": 0,
+    "fireZap": 1,
+    "fire_1": 0,
+    "fire_2": 0,
+    "fire_3": 0,
+}
+FIRE_ONE = {
+    "move": 0,
+    "turn": 0,
+    "fireZap": 0,
+    "fire_1": 1,
+    "fire_2": 0,
+    "fire_3": 0,
+}
+FIRE_TWO = {
+    "move": 0,
+    "turn": 0,
+    "fireZap": 0,
+    "fire_1": 0,
+    "fire_2": 1,
+    "fire_3": 0,
+}
+FIRE_THREE = {
+    "move": 0,
+    "turn": 0,
+    "fireZap": 0,
+    "fire_1": 0,
+    "fire_2": 0,
+    "fire_3": 1,
+}
 # pyformat: enable
 # pylint: enable=bad-whitespace
 
@@ -636,7 +703,7 @@ def create_scene(num_players: int):
                   "stateConfigs": [{
                       "state": "scene",
                   }],
-              }
+              },
           },
           {
               "component": "Transform",
@@ -646,26 +713,28 @@ def create_scene(num_players: int):
               "kwargs": {
                   "numBerryTypes": NUM_BERRY_TYPES,
                   "numPlayers": num_players,
-              }
+              },
           },
           {
               "component": "GlobalZapTracker",
               "kwargs": {
                   "numBerryTypes": NUM_BERRY_TYPES,
                   "numPlayers": num_players,
-              }
+              },
           },
           {
               "component": "GlobalMetricHolder",
               "kwargs": {
                   "metrics": [
-                      {"type": "tensor.Int32Tensor",
-                       "shape": (num_players, num_players),
-                       "variable": "playerZapMatrix"},
+                      {
+                          "type": "tensor.Int32Tensor",
+                          "shape": (num_players, num_players),
+                          "variable": "playerZapMatrix",
+                      },
                   ]
-              }
+              },
           },
-      ]
+      ],
   }
   if _ENABLE_DEBUG_OBSERVATIONS:
     scene["components"].append({
@@ -764,7 +833,7 @@ def create_scene(num_players: int):
                     "variable": "playerZapMatrix",
                 },
             ]
-        }
+        },
     })
   return scene
 
@@ -783,21 +852,28 @@ def create_marking_overlay(player_idx: int) -> Dict[str, Any]:
                   "initialState": "avatarMarkingWait",
                   "stateConfigs": [
                       # Declare one state per level of the hit logic.
-                      {"state": "level_1",
-                       "layer": "superOverlay",
-                       "sprite": "sprite_for_level_1"},
-                      {"state": "level_2",
-                       "layer": "superOverlay",
-                       "sprite": "sprite_for_level_2"},
-                      {"state": "level_3",
-                       "layer": "superOverlay",
-                       "sprite": "sprite_for_level_3"},
-
+                      {
+                          "state": "level_1",
+                          "layer": "superOverlay",
+                          "sprite": "sprite_for_level_1",
+                      },
+                      {
+                          "state": "level_2",
+                          "layer": "superOverlay",
+                          "sprite": "sprite_for_level_2",
+                      },
+                      {
+                          "state": "level_3",
+                          "layer": "superOverlay",
+                          "sprite": "sprite_for_level_3",
+                      },
                       # Invisible inactive (zapped out) overlay type.
-                      {"state": "avatarMarkingWait",
-                       "groups": ["avatarMarkingWaits"]},
-                  ]
-              }
+                      {
+                          "state": "avatarMarkingWait",
+                          "groups": ["avatarMarkingWaits"],
+                      },
+                  ],
+              },
           },
           {
               "component": "Transform",
@@ -806,17 +882,23 @@ def create_marking_overlay(player_idx: int) -> Dict[str, Any]:
               "component": "Appearance",
               "kwargs": {
                   "renderMode": "ascii_shape",
-                  "spriteNames": ["sprite_for_level_1",
-                                  "sprite_for_level_2",
-                                  "sprite_for_level_3"],
-                  "spriteShapes": [MARKING_SPRITE,
-                                   MARKING_SPRITE,
-                                   MARKING_SPRITE],
-                  "palettes": [get_marking_palette(0.0),
-                               get_marking_palette(0.5),
-                               get_marking_palette(1.0)],
-                  "noRotates": [True] * 3
-              }
+                  "spriteNames": [
+                      "sprite_for_level_1",
+                      "sprite_for_level_2",
+                      "sprite_for_level_3",
+                  ],
+                  "spriteShapes": [
+                      MARKING_SPRITE,
+                      MARKING_SPRITE,
+                      MARKING_SPRITE,
+                  ],
+                  "palettes": [
+                      get_marking_palette(0.0),
+                      get_marking_palette(0.5),
+                      get_marking_palette(1.0),
+                  ],
+                  "noRotates": [True] * 3,
+              },
           },
           {
               "component": "GraduatedSanctionsMarking",
@@ -826,18 +908,22 @@ def create_marking_overlay(player_idx: int) -> Dict[str, Any]:
                   "hitName": "zapHit",
                   "recoveryTime": 50,
                   "hitLogic": [
-                      {"levelIncrement": 1,
-                       "sourceReward": 0,
-                       "targetReward": 0,
-                       "freeze": 25},
-                      {"levelIncrement": -1,
-                       "sourceReward": 0,
-                       "targetReward": -10,
-                       "remove": True}
+                      {
+                          "levelIncrement": 1,
+                          "sourceReward": 0,
+                          "targetReward": 0,
+                          "freeze": 25,
+                      },
+                      {
+                          "levelIncrement": -1,
+                          "sourceReward": 0,
+                          "targetReward": -10,
+                          "remove": True,
+                      },
                   ],
-              }
+              },
           },
-      ]
+      ],
   }
   return marking_object
 
@@ -860,37 +946,35 @@ def create_colored_avatar_overlay(player_idx: int) -> Dict[str, Any]:
                           "state": "avatarOverlay",
                           "layer": "overlay",
                           "sprite": "NewbornAvatar",
-                          "groups": ["avatarOverlays"]
+                          "groups": ["avatarOverlays"],
                       },
-
                       # Invisible inactive (zapped out) overlay type.
                       {
                           "state": "avatarOverlayWait",
-                          "groups": ["avatarOverlayWaits"]
+                          "groups": ["avatarOverlayWaits"],
                       },
-
                       # Colored overlay piece types for use after the player has
                       # colored a berry with a coloring beam.
                       {
                           "state": "coloredPlayer_1",
                           "layer": "overlay",
                           "sprite": "ColoredAvatar_1",
-                          "groups": ["avatarOverlays"]
+                          "groups": ["avatarOverlays"],
                       },
                       {
                           "state": "coloredPlayer_2",
                           "layer": "overlay",
                           "sprite": "ColoredAvatar_2",
-                          "groups": ["avatarOverlays"]
+                          "groups": ["avatarOverlays"],
                       },
                       {
                           "state": "coloredPlayer_3",
                           "layer": "overlay",
                           "sprite": "ColoredAvatar_3",
-                          "groups": ["avatarOverlays"]
+                          "groups": ["avatarOverlays"],
                       },
-                  ]
-              }
+                  ],
+              },
           },
           {
               "component": "Transform",
@@ -903,29 +987,27 @@ def create_colored_avatar_overlay(player_idx: int) -> Dict[str, Any]:
                       "ColoredAvatar_{}".format(i)
                       for i in range(1, NUM_BERRY_TYPES + 1)
                   ],
-                  "spriteShapes": [shapes.CUTE_AVATAR] *
-                                  (NUM_BERRY_TYPES + 1),
-                  "palettes":
-                      [shapes.get_palette((125, 125, 125))] +
-                      [shapes.get_palette(beam_color) for beam_color in COLORS],
-                  "noRotates": [True] * (NUM_BERRY_TYPES + 1)
-              }
+                  "spriteShapes": [shapes.CUTE_AVATAR] * (NUM_BERRY_TYPES + 1),
+                  "palettes": [shapes.get_palette((125, 125, 125))] + [
+                      shapes.get_palette(beam_color) for beam_color in COLORS
+                  ],
+                  "noRotates": [True] * (NUM_BERRY_TYPES + 1),
+              },
           },
           {
               "component": "AvatarConnector",
               "kwargs": {
                   "playerIndex": lua_idx,
                   "aliveState": "avatarOverlay",
-                  "waitState": "avatarOverlayWait"
-              }
+                  "waitState": "avatarOverlayWait",
+              },
           },
-      ]
+      ],
   }
   return overlay_object
 
 
-def create_avatar_and_associated_objects(
-    roles: Sequence[str]):
+def create_avatar_and_associated_objects(roles: Sequence[str]):
   """Returns list of avatar objects and associated other objects."""
   avatar_objects = []
   additional_objects = []
@@ -936,7 +1018,8 @@ def create_avatar_and_associated_objects(
       most_tasty_berry_idx = ROLE_TO_MOST_TASTY_BERRY_IDX[role]
 
     avatar_object = create_avatar_object(
-        player_idx=player_idx, most_tasty_berry_idx=most_tasty_berry_idx)
+        player_idx=player_idx, most_tasty_berry_idx=most_tasty_berry_idx
+    )
     avatar_objects.append(avatar_object)
 
     overlay_object = create_colored_avatar_overlay(player_idx)
@@ -975,10 +1058,12 @@ def get_config():
   })
 
   # The roles assigned to each player.
-  config.valid_roles = frozenset({"default",
-                                  "player_who_likes_red",
-                                  "player_who_likes_green",
-                                  "player_who_likes_blue",})
+  config.valid_roles = frozenset({
+      "default",
+      "player_who_likes_red",
+      "player_who_likes_green",
+      "player_who_likes_blue",
+  })
 
   return config
 

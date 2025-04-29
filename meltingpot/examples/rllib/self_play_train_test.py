@@ -29,6 +29,7 @@ class TrainingTests(absltest.TestCase):
         sgd_minibatch_size=20,
         fcnet_hiddens=(4,),
         post_fcnet_hiddens=(4,),
-        lstm_cell_size=2)
+        lstm_cell_size=2,
+    )
     results = self_play_train.train(config, num_iterations=1)
     self.assertEqual(results.num_errors, 0)

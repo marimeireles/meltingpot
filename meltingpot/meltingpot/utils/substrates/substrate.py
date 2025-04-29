@@ -41,6 +41,7 @@ class SubstrateObservables:
       (event_name, event_item).
     dmlab2d: Observables from the underlying dmlab2d environment.
   """
+
   action: reactivex.Observable[Sequence[int]]
   timestep: reactivex.Observable[dm_env.TimeStep]
   events: reactivex.Observable[tuple[str, Any]]
@@ -131,7 +132,8 @@ def build_substrate(
   env = multiplayer_wrapper.Wrapper(
       env,
       individual_observation_names=individual_observations,
-      global_observation_names=global_observations)
+      global_observation_names=global_observations,
+  )
   env = discrete_action_wrapper.Wrapper(env, action_table=action_table)
   # Add a wrapper that augments adds an observation of the collective
   # reward (sum of all players' rewards).

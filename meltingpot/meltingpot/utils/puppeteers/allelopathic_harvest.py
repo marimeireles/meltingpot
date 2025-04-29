@@ -30,6 +30,7 @@ class ConventionFollowerState:
     current_goal: the goal last used by the puppeteer.
     recent_frames: buffer of recent observation frames.
   """
+
   step_count: int
   current_goal: puppeteer.PuppetGoal
   recent_frames: tuple[np.ndarray, ...]
@@ -43,9 +44,10 @@ class ConventionFollower(puppeteer.Puppeteer[ConventionFollowerState]):
       initial_goal: puppeteer.PuppetGoal,
       preference_goals: Sequence[puppeteer.PuppetGoal],
       color_threshold: int,
-      recency_window: int = 5) -> None:
+      recency_window: int = 5,
+  ) -> None:
     """Initializes the puppeteer.
-    
+
     Args:
       initial_goal: the initial goal to pursue.
       preference_goals: sequence of goals corresponding to the R, G, B, goals
@@ -61,12 +63,11 @@ class ConventionFollower(puppeteer.Puppeteer[ConventionFollowerState]):
 
   def initial_state(self) -> ConventionFollowerState:
     return ConventionFollowerState(
-        step_count=0, current_goal=self._initial_goal, recent_frames=())
+        step_count=0, current_goal=self._initial_goal, recent_frames=()
+    )
 
   def step(
-      self,
-      timestep: dm_env.TimeStep,
-      prev_state: ConventionFollowerState
+      self, timestep: dm_env.TimeStep, prev_state: ConventionFollowerState
   ) -> tuple[dm_env.TimeStep, ConventionFollowerState]:
     """Puppeteer step.
 
@@ -83,9 +84,9 @@ class ConventionFollower(puppeteer.Puppeteer[ConventionFollowerState]):
     recent_frames = list(prev_state.recent_frames)
     current_goal = prev_state.current_goal
     if len(recent_frames) < self._recency_window:
-      recent_frames = tuple([timestep.observation['RGB']] + recent_frames)
+      recent_frames = tuple([timestep.observation["RGB"]] + recent_frames)
     else:
-      recent_frames = tuple([timestep.observation['RGB']] + recent_frames[:-1])
+      recent_frames = tuple([timestep.observation["RGB"]] + recent_frames[:-1])
 
     average_color = np.array(recent_frames).mean(axis=(0, 1, 2))
     index = np.argmax(average_color)
@@ -96,4 +97,6 @@ class ConventionFollower(puppeteer.Puppeteer[ConventionFollowerState]):
         ConventionFollowerState(
             step_count=prev_state.step_count + 1,
             current_goal=current_goal,
-            recent_frames=recent_frames))
+            recent_frames=recent_frames,
+        )
+    )

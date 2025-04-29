@@ -19,7 +19,7 @@ import dm_env
 from meltingpot.utils.puppeteers import puppeteer as puppeteer_lib
 
 GOAL_KEY = puppeteer_lib._GOAL_OBSERVATION_KEY  # pylint: disable=protected-access
-State = TypeVar('State')
+State = TypeVar("State")
 
 
 def step_many(
@@ -48,7 +48,8 @@ def goals_from_timesteps(
 
 
 def episode_timesteps(
-    observations: Sequence[Mapping[str, Any]]) -> Iterator[dm_env.TimeStep]:
+    observations: Sequence[Mapping[str, Any]],
+) -> Iterator[dm_env.TimeStep]:
   """Yields an episode timestep for each observation."""
   for n, observation in enumerate(observations):
     if n == 0:

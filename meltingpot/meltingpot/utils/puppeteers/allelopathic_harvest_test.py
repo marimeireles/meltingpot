@@ -26,7 +26,7 @@ _PREFER_G = mock.sentinel.pref_green
 _PREFER_B = mock.sentinel.pref_blue
 _PREFER = (_PREFER_R, _PREFER_G, _PREFER_B)
 
-_RGB_KEY = 'RGB'
+_RGB_KEY = "RGB"
 _NEUTRAL_COLOR = (((100, 100, 100),),)
 _HIGH_R = (((255, 55, 55),),)
 _HIGH_G = (((55, 255, 55),),)
@@ -98,5 +98,6 @@ class ConventionFollowerTest(parameterized.TestCase):
     actual, _ = _goals(puppeteer, [_NEUTRAL_COLOR] + [_HIGH_R] * recency)
     self.assertEqual(actual, expected)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
   absltest.main()

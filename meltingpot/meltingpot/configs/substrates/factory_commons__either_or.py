@@ -40,32 +40,58 @@ _______________________
 """
 
 blue_cube_live = {
-    "type": "all", "list": ["tiled_floor", "blue_cube_wait", "blue_cube_live"]}
-blue_cube_wait = {
-    "type": "all", "list": ["tiled_floor", "blue_cube_wait"]}
+    "type": "all",
+    "list": ["tiled_floor", "blue_cube_wait", "blue_cube_live"],
+}
+blue_cube_wait = {"type": "all", "list": ["tiled_floor", "blue_cube_wait"]}
 
 # `prefab` determines which prefab game object to use for each `char` in the
 # ascii map.
 CHAR_PREFAB_MAP = {
     " ": {"type": "all", "list": ["tiled_floor", "apple", "spawn_point"]},
     # Graspable objects.
-    "c": map_helpers.a_or_b_with_odds(blue_cube_wait,
-                                      blue_cube_live, odds=(1, 1)),
+    "c": map_helpers.a_or_b_with_odds(
+        blue_cube_wait, blue_cube_live, odds=(1, 1)
+    ),
     "C": blue_cube_live,  # This blue cube will always be present.
     # New dynamic components.
-    "l": {"type": "all", "list": ["tiled_floor", "hopper_body",
-                                  "hopper_indicator_blue_cube"]},
+    "l": {
+        "type": "all",
+        "list": ["tiled_floor", "hopper_body", "hopper_indicator_blue_cube"],
+    },
     "O": {"type": "all", "list": ["tiled_floor", "hopper_mouth"]},
-    "D": {"type": "all", "list": ["tiled_floor", "dispenser_body",
-                                  "dispenser_indicator_apple"]},
-    "t": {"type": "all", "list": ["tiled_floor", "dispenser_body",
-                                  "dispenser_indicator_two_apples"]},
-    "s": {"type": "all", "list": ["tiled_floor", "dispenser_body",
-                                  "dispenser_indicator_cube_apple"]},
-    "#": {"type": "all", "list": ["tiled_floor", "dispenser_belt",
-                                  "apple_dispensing_animation"]},
-    "j": {"type": "all", "list": ["tiled_floor", "dispenser_belt",
-                                  "cube_apple_dispensing_animation"]},
+    "D": {
+        "type": "all",
+        "list": ["tiled_floor", "dispenser_body", "dispenser_indicator_apple"],
+    },
+    "t": {
+        "type": "all",
+        "list": [
+            "tiled_floor",
+            "dispenser_body",
+            "dispenser_indicator_two_apples",
+        ],
+    },
+    "s": {
+        "type": "all",
+        "list": [
+            "tiled_floor",
+            "dispenser_body",
+            "dispenser_indicator_cube_apple",
+        ],
+    },
+    "#": {
+        "type": "all",
+        "list": ["tiled_floor", "dispenser_belt", "apple_dispensing_animation"],
+    },
+    "j": {
+        "type": "all",
+        "list": [
+            "tiled_floor",
+            "dispenser_belt",
+            "cube_apple_dispensing_animation",
+        ],
+    },
     "z": {"type": "all", "list": ["tiled_floor", "floor_marking_top"]},
     "x": {"type": "all", "list": ["tiled_floor", "floor_marking_bottom"]},
     # Static components.

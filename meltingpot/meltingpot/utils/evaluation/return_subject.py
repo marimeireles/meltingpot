@@ -32,7 +32,7 @@ class ReturnSubject(subject.Subject):
     if timestep.step_type.first():
       self._return = np.zeros_like(timestep.reward)
     elif self._return is None:
-      raise ValueError('First timestep must be StepType.FIRST.')
+      raise ValueError("First timestep must be StepType.FIRST.")
     self._return += timestep.reward
     if timestep.step_type.last():
       super().on_next(self._return)

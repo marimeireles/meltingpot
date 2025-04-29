@@ -27,12 +27,12 @@ SPAWN_POINT = {
                     "state": "spawnPoint",
                     "groups": ["spawnPoints"],
                 }],
-            }
+            },
         },
         {
             "component": "Transform",
         },
-    ]
+    ],
 }
 
 AVATAR = {
@@ -43,12 +43,14 @@ AVATAR = {
             "kwargs": {
                 "initialState": "player",
                 "stateConfigs": [
-                    {"state": "player",
-                     "layer": "upperPhysical",
-                     "contact": "avatar",
-                     "sprite": "Avatar",},
-                ]
-            }
+                    {
+                        "state": "player",
+                        "layer": "upperPhysical",
+                        "contact": "avatar",
+                        "sprite": "Avatar",
+                    },
+                ],
+            },
         },
         {
             "component": "Transform",
@@ -61,7 +63,7 @@ AVATAR = {
                 "spriteShapes": [shapes.CUTE_AVATAR],
                 "palettes": [{}],  # Will be overridden
                 "noRotates": [True],
-            }
+            },
         },
         {
             "component": "Avatar",
@@ -75,10 +77,10 @@ AVATAR = {
                     "forward": 5,
                     "backward": 1,
                     "centered": False,
-                }
-            }
+                },
+            },
         },
-    ]
+    ],
 }
 
 
@@ -94,7 +96,7 @@ WALL = {
                     "layer": "upperPhysical",
                     "sprite": "Wall",
                 }],
-            }
+            },
         },
         {
             "component": "Transform",
@@ -103,25 +105,17 @@ WALL = {
             "component": "Appearance",
             "kwargs": {
                 "renderMode": "ascii_shape",
-                "spriteNames": ["Wall",],
+                "spriteNames": [
+                    "Wall",
+                ],
                 "spriteShapes": [shapes.WALL],
                 "palettes": [shapes.WALL_PALETTE],
                 "noRotates": [True],
-            }
+            },
         },
-        {
-            "component": "BeamBlocker",
-            "kwargs": {
-                "beamType": "gift"
-            }
-        },
-        {
-            "component": "BeamBlocker",
-            "kwargs": {
-                "beamType": "zap"
-            }
-        },
-    ]
+        {"component": "BeamBlocker", "kwargs": {"beamType": "gift"}},
+        {"component": "BeamBlocker", "kwargs": {"beamType": "zap"}},
+    ],
 }
 
 APPLE = {
@@ -131,14 +125,17 @@ APPLE = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "apple",
-                "stateConfigs": [{
-                    "state": "apple",
-                    "layer": "lowerPhysical",
-                    "sprite": "Apple",
-                }, {
-                    "state": "appleWait",
-                }],
-            }
+                "stateConfigs": [
+                    {
+                        "state": "apple",
+                        "layer": "lowerPhysical",
+                        "sprite": "Apple",
+                    },
+                    {
+                        "state": "appleWait",
+                    },
+                ],
+            },
         },
         {
             "component": "Transform",
@@ -147,11 +144,13 @@ APPLE = {
             "component": "Appearance",
             "kwargs": {
                 "renderMode": "ascii_shape",
-                "spriteNames": ["Apple",],
+                "spriteNames": [
+                    "Apple",
+                ],
                 "spriteShapes": [shapes.LEGACY_APPLE],
                 "palettes": [shapes.GREEN_COIN_PALETTE],
                 "noRotates": [True],
-            }
+            },
         },
         {
             "component": "Edible",
@@ -159,7 +158,7 @@ APPLE = {
                 "liveState": "apple",
                 "waitState": "appleWait",
                 "rewardForEating": 1.0,
-            }
+            },
         },
         {
             "component": "DensityRegrow",
@@ -167,9 +166,9 @@ APPLE = {
                 "liveState": "apple",
                 "waitState": "appleWait",
                 "baseRate": 0.01,
-            }
+            },
         },
-    ]
+    ],
 }
 
 
@@ -197,16 +196,11 @@ def get_config():
 
   # Lua script configuration.
   config.lab2d_settings = {
-      "levelName":
-          "harvest_finished",
-      "levelDirectory":
-          "examples/tutorial/harvest/levels",
-      "maxEpisodeLengthFrames":
-          1000,
-      "numPlayers":
-          5,
-      "spriteSize":
-          8,
+      "levelName": "harvest_finished",
+      "levelDirectory": "examples/tutorial/harvest/levels",
+      "maxEpisodeLengthFrames": 1000,
+      "numPlayers": 5,
+      "spriteSize": 8,
       "simulation": {
           "map": ascii_map,
           "prefabs": {
@@ -215,11 +209,7 @@ def get_config():
               "wall": WALL,
               "apple": APPLE,
           },
-          "charPrefabMap": {
-              "_": "spawn_point",
-              "*": "wall",
-              "A": "apple"
-          },
+          "charPrefabMap": {"_": "spawn_point", "*": "wall", "A": "apple"},
           "playerPalettes": [],
       },
   }

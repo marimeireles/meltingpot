@@ -92,4 +92,5 @@ class SubstrateFactory:
         lab2d_settings=self._lab2d_settings_builder(roles),
         individual_observations=self._individual_observations,
         global_observations=self._global_observations,
-        action_table=self._action_table)
+        action_table=self._action_table,
+    )

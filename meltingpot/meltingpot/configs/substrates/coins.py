@@ -34,16 +34,17 @@ _ENABLE_DEBUG_OBSERVATIONS = False
 MANDATED_NUM_PLAYERS = 2
 
 COIN_PALETTES = {
-    "coin_red": shapes.get_palette((238, 102, 119)),    # Red.
-    "coin_blue": shapes.get_palette((68, 119, 170)),    # Blue.
+    "coin_red": shapes.get_palette((238, 102, 119)),  # Red.
+    "coin_blue": shapes.get_palette((68, 119, 170)),  # Blue.
     "coin_yellow": shapes.get_palette((204, 187, 68)),  # Yellow.
-    "coin_green": shapes.get_palette((34, 136, 51)),    # Green.
-    "coin_purple": shapes.get_palette((170, 51, 119))   # Purple.
+    "coin_green": shapes.get_palette((34, 136, 51)),  # Green.
+    "coin_purple": shapes.get_palette((170, 51, 119)),  # Purple.
 }
 
 
 def get_ascii_map(
-    min_width: int, max_width: int, min_height: int, max_height: int) -> str:
+    min_width: int, max_width: int, min_height: int, max_height: int
+) -> str:
   """Procedurally generate ASCII map."""
   assert min_width <= max_width
   assert min_height <= max_height
@@ -82,6 +83,7 @@ def get_ascii_map(
 
   return ascii_map
 
+
 # `prefab` determines which prefab game object to use for each `char` in the
 # ascii map.
 CHAR_PREFAB_MAP = {
@@ -106,7 +108,7 @@ SCENE = {
                 "stateConfigs": [{
                     "state": "scene",
                 }],
-            }
+            },
         },
         {
             "component": "Transform",
@@ -122,10 +124,10 @@ SCENE = {
             "kwargs": {
                 "minimumFramesPerEpisode": 300,
                 "intervalLength": 100,  # Set equal to unroll length.
-                "probabilityTerminationPerInterval": 0.05
-            }
-        }
-    ]
+                "probabilityTerminationPerInterval": 0.05,
+            },
+        },
+    ],
 }
 if _ENABLE_DEBUG_OBSERVATIONS:
   SCENE["components"].append({
@@ -156,35 +158,31 @@ WALL = {
                     "layer": "upperPhysical",
                     "sprite": "Wall",
                 }],
-            }
+            },
         },
-        {"component": "Transform",},
+        {
+            "component": "Transform",
+        },
         {
             "component": "Appearance",
             "kwargs": {
                 "renderMode": "ascii_shape",
-                "spriteNames": ["Wall",],
+                "spriteNames": [
+                    "Wall",
+                ],
                 "spriteShapes": [shapes.WALL],
-                "palettes": [{"*": (95, 95, 95, 255),
-                              "&": (100, 100, 100, 255),
-                              "@": (109, 109, 109, 255),
-                              "#": (152, 152, 152, 255)}],
-                "noRotates": [True]
-            }
+                "palettes": [{
+                    "*": (95, 95, 95, 255),
+                    "&": (100, 100, 100, 255),
+                    "@": (109, 109, 109, 255),
+                    "#": (152, 152, 152, 255),
+                }],
+                "noRotates": [True],
+            },
         },
-        {
-            "component": "BeamBlocker",
-            "kwargs": {
-                "beamType": "gift"
-            }
-        },
-        {
-            "component": "BeamBlocker",
-            "kwargs": {
-                "beamType": "zap"
-            }
-        },
-    ]
+        {"component": "BeamBlocker", "kwargs": {"beamType": "gift"}},
+        {"component": "BeamBlocker", "kwargs": {"beamType": "zap"}},
+    ],
 }
 
 SPAWN_POINT = {
@@ -197,12 +195,14 @@ SPAWN_POINT = {
                 "stateConfigs": [{
                     "state": "spawnPoint",
                     "layer": "logic",
-                    "groups": ["spawnPoints"]
+                    "groups": ["spawnPoints"],
                 }],
-            }
+            },
         },
-        {"component": "Transform",},
-    ]
+        {
+            "component": "Transform",
+        },
+    ],
 }
 
 
@@ -214,7 +214,7 @@ def get_coin(
     reward_self_for_mismatch: float,
     reward_other_for_match: float,
     reward_other_for_mismatch: float,
-    ) -> PrefabConfig:
+) -> PrefabConfig:
   """Create `PrefabConfig` for coin component."""
   return {
       "name": "coin",
@@ -224,31 +224,38 @@ def get_coin(
               "kwargs": {
                   "initialState": "coinWait",
                   "stateConfigs": [
-                      {"state": coin_type_a,
-                       "layer": "superOverlay",
-                       "sprite": coin_type_a,
+                      {
+                          "state": coin_type_a,
+                          "layer": "superOverlay",
+                          "sprite": coin_type_a,
                       },
-                      {"state": coin_type_b,
-                       "layer": "superOverlay",
-                       "sprite": coin_type_b,
+                      {
+                          "state": coin_type_b,
+                          "layer": "superOverlay",
+                          "sprite": coin_type_b,
                       },
-                      {"state": "coinWait",
-                       "layer": "logic",
+                      {
+                          "state": "coinWait",
+                          "layer": "logic",
                       },
-                  ]
-              }
+                  ],
+              },
           },
-          {"component": "Transform",},
+          {
+              "component": "Transform",
+          },
           {
               "component": "Appearance",
               "kwargs": {
                   "renderMode": "ascii_shape",
                   "spriteNames": [coin_type_a, coin_type_b],
                   "spriteShapes": [shapes.COIN] * 2,
-                  "palettes": [COIN_PALETTES[coin_type_a],
-                               COIN_PALETTES[coin_type_b]],
+                  "palettes": [
+                      COIN_PALETTES[coin_type_a],
+                      COIN_PALETTES[coin_type_b],
+                  ],
                   "noRotates": [False] * 2,
-              }
+              },
           },
           {
               "component": "Coin",
@@ -258,7 +265,7 @@ def get_coin(
                   "rewardSelfForMismatch": reward_self_for_mismatch,
                   "rewardOtherForMatch": reward_other_for_match,
                   "rewardOtherForMismatch": reward_other_for_mismatch,
-              }
+              },
           },
           {
               "component": "ChoiceCoinRegrow",
@@ -267,9 +274,9 @@ def get_coin(
                   "liveStateB": coin_type_b,
                   "waitState": "coinWait",
                   "regrowRate": regrow_rate,
-              }
+              },
           },
-      ]
+      ],
   }
 
 
@@ -283,18 +290,20 @@ def get_avatar(coin_type: str):
               "kwargs": {
                   "initialState": "player",
                   "stateConfigs": [
-                      {"state": "player",
-                       "layer": "upperPhysical",
-                       "sprite": "Avatar",
-                       "contact": "avatar",
-                       "groups": ["players"]},
-
-                      {"state": "playerWait",
-                       "groups": ["playerWaits"]},
-                  ]
-              }
+                      {
+                          "state": "player",
+                          "layer": "upperPhysical",
+                          "sprite": "Avatar",
+                          "contact": "avatar",
+                          "groups": ["players"],
+                      },
+                      {"state": "playerWait", "groups": ["playerWaits"]},
+                  ],
+              },
           },
-          {"component": "Transform",},
+          {
+              "component": "Transform",
+          },
           {
               "component": "Appearance",
               "kwargs": {
@@ -303,8 +312,8 @@ def get_avatar(coin_type: str):
                   "spriteShapes": [shapes.CUTE_AVATAR],
                   # Palette to be overwritten.
                   "palettes": [shapes.get_palette(colors.palette[0])],
-                  "noRotates": [True]
-              }
+                  "noRotates": [True],
+              },
           },
           {
               "component": "Avatar",
@@ -313,7 +322,10 @@ def get_avatar(coin_type: str):
                   "aliveState": "player",
                   "waitState": "playerWait",
                   "spawnGroup": "spawnPoints",
-                  "actionOrder": ["move", "turn",],
+                  "actionOrder": [
+                      "move",
+                      "turn",
+                  ],
                   "actionSpec": {
                       "move": {"default": 0, "min": 0, "max": len(_COMPASS)},
                       "turn": {"default": 0, "min": -1, "max": 1},
@@ -323,9 +335,9 @@ def get_avatar(coin_type: str):
                       "right": 5,
                       "forward": 9,
                       "backward": 1,
-                      "centered": False
+                      "centered": False,
                   },
-              }
+              },
           },
           {
               "component": "PlayerCoinType",
@@ -343,11 +355,8 @@ def get_avatar(coin_type: str):
                   "multiplyRewardOtherForMismatch": 1.0,
               },
           },
-          {
-              "component": "PartnerTracker",
-              "kwargs": {}
-          },
-      ]
+          {"component": "PartnerTracker", "kwargs": {}},
+      ],
   }
   # Signals needed for puppeteers.
   metrics = [
@@ -388,10 +397,9 @@ def get_avatar(coin_type: str):
     })
 
   # Add the metrics reporter.
-  avatar_object["components"].append({
-      "component": "AvatarMetricReporter",
-      "kwargs": {"metrics": metrics}
-  })
+  avatar_object["components"].append(
+      {"component": "AvatarMetricReporter", "kwargs": {"metrics": metrics}}
+  )
 
   return avatar_object
 
@@ -408,13 +416,15 @@ def get_prefabs(
     reward_other_for_mismatch: float = -2.0,
 ) -> PrefabConfig:
   """Make `prefabs` (a dictionary mapping names to template game objects)."""
-  coin = get_coin(coin_type_a=coin_type_a,
-                  coin_type_b=coin_type_b,
-                  regrow_rate=regrow_rate,
-                  reward_self_for_match=reward_self_for_match,
-                  reward_self_for_mismatch=reward_self_for_mismatch,
-                  reward_other_for_match=reward_other_for_match,
-                  reward_other_for_mismatch=reward_other_for_mismatch)
+  coin = get_coin(
+      coin_type_a=coin_type_a,
+      coin_type_b=coin_type_b,
+      regrow_rate=regrow_rate,
+      reward_self_for_match=reward_self_for_match,
+      reward_self_for_mismatch=reward_self_for_mismatch,
+      reward_other_for_match=reward_other_for_match,
+      reward_other_for_mismatch=reward_other_for_mismatch,
+  )
   return {"wall": WALL, "spawn_point": SPAWN_POINT, "coin": coin}
 
 
@@ -423,19 +433,42 @@ def get_prefabs(
 # These correspond to the persistent agent colors, but are meaningless for the
 # human player. They will be overridden by the environment_builder.
 def get_player_color_palettes(
-    coin_type_a: str, coin_type_b: str) -> Sequence[Mapping[str, shapes.Color]]:
+    coin_type_a: str, coin_type_b: str
+) -> Sequence[Mapping[str, shapes.Color]]:
   return [COIN_PALETTES[coin_type_a], COIN_PALETTES[coin_type_b]]
+
 
 # Primitive action components.
 # pylint: disable=bad-whitespace
 # pyformat: disable
-NOOP       = {"move": 0, "turn":  0,}
-FORWARD    = {"move": 1, "turn":  0,}
-STEP_RIGHT = {"move": 2, "turn":  0,}
-BACKWARD   = {"move": 3, "turn":  0,}
-STEP_LEFT  = {"move": 4, "turn":  0,}
-TURN_LEFT  = {"move": 0, "turn": -1,}
-TURN_RIGHT = {"move": 0, "turn":  1,}
+NOOP = {
+    "move": 0,
+    "turn": 0,
+}
+FORWARD = {
+    "move": 1,
+    "turn": 0,
+}
+STEP_RIGHT = {
+    "move": 2,
+    "turn": 0,
+}
+BACKWARD = {
+    "move": 3,
+    "turn": 0,
+}
+STEP_LEFT = {
+    "move": 4,
+    "turn": 0,
+}
+TURN_LEFT = {
+    "move": 0,
+    "turn": -1,
+}
+TURN_RIGHT = {
+    "move": 0,
+    "turn": 1,
+}
 # pyformat: enable
 # pylint: enable=bad-whitespace
 
@@ -469,9 +502,7 @@ def get_config():
       # Global switching signals for puppeteers.
       "MISMATCHED_COIN_COLLECTED_BY_PARTNER",
   ]
-  config.global_observation_names = [
-      "WORLD.RGB"
-  ]
+  config.global_observation_names = ["WORLD.RGB"]
 
   # The specs of the environment (from a single-agent perspective).
   config.action_spec = specs.action(len(ACTION_SET))
@@ -502,11 +533,14 @@ def build(
   # Manually build avatar config.
   num_players = len(roles)
   player_color_palettes = get_player_color_palettes(
-      coin_type_a=coin_type_a, coin_type_b=coin_type_b)
+      coin_type_a=coin_type_a, coin_type_b=coin_type_b
+  )
   avatar_objects = game_object_utils.build_avatar_objects(
-      num_players, {"avatar": get_avatar(coin_type_a)}, player_color_palettes)  # pytype: disable=wrong-arg-types  # allow-recursive-types
+      num_players, {"avatar": get_avatar(coin_type_a)}, player_color_palettes
+  )  # pytype: disable=wrong-arg-types  # allow-recursive-types
   game_object_utils.get_first_named_component(
-      avatar_objects[1], "PlayerCoinType")["kwargs"]["coinType"] = coin_type_b
+      avatar_objects[1], "PlayerCoinType"
+  )["kwargs"]["coinType"] = coin_type_b
 
   # Build the substrate definition.
   substrate_definition = dict(
@@ -518,15 +552,18 @@ def build(
       spriteSize=8,
       topology="BOUNDED",  # Choose from ["BOUNDED", "TORUS"],
       simulation={
-          "map": get_ascii_map(min_width=config.min_width,
-                               max_width=config.max_width,
-                               min_height=config.min_height,
-                               max_height=config.max_height),
+          "map": get_ascii_map(
+              min_width=config.min_width,
+              max_width=config.max_width,
+              min_height=config.min_height,
+              max_height=config.max_height,
+          ),
           "scene": SCENE,
-          "prefabs": get_prefabs(coin_type_a=coin_type_a,
-                                 coin_type_b=coin_type_b),
+          "prefabs": get_prefabs(
+              coin_type_a=coin_type_a, coin_type_b=coin_type_b
+          ),
           "charPrefabMap": CHAR_PREFAB_MAP,
           "gameObjects": avatar_objects,
-      }
+      },
   )
   return substrate_definition

@@ -70,14 +70,17 @@ CHAR_PREFAB_MAP = {
     "P": {"type": "all", "list": ["spawn_point_red", "ground"]},
     "Q": {"type": "all", "list": ["spawn_point_blue", "ground"]},
     "W": "wall",
-    "D": {"type": "choice",
-          "list": ["destroyable_wall"] * 9 + ["destroyed_wall"]},
-    "H": {"type": "choice",
-          "list": ["destroyable_wall"] * 3 + ["destroyed_wall"]},
+    "D": {
+        "type": "choice",
+        "list": ["destroyable_wall"] * 9 + ["destroyed_wall"],
+    },
+    "H": {
+        "type": "choice",
+        "list": ["destroyable_wall"] * 3 + ["destroyed_wall"],
+    },
     "G": "hill",
     ",": "ground",
     "I": {"type": "all", "list": ["indicator", "indicator_frame"]},
-
     # Lines marking the edge of the hill.
     "u": {"type": "all", "list": ["ground", "line_north"]},
     "r": {"type": "all", "list": ["ground", "line_west"]},
@@ -121,13 +124,15 @@ LINE_WEST = shapes.flip_horizontal(LINE_EAST)
 
 def multiply_tuple(color_tuple, factor):
   alpha = color_tuple[3]
-  return tuple([int(np.min([x * factor, alpha])) for x in color_tuple[0: 3]])
+  return tuple([int(np.min([x * factor, alpha])) for x in color_tuple[0:3]])
+
 
 TEAMS_DATA = {
-    "red": {"color": RED_COLOR,
-            "spawn_group": "{}SpawnPoints".format("red")},
-    "blue": {"color": BLUE_COLOR,
-             "spawn_group": "{}SpawnPoints".format("blue")},
+    "red": {"color": RED_COLOR, "spawn_group": "{}SpawnPoints".format("red")},
+    "blue": {
+        "color": BLUE_COLOR,
+        "spawn_group": "{}SpawnPoints".format("blue"),
+    },
 }
 
 WALL = {
@@ -142,27 +147,30 @@ WALL = {
                     "layer": "upperPhysical",
                     "sprite": "Wall",
                 }],
-            }
+            },
         },
-        {"component": "Transform",},
+        {
+            "component": "Transform",
+        },
         {
             "component": "Appearance",
             "kwargs": {
                 "renderMode": "ascii_shape",
-                "spriteNames": ["Wall",],
+                "spriteNames": [
+                    "Wall",
+                ],
                 "spriteShapes": [shapes.WALL],
-                "palettes": [{"*": (95, 95, 95, 255),
-                              "&": (100, 100, 100, 255),
-                              "@": (109, 109, 109, 255),
-                              "#": (152, 152, 152, 255)}],
-                "noRotates": [True]
-            }
+                "palettes": [{
+                    "*": (95, 95, 95, 255),
+                    "&": (100, 100, 100, 255),
+                    "@": (109, 109, 109, 255),
+                    "#": (152, 152, 152, 255),
+                }],
+                "noRotates": [True],
+            },
         },
-        {
-            "component": "AllBeamBlocker",
-            "kwargs": {}
-        },
-    ]
+        {"component": "AllBeamBlocker", "kwargs": {}},
+    ],
 }
 
 
@@ -192,7 +200,7 @@ def get_marking_line(orientation: str):
                       "layer": "lowerPhysical",
                       "sprite": line_name,
                   }],
-              }
+              },
           },
           {
               "component": "Transform",
@@ -201,14 +209,15 @@ def get_marking_line(orientation: str):
               "component": "Appearance",
               "kwargs": {
                   "renderMode": "ascii_shape",
-                  "spriteNames": [line_name,],
+                  "spriteNames": [
+                      line_name,
+                  ],
                   "spriteShapes": [shape],
-                  "palettes": [{"x": (0, 0, 0, 0),
-                                "o": (75, 75, 75, 120)}],
-                  "noRotates": [False]
-              }
+                  "palettes": [{"x": (0, 0, 0, 0), "o": (75, 75, 75, 120)}],
+                  "noRotates": [False],
+              },
           },
-      ]
+      ],
   }
   return prefab
 
@@ -220,27 +229,31 @@ INDICATOR_FRAME = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "inert",
-                "stateConfigs": [
-                    {"state": "inert",
-                     "layer": "superOverlay",
-                     "sprite": "InertFrame"}
-                ]
-            }
+                "stateConfigs": [{
+                    "state": "inert",
+                    "layer": "superOverlay",
+                    "sprite": "InertFrame",
+                }],
+            },
         },
-        {"component": "Transform",},
+        {
+            "component": "Transform",
+        },
         {
             "component": "Appearance",
             "kwargs": {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["InertFrame"],
                 "spriteShapes": [shapes.BUTTON],
-                "palettes": [{"*": (0, 0, 0, 0),
-                              "x": (55, 55, 55, 255),
-                              "#": (0, 0, 0, 0)}],
-                "noRotates": [True]
-            }
+                "palettes": [{
+                    "*": (0, 0, 0, 0),
+                    "x": (55, 55, 55, 255),
+                    "#": (0, 0, 0, 0),
+                }],
+                "noRotates": [True],
+            },
         },
-    ]
+    ],
 }
 
 
@@ -266,24 +279,32 @@ INDICATOR = {
                         "state": "blue",
                         "layer": "background",
                         "sprite": "BlueIndicator",
-                    }
-                ]
-            }
+                    },
+                ],
+            },
         },
-        {"component": "Transform",},
+        {
+            "component": "Transform",
+        },
         {
             "component": "Appearance",
             "kwargs": {
-                "spriteNames": ["UncontrolledIndicator",
-                                "RedIndicator",
-                                "BlueIndicator"],
-                "spriteRGBColors": [PURPLE_COLOR,
-                                    DARKER_RED_COLOR,
-                                    DARKER_BLUE_COLOR]
-            }
+                "spriteNames": [
+                    "UncontrolledIndicator",
+                    "RedIndicator",
+                    "BlueIndicator",
+                ],
+                "spriteRGBColors": [
+                    PURPLE_COLOR,
+                    DARKER_RED_COLOR,
+                    DARKER_BLUE_COLOR,
+                ],
+            },
         },
-        {"component": "ControlIndicator",},
-    ]
+        {
+            "component": "ControlIndicator",
+        },
+    ],
 }
 
 
@@ -293,13 +314,21 @@ def create_ground_prefab(is_hill=False):
     sprite_names = ["RedHill", "BlueHill"]
     sprite_colors = [DARKER_RED_COLOR, DARKER_BLUE_COLOR]
     groups = ["grounds", "hills"]
-    clean_groups = ["hill_clean",]
-    red_groups = ["hill_red",]
-    blue_groups = ["hill_blue",]
+    clean_groups = [
+        "hill_clean",
+    ]
+    red_groups = [
+        "hill_red",
+    ]
+    blue_groups = [
+        "hill_blue",
+    ]
   else:
     sprite_names = ["RedGround", "BlueGround"]
     sprite_colors = [DARKEST_RED_COLOR, DARKEST_BLUE_COLOR]
-    groups = ["grounds",]
+    groups = [
+        "grounds",
+    ]
     clean_groups = []
     red_groups = []
     blue_groups = []
@@ -329,16 +358,18 @@ def create_ground_prefab(is_hill=False):
                           "sprite": sprite_names[1],
                           "groups": groups + blue_groups,
                       },
-                  ]
-              }
+                  ],
+              },
           },
-          {"component": "Transform",},
+          {
+              "component": "Transform",
+          },
           {
               "component": "Appearance",
               "kwargs": {
                   "spriteNames": sprite_names,
-                  "spriteRGBColors": sprite_colors
-              }
+                  "spriteRGBColors": sprite_colors,
+              },
           },
           {
               "component": "GroundOrHill",
@@ -348,9 +379,9 @@ def create_ground_prefab(is_hill=False):
                   "name": "Ground",
                   "teamNames": ["red", "blue"],
                   "isHill": is_hill,
-              }
+              },
           },
-      ]
+      ],
   }
   return prefab
 
@@ -385,41 +416,49 @@ def create_destroyable_wall_prefab(initial_state):
                           "sprite": "Rubble",
                       },
                   ],
-              }
+              },
           },
-          {"component": "Transform",},
+          {
+              "component": "Transform",
+          },
           {
               "component": "Appearance",
               "kwargs": {
                   "renderMode": "ascii_shape",
-                  "spriteNames": ["DestroyableWall",
-                                  "DamagedWall",
-                                  "Rubble"],
-                  "spriteShapes": [shapes.WALL,
-                                   shapes.WALL,
-                                   shapes.WALL],
-                  "palettes": [{"*": (55, 55, 55, 255),
-                                "&": (100, 100, 100, 255),
-                                "@": (109, 109, 109, 255),
-                                "#": (152, 152, 152, 255)},
-                               {"*": (55, 55, 55, 255),
-                                "&": (100, 100, 100, 255),
-                                "@": (79, 79, 79, 255),
-                                "#": (152, 152, 152, 255)},
-                               {"*": (0, 0, 0, 255),
-                                "&": (0, 0, 0, 255),
-                                "@": (29, 29, 29, 255),
-                                "#": (0, 0, 0, 255)}],
-                  "noRotates": [True] * 3
-              }
+                  "spriteNames": ["DestroyableWall", "DamagedWall", "Rubble"],
+                  "spriteShapes": [shapes.WALL, shapes.WALL, shapes.WALL],
+                  "palettes": [
+                      {
+                          "*": (55, 55, 55, 255),
+                          "&": (100, 100, 100, 255),
+                          "@": (109, 109, 109, 255),
+                          "#": (152, 152, 152, 255),
+                      },
+                      {
+                          "*": (55, 55, 55, 255),
+                          "&": (100, 100, 100, 255),
+                          "@": (79, 79, 79, 255),
+                          "#": (152, 152, 152, 255),
+                      },
+                      {
+                          "*": (0, 0, 0, 255),
+                          "&": (0, 0, 0, 255),
+                          "@": (29, 29, 29, 255),
+                          "#": (0, 0, 0, 255),
+                      },
+                  ],
+                  "noRotates": [True] * 3,
+              },
           },
           {
               "component": "Destroyable",
-              "kwargs": {"hitNames": ["red", "blue"],
-                         "initialHealth": initial_health,
-                         "damagedHealthLevel": 2}
-          }
-      ]
+              "kwargs": {
+                  "hitNames": ["red", "blue"],
+                  "initialHealth": initial_health,
+                  "damagedHealthLevel": 2,
+              },
+          },
+      ],
   }
   return prefab
 
@@ -438,18 +477,20 @@ def create_spawn_point_prefab(team):
                       "layer": "logic",
                       "groups": [TEAMS_DATA[team]["spawn_group"]],
                   }],
-              }
+              },
           },
-          {"component": "Transform",},
+          {
+              "component": "Transform",
+          },
           {
               "component": "Appearance",
               "kwargs": {
                   "renderMode": "invisible",
                   "spriteNames": [],
-                  "spriteRGBColors": []
-              }
+                  "spriteRGBColors": [],
+              },
           },
-      ]
+      ],
   }
   return prefab
 
@@ -475,15 +516,15 @@ PREFABS = {
 # Primitive action components.
 # pylint: disable=bad-whitespace
 # pyformat: disable
-NOOP       = {"move": 0, "turn":  0, "fireZap": 0}
-FORWARD    = {"move": 1, "turn":  0, "fireZap": 0}
-STEP_RIGHT = {"move": 2, "turn":  0, "fireZap": 0}
-BACKWARD   = {"move": 3, "turn":  0, "fireZap": 0}
-STEP_LEFT  = {"move": 4, "turn":  0, "fireZap": 0}
-TURN_LEFT  = {"move": 0, "turn": -1, "fireZap": 0}
-TURN_RIGHT = {"move": 0, "turn":  1, "fireZap": 0}
-FIRE_ZAP_A = {"move": 0, "turn":  0, "fireZap": 1}
-FIRE_ZAP_B = {"move": 0, "turn":  0, "fireZap": 2}
+NOOP = {"move": 0, "turn": 0, "fireZap": 0}
+FORWARD = {"move": 1, "turn": 0, "fireZap": 0}
+STEP_RIGHT = {"move": 2, "turn": 0, "fireZap": 0}
+BACKWARD = {"move": 3, "turn": 0, "fireZap": 0}
+STEP_LEFT = {"move": 4, "turn": 0, "fireZap": 0}
+TURN_LEFT = {"move": 0, "turn": -1, "fireZap": 0}
+TURN_RIGHT = {"move": 0, "turn": 1, "fireZap": 0}
+FIRE_ZAP_A = {"move": 0, "turn": 0, "fireZap": 1}
+FIRE_ZAP_B = {"move": 0, "turn": 0, "fireZap": 2}
 # pyformat: enable
 # pylint: enable=bad-whitespace
 
@@ -513,17 +554,19 @@ def create_scene():
                   "stateConfigs": [{
                       "state": "scene",
                   }],
-              }
+              },
           },
-          {"component": "Transform",},
+          {
+              "component": "Transform",
+          },
           {
               "component": "HillManager",
               "kwargs": {
                   "percentToCapture": 80,
                   "rewardPerStepInControl": 1.0,
-              }
-          }
-      ]
+              },
+          },
+      ],
   }
   return scene
 
@@ -531,7 +574,8 @@ def create_scene():
 def create_avatar_object(
     player_idx: int,
     team: str,
-    override_taste_kwargs: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    override_taste_kwargs: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
   """Create an avatar object."""
   # Lua is 1-indexed.
   lua_index = player_idx + 1
@@ -565,44 +609,56 @@ def create_avatar_object(
               "kwargs": {
                   "initialState": "health2",
                   "stateConfigs": [
-                      {"state": "health1",
-                       "layer": "upperPhysical",
-                       "sprite": health1_avatar_sprite_name,
-                       "contact": "avatar",
-                       "groups": ["players"]},
-                      {"state": "health2",
-                       "layer": "upperPhysical",
-                       "sprite": health2_avatar_sprite_name,
-                       "contact": "avatar",
-                       "groups": ["players"]},
-                      {"state": "health3",
-                       "layer": "upperPhysical",
-                       "sprite": health3_avatar_sprite_name,
-                       "contact": "avatar",
-                       "groups": ["players"]},
-
+                      {
+                          "state": "health1",
+                          "layer": "upperPhysical",
+                          "sprite": health1_avatar_sprite_name,
+                          "contact": "avatar",
+                          "groups": ["players"],
+                      },
+                      {
+                          "state": "health2",
+                          "layer": "upperPhysical",
+                          "sprite": health2_avatar_sprite_name,
+                          "contact": "avatar",
+                          "groups": ["players"],
+                      },
+                      {
+                          "state": "health3",
+                          "layer": "upperPhysical",
+                          "sprite": health3_avatar_sprite_name,
+                          "contact": "avatar",
+                          "groups": ["players"],
+                      },
                       # Player wait state used when they have been zapped out.
-                      {"state": "playerWait",
-                       "groups": ["playerWaits"]},
-                  ]
-              }
+                      {"state": "playerWait", "groups": ["playerWaits"]},
+                  ],
+              },
           },
-          {"component": "Transform",},
+          {
+              "component": "Transform",
+          },
           {
               "component": "Appearance",
               "kwargs": {
                   "renderMode": "ascii_shape",
-                  "spriteNames": [health1_avatar_sprite_name,
-                                  health2_avatar_sprite_name,
-                                  health3_avatar_sprite_name],
-                  "spriteShapes": [shapes.CUTE_AVATAR,
-                                   shapes.CUTE_AVATAR,
-                                   shapes.CUTE_AVATAR],
-                  "palettes": [health1_color_palette,
-                               health2_color_palette,
-                               health3_color_palette],
-                  "noRotates": [True] * 3
-              }
+                  "spriteNames": [
+                      health1_avatar_sprite_name,
+                      health2_avatar_sprite_name,
+                      health3_avatar_sprite_name,
+                  ],
+                  "spriteShapes": [
+                      shapes.CUTE_AVATAR,
+                      shapes.CUTE_AVATAR,
+                      shapes.CUTE_AVATAR,
+                  ],
+                  "palettes": [
+                      health1_color_palette,
+                      health2_color_palette,
+                      health3_color_palette,
+                  ],
+                  "noRotates": [True] * 3,
+              },
           },
           {
               "component": "Avatar",
@@ -612,9 +668,7 @@ def create_avatar_object(
                   "additionalLiveStates": ["health1", "health3"],
                   "waitState": "playerWait",
                   "spawnGroup": TEAMS_DATA[team]["spawn_group"],
-                  "actionOrder": ["move",
-                                  "turn",
-                                  "fireZap"],
+                  "actionOrder": ["move", "turn", "fireZap"],
                   "actionSpec": {
                       "move": {"default": 0, "min": 0, "max": len(_COMPASS)},
                       "turn": {"default": 0, "min": -1, "max": 1},
@@ -625,12 +679,12 @@ def create_avatar_object(
                       "right": 5,
                       "forward": 9,
                       "backward": 1,
-                      "centered": False
+                      "centered": False,
                   },
                   # The following kwarg makes it possible to get rewarded for
                   # team rewards even when an avatar is "dead".
                   "skipWaitStateRewards": False,
-              }
+              },
           },
           {
               "component": "ColorZapper",
@@ -645,13 +699,13 @@ def create_avatar_object(
                   "secondaryBeamLength": 6,
                   "secondaryBeamRadius": 0,
                   "aliveStates": ["health1", "health2", "health3"],
-              }
+              },
           },
           {
               "component": "ReadyToShootObservation",
               "kwargs": {
                   "zapperComponent": "ColorZapper",
-              }
+              },
           },
           {
               "component": "ZappedByColor",
@@ -666,17 +720,11 @@ def create_avatar_object(
                   "maxHealthOnOwnColor": 3,
                   "maxHealthOnEnemyColor": 1,
                   "groundLayer": "alternateLogic",
-              }
+              },
           },
-          {
-              "component": "TeamMember",
-              "kwargs": {"team": team}
-          },
-          {
-              "component": "Taste",
-              "kwargs": taste_kwargs
-          },
-      ]
+          {"component": "TeamMember", "kwargs": {"team": team}},
+          {"component": "Taste", "kwargs": taste_kwargs},
+      ],
   }
   if _ENABLE_DEBUG_OBSERVATIONS:
     avatar_object["components"].append({
@@ -687,8 +735,9 @@ def create_avatar_object(
   return avatar_object
 
 
-def _even_vs_odd_team_assignment(num_players,
-                                 taste_kwargs: Optional[Any] = None):
+def _even_vs_odd_team_assignment(
+    num_players, taste_kwargs: Optional[Any] = None
+):
   """Assign players with even ids to red team and odd ids to blue team."""
   avatar_objects = []
   for player_idx in range(0, num_players):
@@ -696,15 +745,17 @@ def _even_vs_odd_team_assignment(num_players,
       team = "red"
     else:
       team = "blue"
-    game_object = create_avatar_object(player_idx, team,
-                                       override_taste_kwargs=taste_kwargs)
+    game_object = create_avatar_object(
+        player_idx, team, override_taste_kwargs=taste_kwargs
+    )
     avatar_objects.append(game_object)
 
   return avatar_objects
 
 
-def _low_vs_high_team_assignment(num_players,
-                                 taste_kwargs: Optional[Any] = None):
+def _low_vs_high_team_assignment(
+    num_players, taste_kwargs: Optional[Any] = None
+):
   """Assign players with id below the median id to blue and above it to red."""
   median = np.median(range(num_players))
   avatar_objects = []
@@ -715,24 +766,29 @@ def _low_vs_high_team_assignment(num_players,
       team = "red"
     else:
       raise ValueError("num_players must be even")
-    game_object = create_avatar_object(player_idx, team,
-                                       override_taste_kwargs=taste_kwargs)
+    game_object = create_avatar_object(
+        player_idx, team, override_taste_kwargs=taste_kwargs
+    )
     avatar_objects.append(game_object)
 
   return avatar_objects
 
 
-def create_avatar_objects(num_players,
-                          taste_kwargs: Optional[Any] = None,
-                          fixed_teams: Optional[bool] = False):
+def create_avatar_objects(
+    num_players,
+    taste_kwargs: Optional[Any] = None,
+    fixed_teams: Optional[bool] = False,
+):
   """Returns list of avatar objects of length 'num_players'."""
   assert num_players % 2 == 0, "num players must be divisible by 2"
   if fixed_teams:
-    avatar_objects = _low_vs_high_team_assignment(num_players,
-                                                  taste_kwargs=taste_kwargs)
+    avatar_objects = _low_vs_high_team_assignment(
+        num_players, taste_kwargs=taste_kwargs
+    )
   else:
-    avatar_objects = _even_vs_odd_team_assignment(num_players,
-                                                  taste_kwargs=taste_kwargs)
+    avatar_objects = _even_vs_odd_team_assignment(
+        num_players, taste_kwargs=taste_kwargs
+    )
   return avatar_objects
 
 
@@ -789,7 +845,8 @@ def build(
       simulation={
           "map": ASCII_MAP,
           "gameObjects": create_avatar_objects(
-              num_players, taste_kwargs=config.shaping_kwargs),
+              num_players, taste_kwargs=config.shaping_kwargs
+          ),
           "scene": create_scene(),
           "prefabs": PREFABS,
           "charPrefabMap": CHAR_PREFAB_MAP,

@@ -154,7 +154,7 @@ PALETTES["dish"] = {
     "~": [0, 0, 0, 0],
     "+": [255, 255, 255, 255],
     "^": [233, 239, 248, 255],
-    "&": [221, 222, 238, 255]
+    "&": [221, 222, 238, 255],
 }
 
 SPRITES["soup"] = SPRITES["dish"]
@@ -162,7 +162,7 @@ PALETTES["soup"] = {
     "~": [0, 0, 0, 0],
     "+": [255, 255, 255, 255],
     "^": [236, 58, 74, 255],
-    "&": [221, 222, 238, 255]
+    "&": [221, 222, 238, 255],
 }
 
 SPRITES["dish_dispenser"] = """
@@ -189,7 +189,7 @@ PALETTES["dish_dispenser"] = {
     "~": BACKGROUND_DARK,
     "+": [255, 255, 255, 255],
     "^": [233, 239, 248, 255],
-    "X": [221, 222, 238, 255]
+    "X": [221, 222, 238, 255],
 }
 
 SPRITES["tomato"] = """
@@ -217,7 +217,7 @@ PALETTES["tomato"] = {
     "&": [190, 53, 62, 255],
     "O": [151, 47, 52, 255],
     "-": [236, 58, 74, 255],
-    "@": [240, 57, 75, 255]
+    "@": [240, 57, 75, 255],
 }
 
 SPRITES["tomato_dispenser"] = """
@@ -248,7 +248,7 @@ PALETTES["tomato_dispenser"] = {
     "X": [190, 53, 62, 255],
     "O": [151, 47, 52, 255],
     "-": [236, 58, 74, 255],
-    "@": [240, 57, 75, 255]
+    "@": [240, 57, 75, 255],
 }
 
 SPRITES["cooking_pot_empty"] = """
@@ -340,7 +340,7 @@ PALETTES["cooking_pot"] = {
     "M": [139, 155, 181, 255],
     "K": [236, 58, 74, 255],
     "L": [161, 43, 43, 255],
-    "N": [242, 226, 187, 255]
+    "N": [242, 226, 187, 255],
 }
 
 SPRITES["loading_bar"] = """
@@ -381,8 +381,9 @@ def create_loading_bar_palette(count, finished=False):
 
 OFFSET_SIZE = 3
 for s in ["empty", "tomato", "dish", "soup"]:
-  SPRITES[s + "_offset"] = ("~~~~~~~~~~~~~~~~\n" * OFFSET_SIZE +
-                            SPRITES[s][1:-OFFSET_SIZE*17])
+  SPRITES[s + "_offset"] = (
+      "~~~~~~~~~~~~~~~~\n" * OFFSET_SIZE + SPRITES[s][1 : -OFFSET_SIZE * 17]
+  )
 
 ###########
 # PREFABS #
@@ -398,14 +399,14 @@ SPAWN_POINT = {
                 "stateConfigs": [{
                     "state": "spawnPoint",
                     "layer": "logic",
-                    "groups": ["spawnPoints"]
+                    "groups": ["spawnPoints"],
                 }],
-            }
+            },
         },
         {
             "component": "Transform",
         },
-    ]
+    ],
 }
 
 # pylint: disable=g-complex-comprehension
@@ -415,81 +416,92 @@ INVENTORY = {
         {
             "component": "StateManager",
             "kwargs": {
-                "initialState":
-                    "wait",
-                "stateConfigs": [{
-                    "state": "wait"
-                }] + [{
-                    "state": item,
-                    "sprite": item,
-                    "layer": "overlay"
-                } for item in items] + [{
-                    "state": item + "_offset",
-                    "sprite": item + "_offset",
-                    "layer": "overlay"
-                } for item in items]
-            }
+                "initialState": "wait",
+                "stateConfigs": (
+                    [{"state": "wait"}]
+                    + [
+                        {"state": item, "sprite": item, "layer": "overlay"}
+                        for item in items
+                    ]
+                    + [
+                        {
+                            "state": item + "_offset",
+                            "sprite": item + "_offset",
+                            "layer": "overlay",
+                        }
+                        for item in items
+                    ]
+                ),
+            },
         },
-        {
-            "component": "Transform",
-            "kwargs": {}
-        },
+        {"component": "Transform", "kwargs": {}},
         {
             "component": "Appearance",
             "kwargs": {
                 "renderMode": "ascii_shape",
                 "spriteNames": items + [item + "_offset" for item in items],
-                "spriteShapes": ([SPRITES[item] for item in items] +
-                                 [SPRITES[item + "_offset"] for item in items]),
-                "palettes": ([PALETTES[item] for item in items] +
-                             [PALETTES[item] for item in items]),
-                "noRotates": [False]
-            }
+                "spriteShapes": [SPRITES[item] for item in items] + [
+                    SPRITES[item + "_offset"] for item in items
+                ],
+                "palettes": [PALETTES[item] for item in items] + [
+                    PALETTES[item] for item in items
+                ],
+                "noRotates": [False],
+            },
         },
         {
             "component": "Inventory",
             "kwargs": {
                 "playerIndex": -1,  # Can be overwritten.
                 "emptyState": "empty",
-                "waitState": "wait"
-            }
+                "waitState": "wait",
+            },
         },
-    ]
+    ],
 }
 # pylint: enable=g-complex-comprehension
 
-loading_palettes = ([create_loading_bar_palette(idx) for idx in range(0, 10)] +
-                    [create_loading_bar_palette(10, finished=True)])
+loading_palettes = [create_loading_bar_palette(idx) for idx in range(0, 10)] + [
+    create_loading_bar_palette(10, finished=True)
+]
 LOADING_BAR = {
     "name": "loading_bar",
-    "components": [{
-        "component": "StateManager",
-        "kwargs": {
-            "initialState":
-                "loading_bar_0",
-            "stateConfigs": [{
-                "state": "loading_bar_%d" % d, "layer": "overlay",
-                "sprite": "loading_bar_%d" % d} for d in range(0, 11)],
-        }
-    }, {
-        "component": "Transform",
-        "kwargs": {}
-    }, {
-        "component": "Appearance",
-        "kwargs": {
-            "renderMode": "ascii_shape",
-            "spriteNames": ["loading_bar_%d" % d for d in range(0, 11)],
-            "spriteShapes": [SPRITES["loading_bar"] for _ in range(0, 11)],
-            "palettes": loading_palettes,
-            "noRotates": [True]
-        }
-    }, {
-        "component": "LoadingBarVisualiser",
-        "kwargs": {
-            "totalTime": COOKING_TIME,
-            "customStateNames": ["loading_bar_%d" % d for d in range(0, 11)],
-        }
-    }]
+    "components": [
+        {
+            "component": "StateManager",
+            "kwargs": {
+                "initialState": "loading_bar_0",
+                "stateConfigs": [
+                    {
+                        "state": "loading_bar_%d" % d,
+                        "layer": "overlay",
+                        "sprite": "loading_bar_%d" % d,
+                    }
+                    for d in range(0, 11)
+                ],
+            },
+        },
+        {"component": "Transform", "kwargs": {}},
+        {
+            "component": "Appearance",
+            "kwargs": {
+                "renderMode": "ascii_shape",
+                "spriteNames": ["loading_bar_%d" % d for d in range(0, 11)],
+                "spriteShapes": [SPRITES["loading_bar"] for _ in range(0, 11)],
+                "palettes": loading_palettes,
+                "noRotates": [True],
+            },
+        },
+        {
+            "component": "LoadingBarVisualiser",
+            "kwargs": {
+                "totalTime": COOKING_TIME,
+                "customStateNames": [
+                    "loading_bar_%d" % d for d in range(0, 11)
+                ],
+            },
+        },
+    ],
 }
 
 
@@ -507,12 +519,9 @@ def create_base_prefab(name, layer="upperPhysical"):
                       "layer": layer,
                       "sprite": f"{name}",
                   }],
-              }
+              },
           },
-          {
-              "component": "Transform",
-              "kwargs": {}
-          },
+          {"component": "Transform", "kwargs": {}},
           {
               "component": "Appearance",
               "kwargs": {
@@ -520,21 +529,19 @@ def create_base_prefab(name, layer="upperPhysical"):
                   "spriteNames": [name],
                   "spriteShapes": [SPRITES[name]],
                   "palettes": [PALETTES[name]],
-                  "noRotates": [True]
-              }
-          }]
+                  "noRotates": [True],
+              },
+          },
+      ],
   }
 
 
 def create_counter():
   """Returns a prefab which can contain one of any item."""
   base_prefab = create_base_prefab("counter")
-  base_prefab["components"] += [{
-      "component": "Container",
-      "kwargs": {
-          "reward": 0.0
-      }
-  }]
+  base_prefab["components"] += [
+      {"component": "Container", "kwargs": {"reward": 0.0}}
+  ]
   return base_prefab
 
 
@@ -543,19 +550,12 @@ def create_dispenser(prefab_name, item_name):
   base_prefab = create_base_prefab(prefab_name)
   base_prefab["components"] += [{
       "component": "Container",
-      "kwargs": {
-          "startingItem": item_name,
-          "infinite": True,
-          "reward": 0.0
-      }
+      "kwargs": {"startingItem": item_name, "infinite": True, "reward": 0.0},
   }]
   return base_prefab
 
 
-def create_receiver(prefab_name,
-                    item_name,
-                    reward=0,
-                    global_reward=False):
+def create_receiver(prefab_name, item_name, reward=0, global_reward=False):
   """Returns a prefab which can receive items from avatars.
 
   Args:
@@ -573,8 +573,8 @@ def create_receiver(prefab_name,
       "kwargs": {
           "acceptedItems": item_name,
           "reward": reward,
-          "globalReward": global_reward
-      }
+          "globalReward": global_reward,
+      },
   }]
   return base_prefab
 
@@ -596,10 +596,12 @@ def create_cooking_pot(time_to_cook, reward=1):
       for food3 in foods_in_pot:
         sprite_name = "CookingPot_%s_%s_%s" % (food1, food2, food3)
         name = "cooking_pot_%s_%s_%s" % (food1, food2, food3)
-        entry = {"state": name,
-                 "layer": "upperPhysical",
-                 "sprite": sprite_name,
-                 "groups": ["cooking_pot"]}
+        entry = {
+            "state": name,
+            "layer": "upperPhysical",
+            "sprite": sprite_name,
+            "groups": ["cooking_pot"],
+        }
         state_configs.append(entry)
         sprite_names.append(sprite_name)
         pots_palette = PALETTES["cooking_pot"]
@@ -618,10 +620,12 @@ def create_cooking_pot(time_to_cook, reward=1):
   # Create cooked state.
   sprite_name = "CookingPot_cooked"
   name = "cooking_pot_cooked"
-  entry = {"state": "cooking_pot_cooked",
-           "layer": "upperPhysical",
-           "sprite": sprite_name,
-           "groups": ["cooking_pot"]}
+  entry = {
+      "state": "cooking_pot_cooked",
+      "layer": "upperPhysical",
+      "sprite": sprite_name,
+      "groups": ["cooking_pot"],
+  }
   state_configs.append(entry)
   sprite_names.append(sprite_name)
   pot_sprites.append(SPRITES["cooking_pot_3"])
@@ -635,16 +639,11 @@ def create_cooking_pot(time_to_cook, reward=1):
           {
               "component": "StateManager",
               "kwargs": {
-                  "initialState": (
-                      "cooking_pot_empty_empty_empty"
-                  ),
-                  "stateConfigs": state_configs
-              }
+                  "initialState": "cooking_pot_empty_empty_empty",
+                  "stateConfigs": state_configs,
+              },
           },
-          {
-              "component": "Transform",
-              "kwargs": {}
-          },
+          {"component": "Transform", "kwargs": {}},
           {
               "component": "Appearance",
               "kwargs": {
@@ -652,8 +651,8 @@ def create_cooking_pot(time_to_cook, reward=1):
                   "spriteNames": sprite_names,
                   "spriteShapes": pot_sprites,
                   "palettes": cooking_pot_palettes,
-                  "noRotates": [True for _ in sprite_names]
-              }
+                  "noRotates": [True for _ in sprite_names],
+              },
           },
           {
               "component": "CookingPot",
@@ -661,10 +660,10 @@ def create_cooking_pot(time_to_cook, reward=1):
                   "acceptedItems": available_foods,
                   "cookingTime": time_to_cook,
                   "reward": reward,
-                  "customStateNames": custom_state_names
-              }
+                  "customStateNames": custom_state_names,
+              },
           },
-      ]
+      ],
   }
 
   return cooking_pot
@@ -677,18 +676,24 @@ def create_prefabs(cooking_pot_pseudoreward: float = 0.0):
       "inventory": INVENTORY,
       "loading_bar": LOADING_BAR,
       "counter": create_counter(),
-      "dish_dispenser": create_dispenser(prefab_name="dish_dispenser",
-                                         item_name="dish"),
-      "tomato_dispenser": create_dispenser(prefab_name="tomato_dispenser",
-                                           item_name="tomato"),
-      "delivery_location": create_receiver(prefab_name="delivery_location",
-                                           item_name="soup",
-                                           reward=20,
-                                           global_reward=True),
-      "cooking_pot": create_cooking_pot(time_to_cook=COOKING_TIME,
-                                        reward=cooking_pot_pseudoreward),
+      "dish_dispenser": create_dispenser(
+          prefab_name="dish_dispenser", item_name="dish"
+      ),
+      "tomato_dispenser": create_dispenser(
+          prefab_name="tomato_dispenser", item_name="tomato"
+      ),
+      "delivery_location": create_receiver(
+          prefab_name="delivery_location",
+          item_name="soup",
+          reward=20,
+          global_reward=True,
+      ),
+      "cooking_pot": create_cooking_pot(
+          time_to_cook=COOKING_TIME, reward=cooking_pot_pseudoreward
+      ),
   }
   return prefabs
+
 
 ###########
 # ACTIONS #
@@ -697,14 +702,14 @@ def create_prefabs(cooking_pot_pseudoreward: float = 0.0):
 # Primitive action components.
 # pylint: disable=bad-whitespace
 # pyformat: disable
-NOOP       = {"move": 0, "turn":  0, "interact": 0}
-FORWARD    = {"move": 1, "turn":  0, "interact": 0}
-STEP_RIGHT = {"move": 2, "turn":  0, "interact": 0}
-BACKWARD   = {"move": 3, "turn":  0, "interact": 0}
-STEP_LEFT  = {"move": 4, "turn":  0, "interact": 0}
-TURN_LEFT  = {"move": 0, "turn": -1, "interact": 0}
-TURN_RIGHT = {"move": 0, "turn":  1, "interact": 0}
-INTERACT   = {"move": 0, "turn":  0, "interact": 1}
+NOOP = {"move": 0, "turn": 0, "interact": 0}
+FORWARD = {"move": 1, "turn": 0, "interact": 0}
+STEP_RIGHT = {"move": 2, "turn": 0, "interact": 0}
+BACKWARD = {"move": 3, "turn": 0, "interact": 0}
+STEP_LEFT = {"move": 4, "turn": 0, "interact": 0}
+TURN_LEFT = {"move": 0, "turn": -1, "interact": 0}
+TURN_RIGHT = {"move": 0, "turn": 1, "interact": 0}
+INTERACT = {"move": 0, "turn": 0, "interact": 1}
 # pyformat: enable
 # pylint: enable=bad-whitespace
 
@@ -731,31 +736,39 @@ def create_game_objects(ascii_map_string, prefabs):
   game_objects = []
   for char, _ in CHAR_PREFAB_MAP.items():
     transforms = game_object_utils.get_game_object_positions_from_map(
-        ascii_map_string, char)
+        ascii_map_string, char
+    )
     for transform in transforms:
       # Add inventory game object for holding and visualising items.
       if char == "#" or char == "O" or char == "D":
         inventory_object = copy.deepcopy(prefabs["inventory"])
         go_transform = game_object_utils.get_first_named_component(
-            inventory_object, "Transform")
-        go_transform["kwargs"]["position"] = (transform.position.x,
-                                              transform.position.y)
+            inventory_object, "Transform"
+        )
+        go_transform["kwargs"]["position"] = (
+            transform.position.x,
+            transform.position.y,
+        )
         game_objects.append(inventory_object)
 
       # Add loading bar object to cooking pots.
       if char == "C":
         loading_object = copy.deepcopy(prefabs["loading_bar"])
         go_transform = game_object_utils.get_first_named_component(
-            loading_object, "Transform")
-        go_transform["kwargs"]["position"] = (transform.position.x,
-                                              transform.position.y)
+            loading_object, "Transform"
+        )
+        go_transform["kwargs"]["position"] = (
+            transform.position.x,
+            transform.position.y,
+        )
         game_objects.append(loading_object)
 
   return game_objects
 
 
-def create_avatar_object(player_idx: int,
-                         target_sprite_self: Dict[str, Any]) -> Dict[str, Any]:
+def create_avatar_object(
+    player_idx: int, target_sprite_self: Dict[str, Any]
+) -> Dict[str, Any]:
   """Create an avatar object that always sees itself as blue."""
   # Lua is 1-indexed.
   lua_index = player_idx + 1
@@ -778,16 +791,16 @@ def create_avatar_object(player_idx: int,
               "kwargs": {
                   "initialState": live_state_name,
                   "stateConfigs": [
-                      {"state": live_state_name,
-                       "layer": "upperPhysical",
-                       "sprite": source_sprite_self,
-                       "contact": "avatar",
-                       "groups": ["players"]},
-
-                      {"state": "playerWait",
-                       "groups": ["playerWaits"]},
-                  ]
-              }
+                      {
+                          "state": live_state_name,
+                          "layer": "upperPhysical",
+                          "sprite": source_sprite_self,
+                          "contact": "avatar",
+                          "groups": ["players"],
+                      },
+                      {"state": "playerWait", "groups": ["playerWaits"]},
+                  ],
+              },
           },
           {
               "component": "Transform",
@@ -799,8 +812,8 @@ def create_avatar_object(player_idx: int,
                   "spriteNames": [source_sprite_self],
                   "spriteShapes": [shapes.CUTE_AVATAR],
                   "palettes": [shapes.get_palette(colors.palette[player_idx])],
-                  "noRotates": [True]
-              }
+                  "noRotates": [True],
+              },
           },
           {
               "component": "AdditionalSprites",
@@ -810,7 +823,7 @@ def create_avatar_object(player_idx: int,
                   "customSpriteShapes": [target_sprite_self["shape"]],
                   "customPalettes": [target_sprite_self["palette"]],
                   "customNoRotates": [target_sprite_self["noRotate"]],
-              }
+              },
           },
           {
               "component": "Avatar",
@@ -831,21 +844,23 @@ def create_avatar_object(player_idx: int,
                       "right": 2,
                       "forward": 3,
                       "backward": 1,
-                      "centered": False
+                      "centered": False,
                   },
                   "spriteMap": custom_sprite_map,
-              }
+              },
           },
           {
               "component": "InteractBeam",
               "kwargs": {
                   "cooldownTime": 1,
                   "shapes": [SPRITES["interact"]],
-                  "palettes": [interact_palette]
-              }
+                  "palettes": [interact_palette],
+              },
           },
-          {"component": "AvatarCumulants",},
-      ]
+          {
+              "component": "AvatarCumulants",
+          },
+      ],
   }
   if _ENABLE_DEBUG_OBSERVATIONS:
     avatar_object["components"].append({
@@ -871,7 +886,7 @@ def create_avatar_object(player_idx: int,
                     "variable": "collectedSoupFromCookingPot",
                 },
             ]
-        }
+        },
     })
 
   return avatar_object
@@ -882,15 +897,14 @@ def create_avatar_objects(num_players, prefabs):
   game_objects = []
   for player_idx in range(0, num_players):
     lua_index = player_idx + 1
-    game_object = create_avatar_object(player_idx,
-                                       TARGET_SPRITE_SELF)
+    game_object = create_avatar_object(player_idx, TARGET_SPRITE_SELF)
     game_objects.append(game_object)
 
     # Add inventory game object which will be connected to player at init.
     inventory_object = copy.deepcopy(prefabs["inventory"])
-    game_object_utils.get_first_named_component(
-        inventory_object,
-        "Inventory")["kwargs"]["playerIndex"] = lua_index
+    game_object_utils.get_first_named_component(inventory_object, "Inventory")[
+        "kwargs"
+    ]["playerIndex"] = lua_index
     game_objects.append(inventory_object)
 
   return game_objects
@@ -929,7 +943,8 @@ def build(
   num_players = len(roles)
   ascii_map = config.layout.ascii_map
   prefabs = create_prefabs(
-      cooking_pot_pseudoreward=config.cooking_pot_pseudoreward)
+      cooking_pot_pseudoreward=config.cooking_pot_pseudoreward
+  )
   game_objects = create_game_objects(ascii_map, prefabs)
   extra_game_objects = create_avatar_objects(num_players, prefabs)
   game_objects += extra_game_objects

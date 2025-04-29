@@ -20,7 +20,8 @@ from meltingpot.utils.substrates import shapes
 
 
 def get_cumulant_metric_configs(
-    num_resources: int) -> Sequence[Mapping[str, Any]]:
+    num_resources: int,
+) -> Sequence[Mapping[str, Any]]:
   """Get metric configs to configure AvatarMetricReporter."""
   cumulants = []
   # One cumulant tracks from frame to frame whether the player participated in
@@ -88,34 +89,41 @@ def create_ready_to_interact_marker(player_idx: int) -> Dict[str, Any]:
                   "stateConfigs": [
                       # Use `overlay` layer for ready and nonready states, both
                       # are used for live avatars and are always connected.
-                      {"state": "ready",
-                       "layer": "overlay",
-                       "sprite": "Ready"},
-                      {"state": "notReady",
-                       "layer": "overlay"},
-
+                      {"state": "ready", "layer": "overlay", "sprite": "Ready"},
+                      {"state": "notReady", "layer": "overlay"},
                       # Result indication colors.
-                      {"state": "resultIndicatorColor1",
-                       "layer": "overlay",
-                       "sprite": "ResultIndicatorColor1"},
-                      {"state": "resultIndicatorColor2",
-                       "layer": "overlay",
-                       "sprite": "ResultIndicatorColor2"},
-                      {"state": "resultIndicatorColor3",
-                       "layer": "overlay",
-                       "sprite": "ResultIndicatorColor3"},
-                      {"state": "resultIndicatorColor4",
-                       "layer": "overlay",
-                       "sprite": "ResultIndicatorColor4"},
-                      {"state": "resultIndicatorColor5",
-                       "layer": "overlay",
-                       "sprite": "ResultIndicatorColor5"},
-
+                      {
+                          "state": "resultIndicatorColor1",
+                          "layer": "overlay",
+                          "sprite": "ResultIndicatorColor1",
+                      },
+                      {
+                          "state": "resultIndicatorColor2",
+                          "layer": "overlay",
+                          "sprite": "ResultIndicatorColor2",
+                      },
+                      {
+                          "state": "resultIndicatorColor3",
+                          "layer": "overlay",
+                          "sprite": "ResultIndicatorColor3",
+                      },
+                      {
+                          "state": "resultIndicatorColor4",
+                          "layer": "overlay",
+                          "sprite": "ResultIndicatorColor4",
+                      },
+                      {
+                          "state": "resultIndicatorColor5",
+                          "layer": "overlay",
+                          "sprite": "ResultIndicatorColor5",
+                      },
                       # Invisible inactive overlay type.
-                      {"state": "avatarMarkingWait",
-                       "groups": ["avatarMarkingWaits"]},
-                  ]
-              }
+                      {
+                          "state": "avatarMarkingWait",
+                          "groups": ["avatarMarkingWaits"],
+                      },
+                  ],
+              },
           },
           {
               "component": "Transform",
@@ -132,7 +140,9 @@ def create_ready_to_interact_marker(player_idx: int) -> Dict[str, Any]:
                       "ResultIndicatorColor4",
                       "ResultIndicatorColor5",
                   ],
-                  "spriteShapes": [shapes.BRONZE_CAP,] * 6,
+                  "spriteShapes": [
+                      shapes.BRONZE_CAP,
+                  ] * 6,
                   "palettes": [
                       shapes.SILVER_CROWN_PALETTE,
                       # Colors are in rainbow order (more or less).
@@ -142,23 +152,25 @@ def create_ready_to_interact_marker(player_idx: int) -> Dict[str, Any]:
                       get_indicator_color_palette((2, 71, 254, 255)),  # blue
                       get_indicator_color_palette((127, 0, 255, 255)),  # violet
                   ],
-                  "noRotates": [True,] * 6,
-              }
+                  "noRotates": [
+                      True,
+                  ] * 6,
+              },
           },
           {
               "component": "AvatarConnector",
               "kwargs": {
                   "playerIndex": lua_idx,
                   "aliveState": "notReady",  # state `notReady` is invisible.
-                  "waitState": "avatarMarkingWait"
-              }
+                  "waitState": "avatarMarkingWait",
+              },
           },
           {
               "component": "ReadyToInteractMarker",
               "kwargs": {
                   "playerIndex": lua_idx,
-              }
+              },
           },
-      ]
+      ],
   }
   return marking_object

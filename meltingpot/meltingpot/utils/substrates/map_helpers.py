@@ -17,9 +17,11 @@ from collections.abc import Mapping, Sequence
 from typing import Any, Union
 
 
-def a_or_b_with_odds(a_descriptor: Union[str, Mapping[str, Any]],
-                     b_descriptor: Union[str, Mapping[str, Any]],
-                     odds: Sequence[int]) -> Mapping[str, Any]:
+def a_or_b_with_odds(
+    a_descriptor: Union[str, Mapping[str, Any]],
+    b_descriptor: Union[str, Mapping[str, Any]],
+    odds: Sequence[int],
+) -> Mapping[str, Any]:
   """Return a versus b with specified odds.
 
   Args:

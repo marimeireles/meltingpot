@@ -27,8 +27,9 @@ from meltingpot.utils.substrates import substrate as substrate_lib
 
 SCENARIOS = frozenset(scenario_configs.SCENARIO_CONFIGS)
 
-SubstrateTransform = Callable[[substrate_lib.Substrate],
-                              substrate_lib.Substrate]
+SubstrateTransform = Callable[
+    [substrate_lib.Substrate], substrate_lib.Substrate
+]
 
 
 def _scenarios_by_substrate() -> Mapping[str, Collection[str]]:
@@ -46,17 +47,17 @@ SCENARIOS_BY_SUBSTRATE = _scenarios_by_substrate()
 
 PERMITTED_OBSERVATIONS = frozenset({
     # The primary visual input.
-    'RGB',
+    "RGB",
     # Extra observations used in some substrates.
-    'HUNGER',
-    'INVENTORY',
-    'MY_OFFER',
-    'OFFERS',
-    'READY_TO_SHOOT',
-    'STAMINA',
-    'VOTING',
+    "HUNGER",
+    "INVENTORY",
+    "MY_OFFER",
+    "OFFERS",
+    "READY_TO_SHOOT",
+    "STAMINA",
+    "VOTING",
     # An extra observation that is never necessary but could perhaps help.
-    'COLLECTIVE_REWARD'
+    "COLLECTIVE_REWARD",
 })
 
 
@@ -131,4 +132,5 @@ def get_factory_from_config(
       bots=bots,
       bots_by_role=config.bots_by_role,
       is_focal=config.is_focal,
-      permitted_observations=PERMITTED_OBSERVATIONS)
+      permitted_observations=PERMITTED_OBSERVATIONS,
+  )

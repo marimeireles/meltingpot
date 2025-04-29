@@ -119,7 +119,7 @@ SCENE = {
                 "stateConfigs": [{
                     "state": "scene",
                 }],
-            }
+            },
         },
         {
             "component": "Transform",
@@ -129,10 +129,10 @@ SCENE = {
             "kwargs": {
                 "minimumFramesPerEpisode": 1000,
                 "intervalLength": 100,  # Set equal to unroll length.
-                "probabilityTerminationPerInterval": 0.2
-            }
+                "probabilityTerminationPerInterval": 0.2,
+            },
         },
-    ]
+    ],
 }
 
 
@@ -148,7 +148,7 @@ WALL = {
                     "layer": "upperPhysical",
                     "sprite": "Wall",
                 }],
-            }
+            },
         },
         {
             "component": "Transform",
@@ -157,22 +157,21 @@ WALL = {
             "component": "Appearance",
             "kwargs": {
                 "renderMode": "ascii_shape",
-                "spriteNames": ["Wall",],
+                "spriteNames": [
+                    "Wall",
+                ],
                 "spriteShapes": [shapes.WALL],
-                "palettes": [{"*": (95, 95, 95, 255),
-                              "&": (100, 100, 100, 255),
-                              "@": (109, 109, 109, 255),
-                              "#": (152, 152, 152, 255)}],
-                "noRotates": [True]
-            }
+                "palettes": [{
+                    "*": (95, 95, 95, 255),
+                    "&": (100, 100, 100, 255),
+                    "@": (109, 109, 109, 255),
+                    "#": (152, 152, 152, 255),
+                }],
+                "noRotates": [True],
+            },
         },
-        {
-            "component": "BeamBlocker",
-            "kwargs": {
-                "beamType": "gift"
-            }
-        },
-    ]
+        {"component": "BeamBlocker", "kwargs": {"beamType": "gift"}},
+    ],
 }
 
 SPAWN_POINT = {
@@ -185,14 +184,14 @@ SPAWN_POINT = {
                 "stateConfigs": [{
                     "state": "spawnPoint",
                     "layer": "logic",
-                    "groups": ["spawnPoints"]
+                    "groups": ["spawnPoints"],
                 }],
-            }
+            },
         },
         {
             "component": "Transform",
         },
-    ]
+    ],
 }
 
 TOKEN = {
@@ -203,16 +202,20 @@ TOKEN = {
             "kwargs": {
                 "initialState": "tokenWait",
                 "stateConfigs": [
-                    {"state": "tokenWait",
-                     "layer": "lowerPhysical",
-                     "sprite": "coinWait",
-                     "groups": []},
-                    {"state": "token",
-                     "layer": "lowerPhysical",
-                     "sprite": "coin",
-                     "groups": ["tokens"]},
-                ]
-            }
+                    {
+                        "state": "tokenWait",
+                        "layer": "lowerPhysical",
+                        "sprite": "coinWait",
+                        "groups": [],
+                    },
+                    {
+                        "state": "token",
+                        "layer": "lowerPhysical",
+                        "sprite": "coin",
+                        "groups": ["tokens"],
+                    },
+                ],
+            },
         },
         {
             "component": "Transform",
@@ -223,9 +226,8 @@ TOKEN = {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["coin", "coinWait"],
                 "spriteShapes": [shapes.COIN, shapes.COIN],
-                "palettes": [
-                    shapes.COIN_PALETTE, shapes.INVISIBLE_PALETTE],
-            }
+                "palettes": [shapes.COIN_PALETTE, shapes.INVISIBLE_PALETTE],
+            },
         },
         {
             "component": "Pickable",
@@ -233,7 +235,7 @@ TOKEN = {
                 "liveState": "token",
                 "waitState": "tokenWait",
                 "rewardForPicking": 0.0,
-            }
+            },
         },
         {
             "component": "FixedRateRegrow",
@@ -241,9 +243,9 @@ TOKEN = {
                 "liveState": "token",
                 "waitState": "tokenWait",
                 "regrowRate": 0.0002,
-            }
+            },
         },
-    ]
+    ],
 }
 
 
@@ -271,14 +273,11 @@ def get_avatar_object(num_players: int, player_index: int):
                           "layer": "upperPhysical",
                           "sprite": avatar_sprite_name,
                           "contact": "avatar",
-                          "groups": ["players"]
+                          "groups": ["players"],
                       },
-                      {
-                          "state": "playerWait",
-                          "groups": ["playerWaits"]
-                      },
-                  ]
-              }
+                      {"state": "playerWait", "groups": ["playerWaits"]},
+                  ],
+              },
           },
           {
               "component": "Transform",
@@ -291,7 +290,7 @@ def get_avatar_object(num_players: int, player_index: int):
                   "spriteShapes": [shapes.CUTE_AVATAR],
                   "palettes": [color_palette],
                   "noRotates": [True],
-              }
+              },
           },
           {
               "component": "Avatar",
@@ -301,45 +300,32 @@ def get_avatar_object(num_players: int, player_index: int):
                   "waitState": "playerWait",
                   "spawnGroup": "spawnPoints",
                   "actionOrder": [
-                      "move", "turn", "refineAndGift", "consumeTokens"
+                      "move",
+                      "turn",
+                      "refineAndGift",
+                      "consumeTokens",
                   ],
                   "actionSpec": {
-                      "move": {
-                          "default": 0,
-                          "min": 0,
-                          "max": len(_COMPASS)
-                      },
-                      "turn": {
-                          "default": 0,
-                          "min": -1,
-                          "max": 1
-                      },
-                      "refineAndGift": {
-                          "default": 0,
-                          "min": 0,
-                          "max": 1
-                      },
-                      "consumeTokens": {
-                          "default": 0,
-                          "min": 0,
-                          "max": 1
-                      },
+                      "move": {"default": 0, "min": 0, "max": len(_COMPASS)},
+                      "turn": {"default": 0, "min": -1, "max": 1},
+                      "refineAndGift": {"default": 0, "min": 0, "max": 1},
+                      "consumeTokens": {"default": 0, "min": 0, "max": 1},
                   },
                   "view": {
                       "left": 5,
                       "right": 5,
                       "forward": 9,
                       "backward": 1,
-                      "centered": False
-                  }
-              }
+                      "centered": False,
+                  },
+              },
           },
           {
               "component": "Inventory",
               "kwargs": {
                   "capacityPerType": MAX_TOKENS_PER_TYPE,
                   "numTokenTypes": NUM_TOKEN_TYPES,
-              }
+              },
           },
           {
               "component": "GiftBeam",
@@ -353,9 +339,9 @@ def get_avatar_object(num_players: int, player_index: int):
                   "roleRewardForGifting": {
                       "none": 0.0,
                       "gifter": 0.2,
-                      "selfish": -2.0
+                      "selfish": -2.0,
                   },
-              }
+              },
           },
           {
               "component": "ReadyToShootObservation",
@@ -372,19 +358,19 @@ def get_avatar_object(num_players: int, player_index: int):
                           "type": "tensor.DoubleTensor",
                           "shape": [NUM_TOKEN_TYPES],
                           "component": "Inventory",
-                          "variable": "inventory"
+                          "variable": "inventory",
                       },
                   ]
-              }
+              },
           },
           {
               "component": "TokenTracker",
               "kwargs": {
                   "numPlayers": num_players,
                   "numTokenTypes": NUM_TOKEN_TYPES,
-              }
+              },
           },
-      ]
+      ],
   }
   if _ENABLE_DEBUG_OBSERVATIONS:
     avatar_object["components"].append({
@@ -411,24 +397,15 @@ def get_avatar_objects(num_players: int):
 # Primitive action components.
 # pylint: disable=bad-whitespace
 # pyformat: disable
-NOOP            = {
-    "move": 0, "turn":  0, "refineAndGift": 0, "consumeTokens": 0}
-FORWARD         = {
-    "move": 1, "turn":  0, "refineAndGift": 0, "consumeTokens": 0}
-STEP_RIGHT      = {
-    "move": 2, "turn":  0, "refineAndGift": 0, "consumeTokens": 0}
-BACKWARD        = {
-    "move": 3, "turn":  0, "refineAndGift": 0, "consumeTokens": 0}
-STEP_LEFT       = {
-    "move": 4, "turn":  0, "refineAndGift": 0, "consumeTokens": 0}
-TURN_LEFT       = {
-    "move": 0, "turn": -1, "refineAndGift": 0, "consumeTokens": 0}
-TURN_RIGHT      = {
-    "move": 0, "turn":  1, "refineAndGift": 0, "consumeTokens": 0}
-REFINE_AND_GIFT = {
-    "move": 0, "turn":  0, "refineAndGift": 1, "consumeTokens": 0}
-CONSUME_TOKENS  = {
-    "move": 0, "turn":  0, "refineAndGift": 0, "consumeTokens": 1}
+NOOP = {"move": 0, "turn": 0, "refineAndGift": 0, "consumeTokens": 0}
+FORWARD = {"move": 1, "turn": 0, "refineAndGift": 0, "consumeTokens": 0}
+STEP_RIGHT = {"move": 2, "turn": 0, "refineAndGift": 0, "consumeTokens": 0}
+BACKWARD = {"move": 3, "turn": 0, "refineAndGift": 0, "consumeTokens": 0}
+STEP_LEFT = {"move": 4, "turn": 0, "refineAndGift": 0, "consumeTokens": 0}
+TURN_LEFT = {"move": 0, "turn": -1, "refineAndGift": 0, "consumeTokens": 0}
+TURN_RIGHT = {"move": 0, "turn": 1, "refineAndGift": 0, "consumeTokens": 0}
+REFINE_AND_GIFT = {"move": 0, "turn": 0, "refineAndGift": 1, "consumeTokens": 0}
+CONSUME_TOKENS = {"move": 0, "turn": 0, "refineAndGift": 0, "consumeTokens": 1}
 # pyformat: enable
 # pylint: enable=bad-whitespace
 

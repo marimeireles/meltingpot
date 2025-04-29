@@ -53,7 +53,6 @@ CHAR_PREFAB_MAP = {
     "|": "wall_east",
     "-": "wall_south",
     "!": "wall_west",
-
     # non-wall prefabs
     "P": {"type": "all", "list": ["ground", "spawn_point"]},
     "~": {"type": "all", "list": ["ground", "tree", "fruit"]},
@@ -72,7 +71,7 @@ NW_WALL_CORNER = {
                     "layer": "superOverlay",
                     "sprite": "NwWallCorner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -82,10 +81,10 @@ NW_WALL_CORNER = {
                 "spriteNames": ["NwWallCorner"],
                 "spriteShapes": [shapes.BRICK_WALL_NW_CORNER],
                 "palettes": [shapes.BRICK_WALL_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 NE_WALL_CORNER = {
@@ -100,7 +99,7 @@ NE_WALL_CORNER = {
                     "layer": "superOverlay",
                     "sprite": "NeWallCorner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -110,10 +109,10 @@ NE_WALL_CORNER = {
                 "spriteNames": ["NeWallCorner"],
                 "spriteShapes": [shapes.BRICK_WALL_NE_CORNER],
                 "palettes": [shapes.BRICK_WALL_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 SE_WALL_CORNER = {
@@ -128,7 +127,7 @@ SE_WALL_CORNER = {
                     "layer": "superOverlay",
                     "sprite": "SeWallCorner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -138,10 +137,10 @@ SE_WALL_CORNER = {
                 "spriteNames": ["SeWallCorner"],
                 "spriteShapes": [shapes.BRICK_WALL_SE_CORNER],
                 "palettes": [shapes.BRICK_WALL_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 SW_WALL_CORNER = {
@@ -156,7 +155,7 @@ SW_WALL_CORNER = {
                     "layer": "superOverlay",
                     "sprite": "SwWallCorner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -166,10 +165,10 @@ SW_WALL_CORNER = {
                 "spriteNames": ["SwWallCorner"],
                 "spriteShapes": [shapes.BRICK_WALL_SW_CORNER],
                 "palettes": [shapes.BRICK_WALL_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 NW_INNER_WALL_CORNER = {
@@ -184,7 +183,7 @@ NW_INNER_WALL_CORNER = {
                     "layer": "superOverlay",
                     "sprite": "NwInnerWallCorner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -194,10 +193,10 @@ NW_INNER_WALL_CORNER = {
                 "spriteNames": ["NwInnerWallCorner"],
                 "spriteShapes": [shapes.BRICK_WALL_INNER_NW_CORNER],
                 "palettes": [shapes.BRICK_WALL_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 NE_INNER_WALL_CORNER = {
@@ -212,7 +211,7 @@ NE_INNER_WALL_CORNER = {
                     "layer": "superOverlay",
                     "sprite": "NeInnerWallCorner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -221,13 +220,15 @@ NE_INNER_WALL_CORNER = {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["NeInnerWallCorner"],
                 "spriteShapes": [shapes.BRICK_WALL_INNER_NE_CORNER],
-                "palettes": [{"b": (166, 162, 139, 255),
-                              "c": (110, 108, 92, 255),
-                              "o": (78, 78, 78, 255)}],
-                "noRotates": [False]
-            }
+                "palettes": [{
+                    "b": (166, 162, 139, 255),
+                    "c": (110, 108, 92, 255),
+                    "o": (78, 78, 78, 255),
+                }],
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 SE_INNER_WALL_CORNER = {
@@ -242,7 +243,7 @@ SE_INNER_WALL_CORNER = {
                     "layer": "superOverlay",
                     "sprite": "SeInnerWallCorner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -251,13 +252,15 @@ SE_INNER_WALL_CORNER = {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["SeInnerWallCorner"],
                 "spriteShapes": [shapes.BRICK_WALL_INNER_SE_CORNER],
-                "palettes": [{"b": (166, 162, 139, 255),
-                              "c": (110, 108, 92, 255),
-                              "o": (78, 78, 78, 255)}],
-                "noRotates": [False]
-            }
+                "palettes": [{
+                    "b": (166, 162, 139, 255),
+                    "c": (110, 108, 92, 255),
+                    "o": (78, 78, 78, 255),
+                }],
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 SW_INNER_WALL_CORNER = {
@@ -272,7 +275,7 @@ SW_INNER_WALL_CORNER = {
                     "layer": "superOverlay",
                     "sprite": "SwInnerWallCorner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -282,10 +285,10 @@ SW_INNER_WALL_CORNER = {
                 "spriteNames": ["SwInnerWallCorner"],
                 "spriteShapes": [shapes.BRICK_WALL_INNER_SW_CORNER],
                 "palettes": [shapes.BRICK_WALL_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 WALL_NORTH = {
@@ -300,7 +303,7 @@ WALL_NORTH = {
                     "layer": "superOverlay",
                     "sprite": "WallNorth",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -310,10 +313,10 @@ WALL_NORTH = {
                 "spriteNames": ["WallNorth"],
                 "spriteShapes": [shapes.BRICK_WALL_NORTH],
                 "palettes": [shapes.BRICK_WALL_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 WALL_EAST = {
@@ -328,7 +331,7 @@ WALL_EAST = {
                     "layer": "superOverlay",
                     "sprite": "WallEast",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -338,10 +341,10 @@ WALL_EAST = {
                 "spriteNames": ["WallEast"],
                 "spriteShapes": [shapes.BRICK_WALL_EAST],
                 "palettes": [shapes.BRICK_WALL_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 WALL_SOUTH = {
@@ -356,7 +359,7 @@ WALL_SOUTH = {
                     "layer": "superOverlay",
                     "sprite": "WallSouth",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -366,10 +369,10 @@ WALL_SOUTH = {
                 "spriteNames": ["WallSouth"],
                 "spriteShapes": [shapes.BRICK_WALL_SOUTH],
                 "palettes": [shapes.BRICK_WALL_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 
@@ -385,7 +388,7 @@ WALL_WEST = {
                     "layer": "superOverlay",
                     "sprite": "WallWest",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -395,10 +398,10 @@ WALL_WEST = {
                 "spriteNames": ["WallWest"],
                 "spriteShapes": [shapes.BRICK_WALL_WEST],
                 "palettes": [shapes.BRICK_WALL_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 GROUND = {
@@ -413,7 +416,7 @@ GROUND = {
                     "layer": "background",
                     "sprite": "groundSprite",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -422,12 +425,14 @@ GROUND = {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["groundSprite"],
                 "spriteShapes": [shapes.DIRT_PATTERN],
-                "palettes": [{"X": (155, 118, 83, 255),
-                              "x": (149, 114, 80, 255),}],
-                "noRotates": [True]
-            }
+                "palettes": [{
+                    "X": (155, 118, 83, 255),
+                    "x": (149, 114, 80, 255),
+                }],
+                "noRotates": [True],
+            },
         },
-    ]
+    ],
 }
 
 
@@ -443,6 +448,7 @@ def get_fruit_tree_palette(fruit_type):
   elif fruit_type == "unripe_banana":
     palette["Z"] = (153, 153, 0, 255)
   return palette
+
 
 TREE = {
     "name": "tree",
@@ -474,27 +480,33 @@ TREE = {
                         "sprite": "bananaShrubSprite",
                     },
                 ],
-            }
+            },
         },
         {"component": "Transform"},
         {
             "component": "Appearance",
             "kwargs": {
                 "renderMode": "ascii_shape",
-                "spriteNames": ["appleTreeSprite",
-                                "bananaTreeSprite",
-                                "appleShrubSprite",
-                                "bananaShrubSprite",],
-                "spriteShapes": [shapes.EMPTY_TREE,
-                                 shapes.EMPTY_TREE,
-                                 shapes.EMPTY_SHRUB,
-                                 shapes.EMPTY_SHRUB],
-                "palettes": [get_fruit_tree_palette("ripe_apple"),
-                             get_fruit_tree_palette("ripe_banana"),
-                             get_fruit_tree_palette("ripe_apple"),
-                             get_fruit_tree_palette("ripe_banana")],
+                "spriteNames": [
+                    "appleTreeSprite",
+                    "bananaTreeSprite",
+                    "appleShrubSprite",
+                    "bananaShrubSprite",
+                ],
+                "spriteShapes": [
+                    shapes.EMPTY_TREE,
+                    shapes.EMPTY_TREE,
+                    shapes.EMPTY_SHRUB,
+                    shapes.EMPTY_SHRUB,
+                ],
+                "palettes": [
+                    get_fruit_tree_palette("ripe_apple"),
+                    get_fruit_tree_palette("ripe_banana"),
+                    get_fruit_tree_palette("ripe_apple"),
+                    get_fruit_tree_palette("ripe_banana"),
+                ],
                 "noRotates": [True] * 4,
-            }
+            },
         },
         {
             "component": "TreeType",
@@ -507,9 +519,9 @@ TREE = {
                     # lower probability that child can pick up what they like
                     "bananaShrub": 0.01,
                 }
-            }
+            },
         },
-    ]
+    ],
 }
 
 FRUIT = {
@@ -553,45 +565,45 @@ FRUIT = {
                         "sprite": "bananaInShrubSprite",
                     },
                 ],
-            }
+            },
         },
         {"component": "Transform"},
         {
             "component": "Appearance",
             "kwargs": {
                 "renderMode": "ascii_shape",
-                "spriteNames": ["appleSprite",
-                                "appleInTreeSprite",
-                                "appleInShrubSprite",
-                                "bananaSprite",
-                                "bananaInTreeSprite",
-                                "bananaInShrubSprite",
-                                ],
-                "spriteShapes": [shapes.HD_APPLE,
-                                 shapes.FRUIT_IN_TREE,
-                                 shapes.FRUIT_IN_SHRUB,
-                                 shapes.HD_APPLE,
-                                 shapes.FRUIT_IN_TREE,
-                                 shapes.FRUIT_IN_SHRUB,
-                                 ],
-                "palettes": [shapes.get_palette((255, 0, 0, 255)),
-                             get_fruit_tree_palette("ripe_apple"),
-                             get_fruit_tree_palette("ripe_apple"),
-                             shapes.get_palette((255, 255, 53, 255)),
-                             get_fruit_tree_palette("ripe_banana"),
-                             get_fruit_tree_palette("ripe_banana"),
-                             ],
+                "spriteNames": [
+                    "appleSprite",
+                    "appleInTreeSprite",
+                    "appleInShrubSprite",
+                    "bananaSprite",
+                    "bananaInTreeSprite",
+                    "bananaInShrubSprite",
+                ],
+                "spriteShapes": [
+                    shapes.HD_APPLE,
+                    shapes.FRUIT_IN_TREE,
+                    shapes.FRUIT_IN_SHRUB,
+                    shapes.HD_APPLE,
+                    shapes.FRUIT_IN_TREE,
+                    shapes.FRUIT_IN_SHRUB,
+                ],
+                "palettes": [
+                    shapes.get_palette((255, 0, 0, 255)),
+                    get_fruit_tree_palette("ripe_apple"),
+                    get_fruit_tree_palette("ripe_apple"),
+                    shapes.get_palette((255, 255, 53, 255)),
+                    get_fruit_tree_palette("ripe_banana"),
+                    get_fruit_tree_palette("ripe_banana"),
+                ],
                 "noRotates": [True] * 6,
-            }
+            },
         },
         {
             "component": "Graspable",
         },
-        {
-            "component": "FruitType",
-            "kwargs": {"framesTillAppleRespawn": 50}
-        },
-    ]
+        {"component": "FruitType", "kwargs": {"framesTillAppleRespawn": 50}},
+    ],
 }
 
 SPAWN_POINT = {
@@ -604,12 +616,12 @@ SPAWN_POINT = {
                 "stateConfigs": [{
                     "state": "spawnPoint",
                     "layer": "alternateLogic",
-                    "groups": ["spawnPoints"]
+                    "groups": ["spawnPoints"],
                 }],
-            }
+            },
         },
         {"component": "Transform"},
-    ]
+    ],
 }
 
 
@@ -638,15 +650,15 @@ PREFABS = {
 # Primitive action components.
 # pylint: disable=bad-whitespace
 # pyformat: disable
-NOOP       = {"move": 0, "turn":  0, "eat": 0, "grasp": 0}
-FORWARD    = {"move": 1, "turn":  0, "eat": 0, "grasp": 0}
-STEP_RIGHT = {"move": 2, "turn":  0, "eat": 0, "grasp": 0}
-BACKWARD   = {"move": 3, "turn":  0, "eat": 0, "grasp": 0}
-STEP_LEFT  = {"move": 4, "turn":  0, "eat": 0, "grasp": 0}
-TURN_LEFT  = {"move": 0, "turn": -1, "eat": 0, "grasp": 0}
-TURN_RIGHT = {"move": 0, "turn":  1, "eat": 0, "grasp": 0}
-EAT     = {"move": 0, "turn":  0, "eat": 1, "grasp": 0}
-GRASP      = {"move": 0, "turn":  0, "eat": 0, "grasp": 1}
+NOOP = {"move": 0, "turn": 0, "eat": 0, "grasp": 0}
+FORWARD = {"move": 1, "turn": 0, "eat": 0, "grasp": 0}
+STEP_RIGHT = {"move": 2, "turn": 0, "eat": 0, "grasp": 0}
+BACKWARD = {"move": 3, "turn": 0, "eat": 0, "grasp": 0}
+STEP_LEFT = {"move": 4, "turn": 0, "eat": 0, "grasp": 0}
+TURN_LEFT = {"move": 0, "turn": -1, "eat": 0, "grasp": 0}
+TURN_RIGHT = {"move": 0, "turn": 1, "eat": 0, "grasp": 0}
+EAT = {"move": 0, "turn": 0, "eat": 1, "grasp": 0}
+GRASP = {"move": 0, "turn": 0, "eat": 0, "grasp": 1}
 
 # pyformat: enable
 # pylint: enable=bad-whitespace
@@ -676,10 +688,10 @@ def create_scene():
                   "stateConfigs": [{
                       "state": "scene",
                   }],
-              }
+              },
           },
           {"component": "Transform"},
-      ]
+      ],
   }
 
   return scene
@@ -701,10 +713,12 @@ def _create_avatar_object(player_idx: int, is_child: bool) -> Dict[str, Any]:
     banana_reward = 1
     grasp_success_probability = 0.3
     # child sees trees as shrubs
-    custom_sprite_map = {"appleTreeSprite": "appleShrubSprite",
-                         "appleInTreeSprite": "appleInShrubSprite",
-                         "bananaTreeSprite": "bananaShrubSprite",
-                         "bananaInTreeSprite": "bananaInShrubSprite"}
+    custom_sprite_map = {
+        "appleTreeSprite": "appleShrubSprite",
+        "appleInTreeSprite": "appleInShrubSprite",
+        "bananaTreeSprite": "bananaShrubSprite",
+        "bananaInTreeSprite": "bananaInShrubSprite",
+    }
   else:
     color_palette = shapes.get_palette(colors.palette[0])
     sprite = shapes.CUTE_AVATAR
@@ -713,11 +727,13 @@ def _create_avatar_object(player_idx: int, is_child: bool) -> Dict[str, Any]:
     banana_reward = 1
     grasp_success_probability = 1
     # parent sees bananas as apples
-    custom_sprite_map = {"bananaTreeSprite": "appleTreeSprite",
-                         "bananaShrubSprite": "appleShrubSprite",
-                         "bananaInTreeSprite": "appleInTreeSprite",
-                         "bananaInShrubSprite": "appleInShrubSprite",
-                         "bananaSprite": "appleSprite",}
+    custom_sprite_map = {
+        "bananaTreeSprite": "appleTreeSprite",
+        "bananaShrubSprite": "appleShrubSprite",
+        "bananaInTreeSprite": "appleInTreeSprite",
+        "bananaInShrubSprite": "appleInShrubSprite",
+        "bananaSprite": "appleSprite",
+    }
 
   avatar_object = {
       "name": "avatar",
@@ -725,8 +741,7 @@ def _create_avatar_object(player_idx: int, is_child: bool) -> Dict[str, Any]:
           {
               "component": "StateManager",
               "kwargs": {
-                  "initialState":
-                      live_state_name,
+                  "initialState": live_state_name,
                   "stateConfigs": [
                       # Initial player state.
                       {
@@ -734,19 +749,14 @@ def _create_avatar_object(player_idx: int, is_child: bool) -> Dict[str, Any]:
                           "layer": "superOverlay",
                           "sprite": avatar_sprite_name,
                           "contact": "avatar",
-                          "groups": ["players"]
+                          "groups": ["players"],
                       },
                       # Player wait type for times when they are zapped out.
-                      {
-                          "state": "playerWait",
-                          "groups": ["playerWaits"]
-                      },
-                  ]
-              }
+                      {"state": "playerWait", "groups": ["playerWaits"]},
+                  ],
+              },
           },
-          {
-              "component": "Transform"
-          },
+          {"component": "Transform"},
           {
               "component": "Appearance",
               "kwargs": {
@@ -754,8 +764,8 @@ def _create_avatar_object(player_idx: int, is_child: bool) -> Dict[str, Any]:
                   "spriteNames": [avatar_sprite_name],
                   "spriteShapes": [sprite],
                   "palettes": [color_palette],
-                  "noRotates": [True]
-              }
+                  "noRotates": [True],
+              },
           },
           {
               "component": "Avatar",
@@ -764,10 +774,7 @@ def _create_avatar_object(player_idx: int, is_child: bool) -> Dict[str, Any]:
                   "aliveState": live_state_name,
                   "waitState": "playerWait",
                   "spawnGroup": "spawnPoints",
-                  "actionOrder": ["move",
-                                  "turn",
-                                  "eat",
-                                  "grasp"],
+                  "actionOrder": ["move", "turn", "eat", "grasp"],
                   "actionSpec": {
                       "move": {"default": 0, "min": 0, "max": len(_COMPASS)},
                       "turn": {"default": 0, "min": -1, "max": 1},
@@ -779,23 +786,23 @@ def _create_avatar_object(player_idx: int, is_child: bool) -> Dict[str, Any]:
                       "right": 5,
                       "forward": 9,
                       "backward": 1,
-                      "centered": False
+                      "centered": False,
                   },
                   "spriteMap": custom_sprite_map,
-              }
+              },
           },
           {
               "component": "Role",
               "kwargs": {
                   "isChild": is_child,
-              }
+              },
           },
           {
               "component": "Eating",
               "kwargs": {
                   "bananaReward": banana_reward,
                   "appleReward": apple_reward,
-              }
+              },
           },
           {
               "component": "PlayerGrasp",
@@ -808,19 +815,19 @@ def _create_avatar_object(player_idx: int, is_child: bool) -> Dict[str, Any]:
                   "droppingParentPseudoreward": 0.0,
                   "tryingChildPseudoreward": 0.0,
                   "tryingChildBananaPseudoreward": 0.0,
-              }
+              },
           },
           {
               "component": "AvatarRespawn",
               "kwargs": {
                   "framesTillRespawn": 100,
-              }
+              },
           },
           {
               "component": "Hunger",
               "kwargs": {
                   "framesTillHungry": 200,
-              }
+              },
           },
           {
               "component": "HungerObserver",
@@ -828,7 +835,7 @@ def _create_avatar_object(player_idx: int, is_child: bool) -> Dict[str, Any]:
                   "needComponent": "Hunger",
               },
           },
-      ]
+      ],
   }
   if _ENABLE_DEBUG_OBSERVATIONS:
     avatar_object["components"].append({
@@ -841,8 +848,7 @@ def _create_avatar_object(player_idx: int, is_child: bool) -> Dict[str, Any]:
 
 def _build_child_objects(player_idx: int):
   """Build child avatar objects."""
-  avatar_object = _create_avatar_object(
-      player_idx, is_child=True)
+  avatar_object = _create_avatar_object(player_idx, is_child=True)
   game_objects = []
   game_objects.append(avatar_object)
   return game_objects
@@ -850,8 +856,7 @@ def _build_child_objects(player_idx: int):
 
 def _build_parent_objects(player_idx: int):
   """Build parent avatar objects."""
-  avatar_object = _create_avatar_object(
-      player_idx, is_child=False)
+  avatar_object = _create_avatar_object(player_idx, is_child=False)
   game_objects = []
   game_objects.append(avatar_object)
   return game_objects
@@ -901,7 +906,10 @@ def get_config():
       "RGB": specs.OBSERVATION["RGB"],
       "HUNGER": specs.float64(),
       # Debug only (do not use the following observations in policies).
-      "WORLD.RGB": specs.rgb(104, 160,),
+      "WORLD.RGB": specs.rgb(
+          104,
+          160,
+      ),
   })
 
   # The roles assigned to each player.

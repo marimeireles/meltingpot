@@ -39,30 +39,35 @@ class CollectiveRewardWrapperTest(absltest.TestCase):
         step_type=dm_env.StepType.MID,
         reward=REWARDS,
         discount=1.0,
-        observation=[{'RGB': RGB} for _ in range(NUM_PLAYERS)])
+        observation=[{"RGB": RGB} for _ in range(NUM_PLAYERS)],
+    )
     actual = wrapped._get_timestep(source)
     added_key = collective_reward_wrapper._COLLECTIVE_REWARD_OBS
     collective_reward = np.sum(REWARDS)
     expected_observation = [
-        {'RGB': RGB, added_key: collective_reward},
+        {"RGB": RGB, added_key: collective_reward},
     ] * NUM_PLAYERS
     expected_timestep = dm_env.TimeStep(
         step_type=dm_env.StepType.MID,
         reward=REWARDS,
         discount=1.0,
-        observation=expected_observation)
+        observation=expected_observation,
+    )
     np.testing.assert_equal(actual, expected_timestep)
 
   def test_spec(self):
     env = mock.Mock(spec_set=dmlab2d.Environment)
     env.observation_spec.return_value = [{
-        'RGB': RGB_SPEC,
+        "RGB": RGB_SPEC,
     }] * NUM_PLAYERS
     wrapped = collective_reward_wrapper.CollectiveRewardWrapper(env)
 
     added_key = collective_reward_wrapper._COLLECTIVE_REWARD_OBS
-    self.assertEqual(wrapped.observation_spec(), [
-        {'RGB': RGB_SPEC, added_key: COLLECTIVE_REWARD_SPEC}] * NUM_PLAYERS)
+    self.assertEqual(
+        wrapped.observation_spec(),
+        [{"RGB": RGB_SPEC, added_key: COLLECTIVE_REWARD_SPEC}] * NUM_PLAYERS,
+    )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
   absltest.main()

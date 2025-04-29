@@ -19,18 +19,21 @@ import dm_env
 from meltingpot.utils.policies import policy
 from meltingpot.utils.puppeteers import puppeteer as puppeteer_lib
 
-PuppeteerState = TypeVar('PuppeteerState')
-PolicyState = TypeVar('PolicyState')
+PuppeteerState = TypeVar("PuppeteerState")
+PolicyState = TypeVar("PolicyState")
 
 
-class PuppetPolicy(policy.Policy[Tuple[PuppeteerState, PolicyState]],
-                   Generic[PuppeteerState, PolicyState]):
+class PuppetPolicy(
+    policy.Policy[Tuple[PuppeteerState, PolicyState]],
+    Generic[PuppeteerState, PolicyState],
+):
   """A puppet policy controlled by a puppeteer function."""
 
   def __init__(
       self,
       puppeteer: puppeteer_lib.Puppeteer[PuppeteerState],
-      puppet: policy.Policy[PolicyState]) -> None:
+      puppet: policy.Policy[PolicyState],
+  ) -> None:
     """Creates a new PuppetBot.
 
     Args:
@@ -49,7 +52,8 @@ class PuppetPolicy(policy.Policy[Tuple[PuppeteerState, PolicyState]],
     """See base class."""
     puppeteer_state, puppet_state = prev_state
     puppet_timestep, puppeteer_state = self._puppeteer.step(
-        timestep, puppeteer_state)
+        timestep, puppeteer_state
+    )
     action, puppet_state = self._puppet.step(puppet_timestep, puppet_state)
     next_state = (puppeteer_state, puppet_state)
     return action, next_state

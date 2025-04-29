@@ -45,7 +45,7 @@ class GiftRefinementsCooperatorTest(parameterized.TestCase):
         gift_goal=_GIFT,
     )
     (actual,), _ = puppeteers.goals_from_observations(
-        puppeteer, [{'INVENTORY': inventory}]
+        puppeteer, [{"INVENTORY": inventory}]
     )
     self.assertEqual(actual, expected)
 
@@ -69,10 +69,10 @@ class GiftRefinementsExtremeCooperatorTest(parameterized.TestCase):
         gift_goal=_GIFT,
     )
     (actual,), _ = puppeteers.goals_from_observations(
-        puppeteer, [{'INVENTORY': inventory}]
+        puppeteer, [{"INVENTORY": inventory}]
     )
     self.assertEqual(actual, expected)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
   absltest.main()

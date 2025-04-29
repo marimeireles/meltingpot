@@ -21,32 +21,36 @@ import immutabledict
 from meltingpot.utils.substrates.wrappers import observables
 import numpy as np
 
-T = TypeVar('T')
+T = TypeVar("T")
 Numeric = Union[int, float, np.ndarray]
 
 
 def _validate_action(
     action: Mapping[str, np.ndarray],
-    action_spec: Mapping[str, dm_env.specs.Array]) -> None:
+    action_spec: Mapping[str, dm_env.specs.Array],
+) -> None:
   """Raises ValueError if action does not matches the action_spec."""
   if set(action) != set(action_spec):
-    raise ValueError('Keys do not match.')
+    raise ValueError("Keys do not match.")
   for key, spec in action_spec.items():
     spec.validate(action[key])
 
 
 def _validate_action_table(
     action_table: Sequence[Mapping[str, np.ndarray]],
-    action_spec: Mapping[str, dm_env.specs.Array]) -> None:
+    action_spec: Mapping[str, dm_env.specs.Array],
+) -> None:
   """Raises ValueError if action_table does not matches the action_spec."""
   if not action_table:
-    raise ValueError('action_table must not be empty')
+    raise ValueError("action_table must not be empty")
   for action_index, action in enumerate(action_table):
     try:
       _validate_action(action, action_spec)
     except ValueError:
-      raise ValueError(f'Action {action_index} ({action}) does not match '
-                       f'action_spec ({action_spec}).') from None
+      raise ValueError(
+          f"Action {action_index} ({action}) does not match "
+          f"action_spec ({action_spec})."
+      ) from None
 
 
 def _immutable_action(
@@ -71,7 +75,8 @@ def _immutable_action_table(
 ) -> Sequence[Mapping[str, np.ndarray]]:
   """Returns an immutable action table."""
   return tuple(
-      _immutable_action(action, action_spec) for action in action_table)
+      _immutable_action(action, action_spec) for action in action_table
+  )
 
 
 class Wrapper(observables.ObservableLab2dWrapper):
@@ -89,7 +94,7 @@ class Wrapper(observables.ObservableLab2dWrapper):
     """
     action_spec = env.action_spec()
     if any(action_spec[0] != spec for spec in action_spec[1:]):
-      raise ValueError('Environment has heterogeneous action specs.')
+      raise ValueError("Environment has heterogeneous action specs.")
     super().__init__(env)
     self._action_table = _immutable_action_table(action_table, action_spec[0])
     _validate_action_table(self._action_table, action_spec[0])
@@ -103,7 +108,6 @@ class Wrapper(observables.ObservableLab2dWrapper):
   def action_spec(self) -> Sequence[dm_env.specs.DiscreteArray]:
     """See base class."""
     spec = dm_env.specs.DiscreteArray(
-        num_values=len(self._action_table),
-        dtype=np.int64,
-        name='action')
+        num_values=len(self._action_table), dtype=np.int64, name="action"
+    )
     return tuple(spec for _ in super().action_spec())

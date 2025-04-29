@@ -31,8 +31,9 @@ class FixedActionPolicy(policy.Policy[Tuple[()]]):
     """
     self._action = action
 
-  def step(self, timestep: dm_env.TimeStep,
-           prev_state: Tuple[()]) -> Tuple[int, Tuple[()]]:
+  def step(
+      self, timestep: dm_env.TimeStep, prev_state: Tuple[()]
+  ) -> Tuple[int, Tuple[()]]:
     """See base class."""
     return self._action, prev_state
 

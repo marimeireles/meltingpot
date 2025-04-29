@@ -28,7 +28,7 @@ from ray.rllib.policy import sample_batch
 
 from ..gym import utils
 
-PLAYER_STR_FORMAT = 'player_{index}'
+PLAYER_STR_FORMAT = "player_{index}"
 
 
 class MeltingPotEnv(multi_agent_env.MultiAgentEnv):
@@ -53,9 +53,11 @@ class MeltingPotEnv(multi_agent_env.MultiAgentEnv):
     # Melting Pot uses a tuple, so we convert
     self.observation_space = self._convert_spaces_tuple_to_dict(
         utils.spec_to_space(self._env.observation_spec()),
-        remove_world_observations=True)
+        remove_world_observations=True,
+    )
     self.action_space = self._convert_spaces_tuple_to_dict(
-        utils.spec_to_space(self._env.action_spec()))
+        utils.spec_to_space(self._env.action_spec())
+    )
     super().__init__()
 
   def reset(self, *args, **kwargs):
@@ -71,7 +73,7 @@ class MeltingPotEnv(multi_agent_env.MultiAgentEnv):
         agent_id: timestep.reward[index]
         for index, agent_id in enumerate(self._ordered_agent_ids)
     }
-    done = {'__all__': timestep.last()}
+    done = {"__all__": timestep.last()}
     info = {}
 
     observations = utils.timestep_to_observations(timestep)
@@ -87,7 +89,7 @@ class MeltingPotEnv(multi_agent_env.MultiAgentEnv):
 
   # Metadata is required by the gym `Env` class that we are extending, to show
   # which modes the `render` method supports.
-  metadata = {'render.modes': ['rgb_array']}
+  metadata = {"render.modes": ["rgb_array"]}
 
   def render(self) -> np.ndarray:
     """Render the environment.
@@ -101,15 +103,14 @@ class MeltingPotEnv(multi_agent_env.MultiAgentEnv):
         into a video.
     """
     observation = self._env.observation()
-    world_rgb = observation[0]['WORLD.RGB']
+    world_rgb = observation[0]["WORLD.RGB"]
 
     # RGB mode is used for recording videos
     return world_rgb
 
   def _convert_spaces_tuple_to_dict(
-      self,
-      input_tuple: spaces.Tuple,
-      remove_world_observations: bool = False) -> spaces.Dict:
+      self, input_tuple: spaces.Tuple, remove_world_observations: bool = False
+  ) -> spaces.Dict:
     """Returns spaces tuple converted to a dictionary.
 
     Args:
@@ -117,8 +118,11 @@ class MeltingPotEnv(multi_agent_env.MultiAgentEnv):
       remove_world_observations: If True will remove non-player observations.
     """
     return spaces.Dict({
-        agent_id: (utils.remove_world_observations_from_space(input_tuple[i])
-                   if remove_world_observations else input_tuple[i])
+        agent_id: (
+            utils.remove_world_observations_from_space(input_tuple[i])
+            if remove_world_observations
+            else input_tuple[i]
+        )
         for i, agent_id in enumerate(self._ordered_agent_ids)
     })
 
@@ -126,7 +130,7 @@ class MeltingPotEnv(multi_agent_env.MultiAgentEnv):
 def env_creator(env_config):
   """Outputs an environment for registering."""
   env_config = config_dict.ConfigDict(env_config)
-  env = substrate.build(env_config['substrate'], roles=env_config['roles'])
+  env = substrate.build(env_config["substrate"], roles=env_config["roles"])
   env = MeltingPotEnv(env)
   return env
 
@@ -137,9 +141,11 @@ class RayModelPolicy(policy.Policy[policy.State]):
   Note: Currently only supports a single input, batching is not enabled
   """
 
-  def __init__(self,
-               model: algorithms.Algorithm,
-               policy_id: str = sample_batch.DEFAULT_POLICY_ID) -> None:
+  def __init__(
+      self,
+      model: algorithms.Algorithm,
+      policy_id: str = sample_batch.DEFAULT_POLICY_ID,
+  ) -> None:
     """Initialize a policy instance.
 
     Args:
@@ -150,13 +156,14 @@ class RayModelPolicy(policy.Policy[policy.State]):
     self._prev_action = 0
     self._policy_id = policy_id
 
-  def step(self, timestep: dm_env.TimeStep,
-           prev_state: policy.State) -> Tuple[int, policy.State]:
+  def step(
+      self, timestep: dm_env.TimeStep, prev_state: policy.State
+  ) -> Tuple[int, policy.State]:
     """See base class."""
     observations = {
         key: value
         for key, value in timestep.observation.items()
-        if 'WORLD' not in key
+        if "WORLD" not in key
     }
 
     action, state, _ = self._model.compute_single_action(
@@ -164,7 +171,8 @@ class RayModelPolicy(policy.Policy[policy.State]):
         prev_state,
         policy_id=self._policy_id,
         prev_action=self._prev_action,
-        prev_reward=timestep.reward)
+        prev_reward=timestep.reward,
+    )
 
     self._prev_action = action
     return action, state

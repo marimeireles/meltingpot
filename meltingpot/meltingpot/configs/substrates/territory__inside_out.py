@@ -64,8 +64,13 @@ L=====================J
 
 # `prefab` determines which prefab game object to use for each `char` in the
 # ascii map.
-resource_associated_prefabs = ["floor", "resource_texture", "resource",
-                               "reward_indicator", "damage_indicator"]
+resource_associated_prefabs = [
+    "floor",
+    "resource_texture",
+    "resource",
+    "reward_indicator",
+    "damage_indicator",
+]
 resource = {"type": "all", "list": resource_associated_prefabs}
 spawn_point_associated_prefabs = ["floor", "spawn_point"]
 spawn_point = {"type": "all", "list": spawn_point_associated_prefabs}

@@ -168,7 +168,7 @@ NW_WALL_CORNER = {
                     "layer": "upperPhysical",
                     "sprite": "NwWallCorner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -178,10 +178,10 @@ NW_WALL_CORNER = {
                 "spriteNames": ["NwWallCorner"],
                 "spriteShapes": [shapes.NW_SHIP_WALL],
                 "palettes": [shapes.SHIP_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 NE_WALL_CORNER = {
@@ -196,7 +196,7 @@ NE_WALL_CORNER = {
                     "layer": "upperPhysical",
                     "sprite": "NeWallCorner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -206,10 +206,10 @@ NE_WALL_CORNER = {
                 "spriteNames": ["NeWallCorner"],
                 "spriteShapes": [shapes.NE_SHIP_WALL],
                 "palettes": [shapes.SHIP_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 SE_WALL_CORNER = {
@@ -224,7 +224,7 @@ SE_WALL_CORNER = {
                     "layer": "upperPhysical",
                     "sprite": "SeWallCorner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -234,10 +234,10 @@ SE_WALL_CORNER = {
                 "spriteNames": ["SeWallCorner"],
                 "spriteShapes": [shapes.SE_SHIP_WALL],
                 "palettes": [shapes.SHIP_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 SW_WALL_CORNER = {
@@ -252,7 +252,7 @@ SW_WALL_CORNER = {
                     "layer": "upperPhysical",
                     "sprite": "SwWallCorner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -262,10 +262,10 @@ SW_WALL_CORNER = {
                 "spriteNames": ["SwWallCorner"],
                 "spriteShapes": [shapes.SW_SHIP_WALL],
                 "palettes": [shapes.SHIP_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 WALL_NORTH = {
@@ -280,7 +280,7 @@ WALL_NORTH = {
                     "layer": "upperPhysical",
                     "sprite": "WallNorth",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -290,10 +290,10 @@ WALL_NORTH = {
                 "spriteNames": ["WallNorth"],
                 "spriteShapes": [shapes.NS_SHIP_WALL],
                 "palettes": [shapes.SHIP_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 TCOUPLING_E = {
@@ -308,7 +308,7 @@ TCOUPLING_E = {
                     "layer": "upperPhysical",
                     "sprite": "TcouplingE",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -318,10 +318,10 @@ TCOUPLING_E = {
                 "spriteNames": ["TcouplingE"],
                 "spriteShapes": [shapes.SHIP_WALL_TCOUPLING_E],
                 "palettes": [shapes.SHIP_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 TCOUPLING_W = {
@@ -336,7 +336,7 @@ TCOUPLING_W = {
                     "layer": "upperPhysical",
                     "sprite": "TcouplingW",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -346,10 +346,10 @@ TCOUPLING_W = {
                 "spriteNames": ["TcouplingW"],
                 "spriteShapes": [shapes.SHIP_WALL_TCOUPLING_W],
                 "palettes": [shapes.SHIP_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 TCOUPLING_N = {
@@ -364,7 +364,7 @@ TCOUPLING_N = {
                     "layer": "upperPhysical",
                     "sprite": "TcouplingN",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -374,10 +374,10 @@ TCOUPLING_N = {
                 "spriteNames": ["TcouplingN"],
                 "spriteShapes": [shapes.SHIP_WALL_TCOUPLING_N],
                 "palettes": [shapes.SHIP_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 TCOUPLING_S = {
@@ -392,7 +392,7 @@ TCOUPLING_S = {
                     "layer": "upperPhysical",
                     "sprite": "TcouplingS",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -402,10 +402,10 @@ TCOUPLING_S = {
                 "spriteNames": ["TcouplingS"],
                 "spriteShapes": [shapes.SHIP_WALL_TCOUPLING_S],
                 "palettes": [shapes.SHIP_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 W_SHIP_SOLID_WALL = {
@@ -420,7 +420,7 @@ W_SHIP_SOLID_WALL = {
                     "layer": "upperPhysical",
                     "sprite": "WShipSolidWall",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -430,10 +430,10 @@ W_SHIP_SOLID_WALL = {
                 "spriteNames": ["WShipSolidWall"],
                 "spriteShapes": [shapes.W_SHIP_SOLID_WALL],
                 "palettes": [shapes.SHIP_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 N_SHIP_SOLID_WALL = {
@@ -448,7 +448,7 @@ N_SHIP_SOLID_WALL = {
                     "layer": "upperPhysical",
                     "sprite": "NShipSolidWall",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -458,10 +458,10 @@ N_SHIP_SOLID_WALL = {
                 "spriteNames": ["NShipSolidWall"],
                 "spriteShapes": [shapes.N_SHIP_SOLID_WALL],
                 "palettes": [shapes.SHIP_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 E_SHIP_SOLID_WALL = {
@@ -476,7 +476,7 @@ E_SHIP_SOLID_WALL = {
                     "layer": "upperPhysical",
                     "sprite": "EShipSolidWall",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -486,10 +486,10 @@ E_SHIP_SOLID_WALL = {
                 "spriteNames": ["EShipSolidWall"],
                 "spriteShapes": [shapes.E_SHIP_SOLID_WALL],
                 "palettes": [shapes.SHIP_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 S_SHIP_SOLID_WALL = {
@@ -504,7 +504,7 @@ S_SHIP_SOLID_WALL = {
                     "layer": "upperPhysical",
                     "sprite": "SShipSolidWall",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -514,10 +514,10 @@ S_SHIP_SOLID_WALL = {
                 "spriteNames": ["SShipSolidWall"],
                 "spriteShapes": [shapes.S_SHIP_SOLID_WALL],
                 "palettes": [shapes.SHIP_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 WALL_WEST = {
@@ -532,7 +532,7 @@ WALL_WEST = {
                     "layer": "upperPhysical",
                     "sprite": "WallWest",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -542,10 +542,10 @@ WALL_WEST = {
                 "spriteNames": ["WallWest"],
                 "spriteShapes": [shapes.EW_SHIP_WALL],
                 "palettes": [shapes.SHIP_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 NW_GRATE = {
@@ -560,7 +560,7 @@ NW_GRATE = {
                     "layer": "background",
                     "sprite": "nw_grate",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -570,10 +570,10 @@ NW_GRATE = {
                 "spriteNames": ["nw_grate"],
                 "spriteShapes": [shapes.NW_GRATE],
                 "palettes": [shapes.GRATE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 N_GRATE = {
@@ -588,7 +588,7 @@ N_GRATE = {
                     "layer": "background",
                     "sprite": "n_grate",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -598,10 +598,10 @@ N_GRATE = {
                 "spriteNames": ["n_grate"],
                 "spriteShapes": [shapes.N_GRATE],
                 "palettes": [shapes.GRATE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 NE_GRATE = {
@@ -616,7 +616,7 @@ NE_GRATE = {
                     "layer": "background",
                     "sprite": "ne_grate",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -626,10 +626,10 @@ NE_GRATE = {
                 "spriteNames": ["ne_grate"],
                 "spriteShapes": [shapes.NE_GRATE],
                 "palettes": [shapes.GRATE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 W_GRATE = {
@@ -644,7 +644,7 @@ W_GRATE = {
                     "layer": "background",
                     "sprite": "w_grate",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -654,10 +654,10 @@ W_GRATE = {
                 "spriteNames": ["w_grate"],
                 "spriteShapes": [shapes.W_GRATE],
                 "palettes": [shapes.GRATE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 INNER_GRATE = {
@@ -672,7 +672,7 @@ INNER_GRATE = {
                     "layer": "background",
                     "sprite": "inner_grate",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -682,10 +682,10 @@ INNER_GRATE = {
                 "spriteNames": ["inner_grate"],
                 "spriteShapes": [shapes.INNER_GRATE],
                 "palettes": [shapes.GRATE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 E_GRATE = {
@@ -700,7 +700,7 @@ E_GRATE = {
                     "layer": "background",
                     "sprite": "e_grate",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -710,10 +710,10 @@ E_GRATE = {
                 "spriteNames": ["e_grate"],
                 "spriteShapes": [shapes.E_GRATE],
                 "palettes": [shapes.GRATE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 SE_GRATE = {
@@ -728,7 +728,7 @@ SE_GRATE = {
                     "layer": "background",
                     "sprite": "se_grate",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -738,10 +738,10 @@ SE_GRATE = {
                 "spriteNames": ["se_grate"],
                 "spriteShapes": [shapes.SE_GRATE],
                 "palettes": [shapes.GRATE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 S_GRATE = {
@@ -756,7 +756,7 @@ S_GRATE = {
                     "layer": "background",
                     "sprite": "s_grate",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -766,10 +766,10 @@ S_GRATE = {
                 "spriteNames": ["s_grate"],
                 "spriteShapes": [shapes.S_GRATE],
                 "palettes": [shapes.GRATE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 SW_GRATE = {
@@ -784,7 +784,7 @@ SW_GRATE = {
                     "layer": "background",
                     "sprite": "sw_grate",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -794,10 +794,10 @@ SW_GRATE = {
                 "spriteNames": ["sw_grate"],
                 "spriteShapes": [shapes.SW_GRATE],
                 "palettes": [shapes.GRATE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 GLASS_WALL = {
@@ -812,7 +812,7 @@ GLASS_WALL = {
                     "layer": "upperPhysical",
                     "sprite": "glass_wall",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -822,10 +822,10 @@ GLASS_WALL = {
                 "spriteNames": ["glass_wall"],
                 "spriteShapes": [shapes.GLASS_WALL],
                 "palettes": [shapes.GLASS_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 FILL = {
@@ -840,7 +840,7 @@ FILL = {
                     "layer": "upperPhysical",
                     "sprite": "fill",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -849,11 +849,13 @@ FILL = {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["fill"],
                 "spriteShapes": [shapes.FILL],
-                "palettes": [{"i": (58, 68, 102, 255),}],
-                "noRotates": [False]
-            }
+                "palettes": [{
+                    "i": (58, 68, 102, 255),
+                }],
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 TILED_FLOOR = {
@@ -868,7 +870,7 @@ TILED_FLOOR = {
                     "layer": "background",
                     "sprite": "tiled_floor",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -877,12 +879,14 @@ TILED_FLOOR = {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["tiled_floor"],
                 "spriteShapes": [shapes.TILED_FLOOR_GREY],
-                "palettes": [{"o": (204, 199, 192, 255),
-                              "-": (194, 189, 182, 255),}],
-                "noRotates": [False]
-            }
+                "palettes": [{
+                    "o": (204, 199, 192, 255),
+                    "-": (194, 189, 182, 255),
+                }],
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 WOOD_FLOOR = {
@@ -897,7 +901,7 @@ WOOD_FLOOR = {
                     "layer": "background",
                     "sprite": "wood_floor",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -907,10 +911,10 @@ WOOD_FLOOR = {
                 "spriteNames": ["wood_floor"],
                 "spriteShapes": [shapes.WOOD_FLOOR],
                 "palettes": [shapes.WOOD_FLOOR_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 METAL_FLOORING = {
@@ -925,7 +929,7 @@ METAL_FLOORING = {
                     "layer": "background",
                     "sprite": "metal_flooring",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -935,10 +939,10 @@ METAL_FLOORING = {
                 "spriteNames": ["metal_flooring"],
                 "spriteShapes": [shapes.METAL_TILE],
                 "palettes": [shapes.METAL_FLOOR_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 METAL_PANEL_FLOORING = {
@@ -953,7 +957,7 @@ METAL_PANEL_FLOORING = {
                     "layer": "background",
                     "sprite": "metal_panel_flooring",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -963,10 +967,10 @@ METAL_PANEL_FLOORING = {
                 "spriteNames": ["metal_panel_flooring"],
                 "spriteShapes": [shapes.METAL_PANEL],
                 "palettes": [shapes.METAL_PANEL_FLOOR_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 CHECKERED_FLOORING = {
@@ -981,7 +985,7 @@ CHECKERED_FLOORING = {
                     "layer": "background",
                     "sprite": "checkered_flooring",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -990,12 +994,14 @@ CHECKERED_FLOORING = {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["checkered_flooring"],
                 "spriteShapes": [shapes.CHECKERED_TILE],
-                "palettes": [{"X": (120, 108, 108, 255),
-                              "x": (115, 103, 103, 255),}],
-                "noRotates": [False]
-            }
+                "palettes": [{
+                    "X": (120, 108, 108, 255),
+                    "x": (115, 103, 103, 255),
+                }],
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 TILED_FLOORING1 = {
@@ -1010,7 +1016,7 @@ TILED_FLOORING1 = {
                     "layer": "background",
                     "sprite": "tiled_flooring1",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -1020,10 +1026,10 @@ TILED_FLOORING1 = {
                 "spriteNames": ["tiled_flooring1"],
                 "spriteShapes": [shapes.TILE1],
                 "palettes": [shapes.TILE_FLOOR_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 TILED_FLOORING2 = {
@@ -1038,7 +1044,7 @@ TILED_FLOORING2 = {
                     "layer": "background",
                     "sprite": "tiled_flooring2",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -1048,10 +1054,10 @@ TILED_FLOORING2 = {
                 "spriteNames": ["tiled_flooring2"],
                 "spriteShapes": [shapes.TILE2],
                 "palettes": [shapes.TILE_FLOOR_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 THRESHOLD = {
@@ -1066,7 +1072,7 @@ THRESHOLD = {
                     "layer": "background",
                     "sprite": "threshold",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -1075,12 +1081,14 @@ THRESHOLD = {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["threshold"],
                 "spriteShapes": [shapes.THRESHOLD],
-                "palettes": [{"X": (92, 95, 92, 255),
-                              "x": (106, 108, 106, 255),}],
-                "noRotates": [False]
-            }
+                "palettes": [{
+                    "X": (92, 95, 92, 255),
+                    "x": (106, 108, 106, 255),
+                }],
+                "noRotates": [False],
+            },
         },
-    ]
+    ],
 }
 
 # Functional components for Hidden Agenda
@@ -1096,12 +1104,12 @@ SPAWN_POINT = {
                     "state": "spawnPoint",
                     "groups": ["spawnPoints"],
                 }],
-            }
+            },
         },
         {
             "component": "Transform",
         },
-    ]
+    ],
 }
 
 VOTING_SPAWN_POINT = {
@@ -1115,12 +1123,12 @@ VOTING_SPAWN_POINT = {
                     "state": "votingSpawnPoint",
                     "groups": ["votingSpawnPoints"],
                 }],
-            }
+            },
         },
         {
             "component": "Transform",
         },
-    ]
+    ],
 }
 
 TELEPORT_SPAWN_POINT = {
@@ -1134,12 +1142,12 @@ TELEPORT_SPAWN_POINT = {
                     "state": "teleportSpawnPoint",
                     "groups": ["teleportSpawnPoints"],
                 }],
-            }
+            },
         },
         {
             "component": "Transform",
         },
-    ]
+    ],
 }
 
 
@@ -1151,14 +1159,17 @@ def get_gem_prefab(crewmate_pseudoreward: float):
               "component": "StateManager",
               "kwargs": {
                   "initialState": "gem",
-                  "stateConfigs": [{
-                      "state": "gem",
-                      "layer": "lowerPhysical",
-                      "sprite": "Gem",
-                  }, {
-                      "state": "gemWait",
-                  }],
-              }
+                  "stateConfigs": [
+                      {
+                          "state": "gem",
+                          "layer": "lowerPhysical",
+                          "sprite": "Gem",
+                      },
+                      {
+                          "state": "gemWait",
+                      },
+                  ],
+              },
           },
           {
               "component": "Transform",
@@ -1167,11 +1178,13 @@ def get_gem_prefab(crewmate_pseudoreward: float):
               "component": "Appearance",
               "kwargs": {
                   "renderMode": "ascii_shape",
-                  "spriteNames": ["Gem",],
+                  "spriteNames": [
+                      "Gem",
+                  ],
                   "spriteShapes": [shapes.SMALL_SPHERE],
                   "palettes": [shapes.MOULD_PALETTE],
                   "noRotates": [True],
-              }
+              },
           },
           {
               "component": "Collectable",
@@ -1181,9 +1194,9 @@ def get_gem_prefab(crewmate_pseudoreward: float):
                   "rewardForCollecting_crewmate": crewmate_pseudoreward,
                   "rewardForCollecting_impostor": 0.0,
                   "regrowRate": 0.001,
-              }
+              },
           },
-      ]
+      ],
   }
 
 
@@ -1200,7 +1213,7 @@ def get_gem_deposit_prefab(crewmate_pseudoreward: float):
                       "layer": "lowerPhysical",
                       "sprite": "GemDeposit",
                   }],
-              }
+              },
           },
           {
               "component": "Transform",
@@ -1213,22 +1226,26 @@ def get_gem_deposit_prefab(crewmate_pseudoreward: float):
                   "spriteShapes": ["x"],
                   "palettes": [shapes.GRATE_PALETTE],
                   "noRotates": [False],
-              }
+              },
           },
           {
               "component": "Deposit",
               "kwargs": {
                   "crewmateReward": crewmate_pseudoreward,
                   "impostorReward": 0.0,
-              }
-          }
-      ]
+              },
+          },
+      ],
   }
 
 
-def create_player(player_idx: int, role: str, num_players: int,
-                  pseudoreward_for_freezing: float,
-                  pseudoreward_for_being_frozen: float):
+def create_player(
+    player_idx: int,
+    role: str,
+    num_players: int,
+    pseudoreward_for_freezing: float,
+    pseudoreward_for_being_frozen: float,
+):
   """Create a prefab for a Player (Impostor or Crewmate).
 
   Args:
@@ -1261,15 +1278,19 @@ def create_player(player_idx: int, role: str, num_players: int,
               "kwargs": {
                   "initialState": live_state_name,
                   "stateConfigs": [
-                      {"state": live_state_name,
-                       "layer": "upperPhysical",
-                       "sprite": avatar_sprite_name,
-                       "contact": "avatar"},
+                      {
+                          "state": live_state_name,
+                          "layer": "upperPhysical",
+                          "sprite": avatar_sprite_name,
+                          "contact": "avatar",
+                      },
                       {"state": "playerWait"},
-                      {"state": "playerBody",
-                       "layer": "upperPhysical",
-                       "sprite": "Player_tagged"},
-                  ]
+                      {
+                          "state": "playerBody",
+                          "layer": "upperPhysical",
+                          "sprite": "Player_tagged",
+                      },
+                  ],
               },
           },
           {
@@ -1280,31 +1301,33 @@ def create_player(player_idx: int, role: str, num_players: int,
               "kwargs": {
                   "renderMode": "ascii_shape",
                   "spriteNames": [avatar_sprite_name, "Player_tagged"],
-                  "spriteShapes": [shapes.CUTE_AVATAR,
-                                   shapes.CUTE_AVATAR_FROZEN],
+                  "spriteShapes": [
+                      shapes.CUTE_AVATAR,
+                      shapes.CUTE_AVATAR_FROZEN,
+                  ],
                   "palettes": [
                       shapes.get_palette(HIDDEN_AGENDA_COLORS[player_idx]),
-                      shapes.get_palette(HIDDEN_AGENDA_COLORS[player_idx])
+                      shapes.get_palette(HIDDEN_AGENDA_COLORS[player_idx]),
                   ],
-                  "noRotates": [True]
-              }
+                  "noRotates": [True],
+              },
           },
           {
               "component": "AdditionalPlayerSprites",
               "kwargs": {
-                  "renderMode":
-                      "ascii_shape",
+                  "renderMode": "ascii_shape",
                   "customSpriteNames": [
                       "Player_impostor" + str(i + 1) for i in range(num_players)
                   ],
-                  "customSpriteShapes": [shapes.CUTE_AVATAR_W_BUBBLE] *
-                                        num_players,
+                  "customSpriteShapes": [
+                      shapes.CUTE_AVATAR_W_BUBBLE
+                  ] * num_players,
                   "customPalettes": [
                       shapes.get_palette(HIDDEN_AGENDA_COLORS[i])
                       for i in range(num_players)
                   ],
-                  "customNoRotates": [True]
-              }
+                  "customNoRotates": [True],
+              },
           },
           {
               "component": "Avatar",
@@ -1325,7 +1348,7 @@ def create_player(player_idx: int, role: str, num_players: int,
                       "right": 5,
                       "forward": 9,
                       "backward": 1,
-                      "centered": False
+                      "centered": False,
                   },
                   "spriteMap": sprite_map,
               },
@@ -1335,19 +1358,19 @@ def create_player(player_idx: int, role: str, num_players: int,
               "kwargs": {
                   "frozenState": "playerBody",
                   "role": role,  # `crewmate` or `impostor`.
-              }
+              },
           },
           {
               "component": "Inventory",
               "kwargs": {
                   "max_gems": 1,
-              }
+              },
           },
           {
               "component": "AdditionalObserver",
               "kwargs": {
                   "num_players": num_players,
-              }
+              },
           },
           {
               "component": "Tagger",
@@ -1358,7 +1381,7 @@ def create_player(player_idx: int, role: str, num_players: int,
                   "penaltyForBeingTagged": pseudoreward_for_being_frozen,
                   "rewardForTagging": pseudoreward_for_freezing,
                   "removeHitPlayer": "freeze",
-              }
+              },
           },
           {
               "component": "ReadyToShootObservation",
@@ -1373,9 +1396,9 @@ def create_player(player_idx: int, role: str, num_players: int,
                   "votingActive": False,
                   "votingMethod": "deliberation",
                   "votingValues": {},
-              }
+              },
           },
-      ]
+      ],
   }
   if _ENABLE_DEBUG_OBSERVATIONS:
     player["components"].append({
@@ -1446,17 +1469,18 @@ def create_prefabs(
   }
   return prefabs
 
+
 # Primitive action components.
 # pylint: disable=bad-whitespace
 # pyformat: disable
-NOOP       = {"move": 0, "turn": 0,  "tag": 0, "vote": 0}
-FORWARD    = {"move": 1, "turn": 0,  "tag": 0, "vote": 0}
-STEP_RIGHT = {"move": 2, "turn": 0,  "tag": 0, "vote": 0}
-BACKWARD   = {"move": 3, "turn": 0,  "tag": 0, "vote": 0}
-STEP_LEFT  = {"move": 4, "turn": 0,  "tag": 0, "vote": 0}
-TURN_LEFT  = {"move": 0, "turn": -1, "tag": 0, "vote": 0}
-TURN_RIGHT = {"move": 0, "turn": 1,  "tag": 0, "vote": 0}
-TAG        = {"move": 0, "turn": 0,  "tag": 1, "vote": 0}
+NOOP = {"move": 0, "turn": 0, "tag": 0, "vote": 0}
+FORWARD = {"move": 1, "turn": 0, "tag": 0, "vote": 0}
+STEP_RIGHT = {"move": 2, "turn": 0, "tag": 0, "vote": 0}
+BACKWARD = {"move": 3, "turn": 0, "tag": 0, "vote": 0}
+STEP_LEFT = {"move": 4, "turn": 0, "tag": 0, "vote": 0}
+TURN_LEFT = {"move": 0, "turn": -1, "tag": 0, "vote": 0}
+TURN_RIGHT = {"move": 0, "turn": 1, "tag": 0, "vote": 0}
+TAG = {"move": 0, "turn": 0, "tag": 1, "vote": 0}
 # pylint: enable=bad-whitespace
 # pyformat: enable
 
@@ -1465,13 +1489,16 @@ def create_action_set(num_players):
   """Create the action set for the agents."""
   action_set = [
       NOOP,
-      FORWARD, BACKWARD,
-      STEP_LEFT, STEP_RIGHT,
-      TURN_LEFT, TURN_RIGHT,
+      FORWARD,
+      BACKWARD,
+      STEP_LEFT,
+      STEP_RIGHT,
+      TURN_LEFT,
+      TURN_RIGHT,
       TAG,
   ]
   # vote for each player and no-vote.
-  for player in range(1, num_players+2):
+  for player in range(1, num_players + 2):
     vote = copy.deepcopy(NOOP)
     vote["vote"] = player
     action_set.append(vote)
@@ -1510,40 +1537,36 @@ def get_config():
                   "stateConfigs": [{
                       "state": "scene",
                   }],
-              }
+              },
           },
           {
               "component": "Transform",
           },
           {
-              "component":
-                  "Progress",
-              "kwargs":
-                  config_dict.ConfigDict({
-                      "num_players":
-                          MANDATED_NUM_PLAYERS,
-                      "goal": 32,
-                      "potential_pseudorewards": False,
-                      "crewmate_task_reward": 1,
-                      "impostor_task_reward": -1,
-                      "crewmate_tag_reward": -1,
-                      "impostor_tag_reward": 1,
-                      "crewmate_vote_reward": 1,
-                      "impostor_vote_reward": -1,
-                      "incorrect_vote_reward": 0,
-                      "correct_vote_reward": 0,
-                      "step_reward": 0,
-                      "teleport_spawn_group":
-                          "teleportSpawnPoints",
-                      "voting_params": {
-                          "type": "deliberation",
-                          "votingPhaseCooldown": 25,
-                          "votingFrameFrequency": 200,
-                          "taggingTriggerVoting": True,
-                      }
-                  })
+              "component": "Progress",
+              "kwargs": config_dict.ConfigDict({
+                  "num_players": MANDATED_NUM_PLAYERS,
+                  "goal": 32,
+                  "potential_pseudorewards": False,
+                  "crewmate_task_reward": 1,
+                  "impostor_task_reward": -1,
+                  "crewmate_tag_reward": -1,
+                  "impostor_tag_reward": 1,
+                  "crewmate_vote_reward": 1,
+                  "impostor_vote_reward": -1,
+                  "incorrect_vote_reward": 0,
+                  "correct_vote_reward": 0,
+                  "step_reward": 0,
+                  "teleport_spawn_group": "teleportSpawnPoints",
+                  "voting_params": {
+                      "type": "deliberation",
+                      "votingPhaseCooldown": 25,
+                      "votingFrameFrequency": 200,
+                      "taggingTriggerVoting": True,
+                  },
+              }),
           },
-      ]
+      ],
   }
   # The voting matrix metric is always used.
   metrics = [{
@@ -1566,23 +1589,20 @@ def get_config():
         "type": "tensor.DoubleTensor",
         "shape": (MANDATED_NUM_PLAYERS,),
         "component": "Progress",
-        "variable": "identity_tensor"
+        "variable": "identity_tensor",
     })
     metrics.append({
         "name": "VOTING",
         "type": "tensor.DoubleTensor",
         "shape": (MANDATED_NUM_PLAYERS, MANDATED_NUM_PLAYERS + 2),
         "component": "Progress",
-        "variable": "votingMatrix"
+        "variable": "votingMatrix",
     })
 
   # Add the global metrics reporter
-  config.scene_prefab["components"].append({
-      "component": "GlobalMetricReporter",
-      "kwargs": {
-          "metrics": metrics
-      }
-  })
+  config.scene_prefab["components"].append(
+      {"component": "GlobalMetricReporter", "kwargs": {"metrics": metrics}}
+  )
 
   # Action set configuration.
   config.action_set = create_action_set(MANDATED_NUM_PLAYERS)
@@ -1610,8 +1630,10 @@ def get_config():
   })
 
   # The roles assigned to each player.
-  config.valid_roles = frozenset({"crewmate",
-                                  "impostor",})
+  config.valid_roles = frozenset({
+      "crewmate",
+      "impostor",
+  })
   config.default_player_roles = ("crewmate",) * 4 + ("impostor",)
 
   return config
@@ -1627,14 +1649,15 @@ def build(
   avatar_objects = []
   for player_idx, role in enumerate(roles):
     # Create an avatar with the correct role.
-    avatar_objects.append(create_player(
-        player_idx=player_idx,
-        role=role,
-        num_players=num_players,
-        pseudoreward_for_freezing=
-        config.pseudorewards.pseudoreward_for_freezing,
-        pseudoreward_for_being_frozen=
-        config.pseudorewards.pseudoreward_for_being_frozen))
+    avatar_objects.append(
+        create_player(
+            player_idx=player_idx,
+            role=role,
+            num_players=num_players,
+            pseudoreward_for_freezing=config.pseudorewards.pseudoreward_for_freezing,
+            pseudoreward_for_being_frozen=config.pseudorewards.pseudoreward_for_being_frozen,
+        )
+    )
   substrate_definition = dict(
       levelName="hidden_agenda",
       levelDirectory="meltingpot/lua/levels",

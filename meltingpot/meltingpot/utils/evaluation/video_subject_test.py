@@ -23,10 +23,10 @@ import numpy as np
 
 def _as_timesteps(frames):
   first, *mids, last = frames
-  yield dm_env.restart(observation=[{'WORLD.RGB': first}])
+  yield dm_env.restart(observation=[{"WORLD.RGB": first}])
   for frame in mids:
-    yield dm_env.transition(observation=[{'WORLD.RGB': frame}], reward=0)
-  yield dm_env.termination(observation=[{'WORLD.RGB': last}], reward=0)
+    yield dm_env.transition(observation=[{"WORLD.RGB": frame}], reward=0)
+  yield dm_env.termination(observation=[{"WORLD.RGB": last}], reward=0)
 
 
 def _get_frames(path):
@@ -67,15 +67,15 @@ class VideoSubjectTest(absltest.TestCase):
   def test_lossless_writes_correct_frames(self):
     # Use lossless compression for equality test.
     subject = video_subject.VideoSubject(
-        root=tempfile.mkdtemp(), extension='avi', codec='png '
+        root=tempfile.mkdtemp(), extension="avi", codec="png "
     )
     step_written, video_path = _write_frames_to_subject(subject, TEST_FRAMES)
     frames_written = np.stack(list(_get_frames(video_path)), axis=0)
 
-    with self.subTest('written_on_final_step'):
+    with self.subTest("written_on_final_step"):
       self.assertEqual(step_written, TEST_FRAMES.shape[0] - 1)
 
-    with self.subTest('contents'):
+    with self.subTest("contents"):
       np.testing.assert_equal(frames_written, TEST_FRAMES)
 
   def test_default_writes_correct_shape(self):
@@ -83,11 +83,12 @@ class VideoSubjectTest(absltest.TestCase):
     step_written, video_path = _write_frames_to_subject(subject, TEST_FRAMES)
     frames_written = np.stack(list(_get_frames(video_path)), axis=0)
 
-    with self.subTest('written_on_final_step'):
+    with self.subTest("written_on_final_step"):
       self.assertEqual(step_written, TEST_FRAMES.shape[0] - 1)
 
-    with self.subTest('shape'):
+    with self.subTest("shape"):
       self.assertEqual(frames_written.shape, TEST_FRAMES.shape)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
   absltest.main()

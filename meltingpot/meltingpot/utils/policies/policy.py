@@ -18,7 +18,7 @@ from typing import Generic, Tuple, TypeVar
 
 import dm_env
 
-State = TypeVar('State')
+State = TypeVar("State")
 
 
 class Policy(Generic[State], metaclass=abc.ABCMeta):
@@ -36,8 +36,9 @@ class Policy(Generic[State], metaclass=abc.ABCMeta):
     raise NotImplementedError()
 
   @abc.abstractmethod
-  def step(self, timestep: dm_env.TimeStep,
-           prev_state: State) -> Tuple[int, State]:
+  def step(
+      self, timestep: dm_env.TimeStep, prev_state: State
+  ) -> Tuple[int, State]:
     """Steps the agent.
 
     Must not have any side effects.

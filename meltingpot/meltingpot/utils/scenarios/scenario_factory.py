@@ -23,8 +23,9 @@ from meltingpot.utils.scenarios import scenario as scenario_lib
 from meltingpot.utils.substrates import substrate as substrate_lib
 from meltingpot.utils.substrates import substrate_factory
 
-SubstrateTransform = Callable[[substrate_lib.Substrate],
-                              substrate_lib.Substrate]
+SubstrateTransform = Callable[
+    [substrate_lib.Substrate], substrate_lib.Substrate
+]
 
 
 class ScenarioFactory:
@@ -52,14 +53,14 @@ class ScenarioFactory:
         exposed by the scenario to focal agents.
     """
     if len(roles) != len(is_focal):
-      raise ValueError('roles and is_focal must be the same length')
+      raise ValueError("roles and is_focal must be the same length")
     self._substrate = substrate
     self._bots = immutabledict.immutabledict(bots)
     self._roles = tuple(roles)
     self._is_focal = tuple(is_focal)
-    self._bots_by_role = immutabledict.immutabledict({
-        role: tuple(bots) for role, bots in bots_by_role.items()
-    })
+    self._bots_by_role = immutabledict.immutabledict(
+        {role: tuple(bots) for role, bots in bots_by_role.items()}
+    )
     self._permitted_observations = frozenset(permitted_observations)
 
   def num_focal_players(self) -> int:
@@ -69,14 +70,16 @@ class ScenarioFactory:
   def focal_player_roles(self) -> Sequence[str]:
     """Returns the roles of the focal players."""
     return tuple(
-        role for n, role in enumerate(self._roles) if self._is_focal[n])
+        role for n, role in enumerate(self._roles) if self._is_focal[n]
+    )
 
   def timestep_spec(self) -> dm_env.TimeStep:
     """Returns spec of timestep sent to a single focal player."""
     substrate_timestep_spec = self._substrate.timestep_spec()
     substrate_observation_spec = substrate_timestep_spec.observation
     focal_observation_spec = immutabledict.immutabledict({
-        key: spec for key, spec in substrate_observation_spec.items()
+        key: spec
+        for key, spec in substrate_observation_spec.items()
         if key in self._permitted_observations
     })
     return substrate_timestep_spec._replace(observation=focal_observation_spec)
@@ -97,7 +100,8 @@ class ScenarioFactory:
         bots_by_role=self._bots_by_role,
         roles=self._roles,
         is_focal=self._is_focal,
-        permitted_observations=self._permitted_observations)
+        permitted_observations=self._permitted_observations,
+    )
 
   def build_transformed(
       self, substrate_transform: Optional[SubstrateTransform] = None
@@ -126,4 +130,5 @@ class ScenarioFactory:
         bots_by_role=self._bots_by_role,
         roles=self._roles,
         is_focal=self._is_focal,
-        permitted_observations=all_observations)
+        permitted_observations=all_observations,
+    )

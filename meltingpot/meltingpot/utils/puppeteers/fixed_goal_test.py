@@ -31,5 +31,5 @@ class FixedGoalTest(parameterized.TestCase):
     self.assertSequenceEqual(actual, expected)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
   absltest.main()

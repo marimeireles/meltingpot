@@ -26,8 +26,9 @@ import torch.nn.functional as F
 
 from . import utils
 
-device = torch.device("cuda") if torch.cuda.is_available() else torch.device(
-    "cpu")
+device = (
+    torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+)
 
 
 # Use this with lambda wrapper returning observations only
@@ -56,20 +57,24 @@ class CustomCNN(torch_layers.BaseFeaturesExtractor):
 
     self.conv = nn.Sequential(
         nn.Conv2d(
-            num_frames * 3, num_frames * 3, kernel_size=8, stride=4, padding=0),
+            num_frames * 3, num_frames * 3, kernel_size=8, stride=4, padding=0
+        ),
         nn.ReLU(),  # 18 * 21 * 21
         nn.Conv2d(
-            num_frames * 3, num_frames * 6, kernel_size=5, stride=2, padding=0),
+            num_frames * 3, num_frames * 6, kernel_size=5, stride=2, padding=0
+        ),
         nn.ReLU(),  # 36 * 9 * 9
         nn.Conv2d(
-            num_frames * 6, num_frames * 6, kernel_size=3, stride=1, padding=0),
+            num_frames * 6, num_frames * 6, kernel_size=3, stride=1, padding=0
+        ),
         nn.ReLU(),  # 36 * 7 * 7
         nn.Flatten(),
     )
     flat_out = num_frames * 6 * 7 * 7
     self.fc1 = nn.Linear(in_features=flat_out, out_features=fcnet_hiddens[0])
     self.fc2 = nn.Linear(
-        in_features=fcnet_hiddens[0], out_features=fcnet_hiddens[1])
+        in_features=fcnet_hiddens[0], out_features=fcnet_hiddens[1]
+    )
 
   def forward(self, observations) -> torch.Tensor:
     # Convert to tensor, rescale to [0, 1], and convert from
@@ -101,8 +106,9 @@ def main():
   features_dim = 128
   fcnet_hiddens = [1024, 128]  # Two hidden layers for cnn extractor
   ent_coef = 0.001  # entropy coefficient in loss
-  batch_size = (rollout_len * num_envs // 2
-               )  # This is from the rllib baseline implementation
+  batch_size = (
+      rollout_len * num_envs // 2
+  )  # This is from the rllib baseline implementation
   lr = 0.0001
   n_epochs = 30
   gae_lambda = 1.0
@@ -123,7 +129,8 @@ def main():
       env,
       num_vec_envs=num_envs,
       num_cpus=num_cpus,
-      base_class="stable_baselines3")
+      base_class="stable_baselines3",
+  )
   env = vec_env.VecMonitor(env)
   env = vec_env.VecTransposeImage(env, True)
 
@@ -131,12 +138,14 @@ def main():
       max_cycles=rollout_len,
       env_config=env_config,
   )
-  eval_env = ss.observation_lambda_v0(eval_env, lambda x, _: x["RGB"],
-                                      lambda s: s["RGB"])
+  eval_env = ss.observation_lambda_v0(
+      eval_env, lambda x, _: x["RGB"], lambda s: s["RGB"]
+  )
   eval_env = ss.frame_stack_v1(eval_env, num_frames)
   eval_env = ss.pettingzoo_env_to_vec_env_v1(eval_env)
   eval_env = ss.concat_vec_envs_v1(
-      eval_env, num_vec_envs=1, num_cpus=1, base_class="stable_baselines3")
+      eval_env, num_vec_envs=1, num_cpus=1, base_class="stable_baselines3"
+  )
   eval_env = vec_env.VecMonitor(eval_env)
   eval_env = vec_env.VecTransposeImage(eval_env, True)
   eval_freq = 100000 // (num_envs * num_agents)
@@ -172,7 +181,8 @@ def main():
   if model_path is not None:
     model = stable_baselines3.PPO.load(model_path, env=env)
   eval_callback = callbacks.EvalCallback(
-      eval_env, eval_freq=eval_freq, best_model_save_path=tensorboard_log)
+      eval_env, eval_freq=eval_freq, best_model_save_path=tensorboard_log
+  )
   model.learn(total_timesteps=total_timesteps, callback=eval_callback)
 
   logdir = model.logger.dir

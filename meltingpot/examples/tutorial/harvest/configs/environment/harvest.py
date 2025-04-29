@@ -26,16 +26,11 @@ def get_config():
 
   # Lua script configuration.
   config.lab2d_settings = {
-      "levelName":
-          "harvest",
-      "levelDirectory":
-          "examples/tutorial/harvest/levels",
-      "maxEpisodeLengthFrames":
-          100,
-      "numPlayers":
-          0,
-      "spriteSize":
-          8,
+      "levelName": "harvest",
+      "levelDirectory": "examples/tutorial/harvest/levels",
+      "maxEpisodeLengthFrames": 100,
+      "numPlayers": 0,
+      "spriteSize": 8,
       "simulation": {
           "map": " ",
           "prefabs": {},

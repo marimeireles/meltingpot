@@ -75,7 +75,6 @@ CHAR_PREFAB_MAP = {
     "#": {"type": "all", "list": ["ground", "wall_shadow_s"]},
     ">": {"type": "all", "list": ["ground", "wall_shadow_se"]},
     "<": {"type": "all", "list": ["ground", "wall_shadow_sw"]},
-
     # non-wall prefabs
     "L": "river",
     "P": {"type": "all", "list": ["ground", "potential_tree", "spawn_point"]},
@@ -105,7 +104,10 @@ def get_config():
       "OFFERS": specs.int64(102),
       "HUNGER": specs.float64(),
       # Debug only (do not use the following observations in policies).
-      "WORLD.RGB": specs.rgb(248, 248,),
+      "WORLD.RGB": specs.rgb(
+          248,
+          248,
+      ),
   })
 
   # The roles assigned to each player.

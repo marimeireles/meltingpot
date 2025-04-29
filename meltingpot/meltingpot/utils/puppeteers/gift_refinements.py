@@ -61,13 +61,14 @@ class GiftRefinementsCooperator(puppeteer.Puppeteer[tuple[()]]):
 
   def should_consume(self, observation: Observation) -> bool:
     """Decides whether we should consume tokens in our inventory."""
-    _, refined, twice_refined = observation['INVENTORY']
+    _, refined, twice_refined = observation["INVENTORY"]
     return bool(refined) or bool(twice_refined)
 
-  def step(self, timestep: dm_env.TimeStep,
-           prev_state: tuple[()]) -> tuple[dm_env.TimeStep, tuple[()]]:
+  def step(
+      self, timestep: dm_env.TimeStep, prev_state: tuple[()]
+  ) -> tuple[dm_env.TimeStep, tuple[()]]:
     """See base class."""
-    if np.sum(timestep.observation['INVENTORY']):
+    if np.sum(timestep.observation["INVENTORY"]):
       if self.should_consume(timestep.observation):
         goal = self._consume_goal
       else:
@@ -91,5 +92,5 @@ class GiftRefinementsExtremeCooperator(GiftRefinementsCooperator):
 
   def should_consume(self, observation: Observation) -> bool:
     """See base class."""
-    _, _, twice_refined = observation['INVENTORY']
+    _, _, twice_refined = observation["INVENTORY"]
     return bool(twice_refined > 0)

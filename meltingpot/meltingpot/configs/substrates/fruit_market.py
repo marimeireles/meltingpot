@@ -71,7 +71,7 @@ NW_WALL_CORNER = {
                     "layer": "upperPhysical",
                     "sprite": "NwWallCorner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -81,12 +81,12 @@ NW_WALL_CORNER = {
                 "spriteNames": ["NwWallCorner"],
                 "spriteShapes": [shapes.FENCE_NW_CORNER],
                 "palettes": [shapes.FENCE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "hold"}},
         {"component": "BeamBlocker", "kwargs": {"beamType": "shove"}},
-    ]
+    ],
 }
 
 NE_WALL_CORNER = {
@@ -101,7 +101,7 @@ NE_WALL_CORNER = {
                     "layer": "upperPhysical",
                     "sprite": "NeWallCorner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -111,12 +111,12 @@ NE_WALL_CORNER = {
                 "spriteNames": ["NeWallCorner"],
                 "spriteShapes": [shapes.FENCE_NE_CORNER],
                 "palettes": [shapes.FENCE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "hold"}},
         {"component": "BeamBlocker", "kwargs": {"beamType": "shove"}},
-    ]
+    ],
 }
 
 NE_INNER_WALL_CORNER = {
@@ -131,7 +131,7 @@ NE_INNER_WALL_CORNER = {
                     "layer": "upperPhysical",
                     "sprite": "ne_inner_wall_corner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -141,12 +141,12 @@ NE_INNER_WALL_CORNER = {
                 "spriteNames": ["ne_inner_wall_corner"],
                 "spriteShapes": [shapes.FENCE_INNER_NE_CORNER],
                 "palettes": [shapes.FENCE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "hold"}},
         {"component": "BeamBlocker", "kwargs": {"beamType": "shove"}},
-    ]
+    ],
 }
 
 NW_INNER_WALL_CORNER = {
@@ -161,7 +161,7 @@ NW_INNER_WALL_CORNER = {
                     "layer": "upperPhysical",
                     "sprite": "nw_inner_wall_corner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -171,12 +171,12 @@ NW_INNER_WALL_CORNER = {
                 "spriteNames": ["nw_inner_wall_corner"],
                 "spriteShapes": [shapes.FENCE_INNER_NW_CORNER],
                 "palettes": [shapes.FENCE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "hold"}},
         {"component": "BeamBlocker", "kwargs": {"beamType": "shove"}},
-    ]
+    ],
 }
 
 SE_WALL_CORNER = {
@@ -191,7 +191,7 @@ SE_WALL_CORNER = {
                     "layer": "upperPhysical",
                     "sprite": "SeWallCorner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -201,12 +201,12 @@ SE_WALL_CORNER = {
                 "spriteNames": ["SeWallCorner"],
                 "spriteShapes": [shapes.FENCE_SE_CORNER],
                 "palettes": [shapes.FENCE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "hold"}},
         {"component": "BeamBlocker", "kwargs": {"beamType": "shove"}},
-    ]
+    ],
 }
 
 SW_WALL_CORNER = {
@@ -221,7 +221,7 @@ SW_WALL_CORNER = {
                     "layer": "upperPhysical",
                     "sprite": "SwWallCorner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -231,12 +231,12 @@ SW_WALL_CORNER = {
                 "spriteNames": ["SwWallCorner"],
                 "spriteShapes": [shapes.FENCE_SW_CORNER],
                 "palettes": [shapes.FENCE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "hold"}},
         {"component": "BeamBlocker", "kwargs": {"beamType": "shove"}},
-    ]
+    ],
 }
 
 WALL_SHADOW_SW = {
@@ -251,7 +251,7 @@ WALL_SHADOW_SW = {
                     "layer": "upperPhysical",
                     "sprite": "wall_shadow_sw",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -261,12 +261,12 @@ WALL_SHADOW_SW = {
                 "spriteNames": ["wall_shadow_sw"],
                 "spriteShapes": [shapes.FENCE_SHADOW_SW],
                 "palettes": [shapes.FENCE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "hold"}},
         {"component": "BeamBlocker", "kwargs": {"beamType": "shove"}},
-    ]
+    ],
 }
 
 WALL_SHADOW_S = {
@@ -281,7 +281,7 @@ WALL_SHADOW_S = {
                     "layer": "upperPhysical",
                     "sprite": "wall_shadow_s",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -291,12 +291,12 @@ WALL_SHADOW_S = {
                 "spriteNames": ["wall_shadow_s"],
                 "spriteShapes": [shapes.FENCE_SHADOW_S],
                 "palettes": [shapes.FENCE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "hold"}},
         {"component": "BeamBlocker", "kwargs": {"beamType": "shove"}},
-    ]
+    ],
 }
 
 WALL_SHADOW_SE = {
@@ -311,7 +311,7 @@ WALL_SHADOW_SE = {
                     "layer": "upperPhysical",
                     "sprite": "wall_shadow_se",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -321,12 +321,12 @@ WALL_SHADOW_SE = {
                 "spriteNames": ["wall_shadow_se"],
                 "spriteShapes": [shapes.FENCE_SHADOW_SE],
                 "palettes": [shapes.FENCE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "hold"}},
         {"component": "BeamBlocker", "kwargs": {"beamType": "shove"}},
-    ]
+    ],
 }
 
 WALL_NORTH = {
@@ -341,7 +341,7 @@ WALL_NORTH = {
                     "layer": "upperPhysical",
                     "sprite": "WallNorth",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -351,12 +351,12 @@ WALL_NORTH = {
                 "spriteNames": ["WallNorth"],
                 "spriteShapes": [shapes.FENCE_N],
                 "palettes": [shapes.FENCE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "hold"}},
         {"component": "BeamBlocker", "kwargs": {"beamType": "shove"}},
-    ]
+    ],
 }
 
 WALL_EAST = {
@@ -371,7 +371,7 @@ WALL_EAST = {
                     "layer": "upperPhysical",
                     "sprite": "WallEast",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -381,12 +381,12 @@ WALL_EAST = {
                 "spriteNames": ["WallEast"],
                 "spriteShapes": [shapes.FENCE_E],
                 "palettes": [shapes.FENCE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "hold"}},
         {"component": "BeamBlocker", "kwargs": {"beamType": "shove"}},
-    ]
+    ],
 }
 
 WALL_SOUTH = {
@@ -401,7 +401,7 @@ WALL_SOUTH = {
                     "layer": "upperPhysical",
                     "sprite": "WallSouth",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -411,12 +411,12 @@ WALL_SOUTH = {
                 "spriteNames": ["WallSouth"],
                 "spriteShapes": [shapes.FENCE_S],
                 "palettes": [shapes.FENCE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "hold"}},
         {"component": "BeamBlocker", "kwargs": {"beamType": "shove"}},
-    ]
+    ],
 }
 
 
@@ -432,7 +432,7 @@ WALL_WEST = {
                     "layer": "upperPhysical",
                     "sprite": "WallWest",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -442,12 +442,12 @@ WALL_WEST = {
                 "spriteNames": ["WallWest"],
                 "spriteShapes": [shapes.FENCE_W],
                 "palettes": [shapes.FENCE_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "hold"}},
         {"component": "BeamBlocker", "kwargs": {"beamType": "shove"}},
-    ]
+    ],
 }
 
 STONE_WALL = {
@@ -462,7 +462,7 @@ STONE_WALL = {
                     "layer": "upperPhysical",
                     "sprite": "StoneWall",
                 }],
-            }
+            },
         },
         {
             "component": "Transform",
@@ -473,16 +473,18 @@ STONE_WALL = {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["StoneWall"],
                 "spriteShapes": [shapes.WALL],
-                "palettes": [{"*": (95, 95, 95, 255),
-                              "&": (100, 100, 100, 255),
-                              "@": (109, 109, 109, 255),
-                              "#": (152, 152, 152, 255)}],
-                "noRotates": [False]
-            }
+                "palettes": [{
+                    "*": (95, 95, 95, 255),
+                    "&": (100, 100, 100, 255),
+                    "@": (109, 109, 109, 255),
+                    "#": (152, 152, 152, 255),
+                }],
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "hold"}},
         {"component": "BeamBlocker", "kwargs": {"beamType": "shove"}},
-    ]
+    ],
 }
 
 SPAWN_POINT = {
@@ -495,14 +497,14 @@ SPAWN_POINT = {
                 "stateConfigs": [{
                     "state": "spawnPoint",
                     "layer": "logic",
-                    "groups": ["spawnPoints"]
+                    "groups": ["spawnPoints"],
                 }],
-            }
+            },
         },
         {
             "component": "Transform",
         },
-    ]
+    ],
 }
 
 
@@ -517,39 +519,54 @@ def get_water():
               "kwargs": {
                   "initialState": "water_1",
                   "stateConfigs": [
-                      {"state": "water_1",
-                       "layer": layer,
-                       "sprite": "water_1",
-                       "groups": ["water"]},
-                      {"state": "water_2",
-                       "layer": layer,
-                       "sprite": "water_2",
-                       "groups": ["water"]},
-                      {"state": "water_3",
-                       "layer": layer,
-                       "sprite": "water_3",
-                       "groups": ["water"]},
-                      {"state": "water_4",
-                       "layer": layer,
-                       "sprite": "water_4",
-                       "groups": ["water"]},
-                  ]
-              }
+                      {
+                          "state": "water_1",
+                          "layer": layer,
+                          "sprite": "water_1",
+                          "groups": ["water"],
+                      },
+                      {
+                          "state": "water_2",
+                          "layer": layer,
+                          "sprite": "water_2",
+                          "groups": ["water"],
+                      },
+                      {
+                          "state": "water_3",
+                          "layer": layer,
+                          "sprite": "water_3",
+                          "groups": ["water"],
+                      },
+                      {
+                          "state": "water_4",
+                          "layer": layer,
+                          "sprite": "water_4",
+                          "groups": ["water"],
+                      },
+                  ],
+              },
           },
-          {"component": "Transform",},
+          {
+              "component": "Transform",
+          },
           {
               "component": "Appearance",
               "kwargs": {
                   "renderMode": "ascii_shape",
                   "spriteNames": ["water_1", "water_2", "water_3", "water_4"],
-                  "spriteShapes": [shapes.WATER_1, shapes.WATER_2,
-                                   shapes.WATER_3, shapes.WATER_4],
+                  "spriteShapes": [
+                      shapes.WATER_1,
+                      shapes.WATER_2,
+                      shapes.WATER_3,
+                      shapes.WATER_4,
+                  ],
                   "palettes": [{
                       "@": (52, 193, 209, 255),
                       "*": (34, 166, 181, 255),
                       "o": (32, 155, 168, 255),
-                      "~": (31, 148, 161, 255)}] * 4,
-              }
+                      "~": (31, 148, 161, 255),
+                  }] * 4,
+              },
           },
           {
               "component": "Animation",
@@ -559,7 +576,7 @@ def get_water():
                   "loop": True,
                   "randomStartFrame": True,
                   "group": "water",
-              }
+              },
           },
           {
               "component": "TraversalCost",
@@ -567,9 +584,9 @@ def get_water():
                   "penaltyAmount": 0,  # No reward cost from crossing water.
                   "alsoReduceStamina": True,  # Crossing water depletes stamina.
                   "staminaPenaltyAmount": 1,  # Stamina lost per step on water.
-              }
+              },
           },
-      ]
+      ],
   }
   return water
 
@@ -586,7 +603,7 @@ GROUND = {
                     "layer": "background",
                     "sprite": "groundSprite",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -595,12 +612,14 @@ GROUND = {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["groundSprite"],
                 "spriteShapes": [shapes.DIRT_PATTERN],
-                "palettes": [{"X": (207, 199, 184, 255),
-                              "x": (199, 192, 177, 255),}],
-                "noRotates": [True]
-            }
+                "palettes": [{
+                    "X": (207, 199, 184, 255),
+                    "x": (199, 192, 177, 255),
+                }],
+                "noRotates": [True],
+            },
         },
-    ]
+    ],
 }
 
 
@@ -622,15 +641,20 @@ def get_fruit_tree_palette(fruit_type):
     return banana_palette
 
 
-def get_potential_tree(probability_empty: float = 0.9,
-                       probability_apple: float = 0.05,
-                       probability_banana: float = 0.05) -> PrefabConfig:
+def get_potential_tree(
+    probability_empty: float = 0.9,
+    probability_apple: float = 0.05,
+    probability_banana: float = 0.05,
+) -> PrefabConfig:
   """Return a prefab for a potential tree."""
-  assert probability_empty + probability_apple + probability_banana == 1.0, (
-      "Probabilities must sum to 1.0.")
-  spawn_probabilities = {"empty": probability_empty,
-                         "apple": probability_apple,
-                         "banana": probability_banana}
+  assert (
+      probability_empty + probability_apple + probability_banana == 1.0
+  ), "Probabilities must sum to 1.0."
+  spawn_probabilities = {
+      "empty": probability_empty,
+      "apple": probability_apple,
+      "banana": probability_banana,
+  }
   prefab = {
       "name": "potential_tree",
       "components": [
@@ -661,47 +685,50 @@ def get_potential_tree(probability_empty: float = 0.9,
                           "sprite": "bananaTreeUnripeSprite",
                       },
                   ],
-              }
+              },
           },
           {"component": "Transform"},
           {
               "component": "Appearance",
               "kwargs": {
                   "renderMode": "ascii_shape",
-                  "spriteNames": ["appleTreeHarvestableSprite",
-                                  "bananaTreeHarvestableSprite",
-                                  "appleTreeUnripeSprite",
-                                  "bananaTreeUnripeSprite"],
-                  "spriteShapes": [shapes.APPLE_TREE_STOUT,
-                                   shapes.BANANA_TREE,
-                                   shapes.APPLE_TREE_STOUT,
-                                   shapes.BANANA_TREE],
-                  "palettes": [get_fruit_tree_palette("ripe_apple"),
-                               get_fruit_tree_palette("ripe_banana"),
-                               get_fruit_tree_palette("unripe_apple"),
-                               get_fruit_tree_palette("unripe_banana")],
-                  "noRotates": [True,
-                                True,
-                                True,
-                                True]
-              }
+                  "spriteNames": [
+                      "appleTreeHarvestableSprite",
+                      "bananaTreeHarvestableSprite",
+                      "appleTreeUnripeSprite",
+                      "bananaTreeUnripeSprite",
+                  ],
+                  "spriteShapes": [
+                      shapes.APPLE_TREE_STOUT,
+                      shapes.BANANA_TREE,
+                      shapes.APPLE_TREE_STOUT,
+                      shapes.BANANA_TREE,
+                  ],
+                  "palettes": [
+                      get_fruit_tree_palette("ripe_apple"),
+                      get_fruit_tree_palette("ripe_banana"),
+                      get_fruit_tree_palette("unripe_apple"),
+                      get_fruit_tree_palette("unripe_banana"),
+                  ],
+                  "noRotates": [True, True, True, True],
+              },
           },
           {
               "component": "FruitType",
               "kwargs": {
                   "probabilities": spawn_probabilities,
-              }
+              },
           },
           {
               "component": "Harvestable",
               "kwargs": {
                   "regrowthTime": 50,
-              }
+              },
           },
           {
               "component": "PreventStaminaRecoveryHere",
           },
-      ]
+      ],
   }
   return prefab
 
@@ -709,34 +736,170 @@ def get_potential_tree(probability_empty: float = 0.9,
 # Primitive action components.
 # pylint: disable=bad-whitespace
 # pyformat: disable
-NOOP        = {"move": 0, "turn":  0, "eat_apple": 0, "eat_banana": 0, "offer_apple": 0, "offer_banana": 0, "offer_cancel": 0, "hold": 0, "shove":  0}
-FORWARD     = {"move": 1, "turn":  0, "eat_apple": 0, "eat_banana": 0, "offer_apple": 0, "offer_banana": 0, "offer_cancel": 0, "hold": 0, "shove":  0}
-STEP_RIGHT  = {"move": 2, "turn":  0, "eat_apple": 0, "eat_banana": 0, "offer_apple": 0, "offer_banana": 0, "offer_cancel": 0, "hold": 0, "shove":  0}
-BACKWARD    = {"move": 3, "turn":  0, "eat_apple": 0, "eat_banana": 0, "offer_apple": 0, "offer_banana": 0, "offer_cancel": 0, "hold": 0, "shove":  0}
-STEP_LEFT   = {"move": 4, "turn":  0, "eat_apple": 0, "eat_banana": 0, "offer_apple": 0, "offer_banana": 0, "offer_cancel": 0, "hold": 0, "shove":  0}
-TURN_LEFT   = {"move": 0, "turn": -1, "eat_apple": 0, "eat_banana": 0, "offer_apple": 0, "offer_banana": 0, "offer_cancel": 0, "hold": 0, "shove":  0}
-TURN_RIGHT  = {"move": 0, "turn":  1, "eat_apple": 0, "eat_banana": 0, "offer_apple": 0, "offer_banana": 0, "offer_cancel": 0, "hold": 0, "shove":  0}
-EAT_APPLE   = {"move": 0, "turn":  0, "eat_apple": 1, "eat_banana": 0, "offer_apple": 0, "offer_banana": 0, "offer_cancel": 0, "hold": 0, "shove":  0}
-EAT_BANANA  = {"move": 0, "turn":  0, "eat_apple": 0, "eat_banana": 1, "offer_apple": 0, "offer_banana": 0, "offer_cancel": 0, "hold": 0, "shove":  0}
-HOLD        = {"move": 0, "turn":  0, "eat_apple": 0, "eat_banana": 0, "offer_apple": 0, "offer_banana": 0, "offer_cancel": 0, "hold": 1, "shove":  0}
+NOOP = {
+    "move": 0,
+    "turn": 0,
+    "eat_apple": 0,
+    "eat_banana": 0,
+    "offer_apple": 0,
+    "offer_banana": 0,
+    "offer_cancel": 0,
+    "hold": 0,
+    "shove": 0,
+}
+FORWARD = {
+    "move": 1,
+    "turn": 0,
+    "eat_apple": 0,
+    "eat_banana": 0,
+    "offer_apple": 0,
+    "offer_banana": 0,
+    "offer_cancel": 0,
+    "hold": 0,
+    "shove": 0,
+}
+STEP_RIGHT = {
+    "move": 2,
+    "turn": 0,
+    "eat_apple": 0,
+    "eat_banana": 0,
+    "offer_apple": 0,
+    "offer_banana": 0,
+    "offer_cancel": 0,
+    "hold": 0,
+    "shove": 0,
+}
+BACKWARD = {
+    "move": 3,
+    "turn": 0,
+    "eat_apple": 0,
+    "eat_banana": 0,
+    "offer_apple": 0,
+    "offer_banana": 0,
+    "offer_cancel": 0,
+    "hold": 0,
+    "shove": 0,
+}
+STEP_LEFT = {
+    "move": 4,
+    "turn": 0,
+    "eat_apple": 0,
+    "eat_banana": 0,
+    "offer_apple": 0,
+    "offer_banana": 0,
+    "offer_cancel": 0,
+    "hold": 0,
+    "shove": 0,
+}
+TURN_LEFT = {
+    "move": 0,
+    "turn": -1,
+    "eat_apple": 0,
+    "eat_banana": 0,
+    "offer_apple": 0,
+    "offer_banana": 0,
+    "offer_cancel": 0,
+    "hold": 0,
+    "shove": 0,
+}
+TURN_RIGHT = {
+    "move": 0,
+    "turn": 1,
+    "eat_apple": 0,
+    "eat_banana": 0,
+    "offer_apple": 0,
+    "offer_banana": 0,
+    "offer_cancel": 0,
+    "hold": 0,
+    "shove": 0,
+}
+EAT_APPLE = {
+    "move": 0,
+    "turn": 0,
+    "eat_apple": 1,
+    "eat_banana": 0,
+    "offer_apple": 0,
+    "offer_banana": 0,
+    "offer_cancel": 0,
+    "hold": 0,
+    "shove": 0,
+}
+EAT_BANANA = {
+    "move": 0,
+    "turn": 0,
+    "eat_apple": 0,
+    "eat_banana": 1,
+    "offer_apple": 0,
+    "offer_banana": 0,
+    "offer_cancel": 0,
+    "hold": 0,
+    "shove": 0,
+}
+HOLD = {
+    "move": 0,
+    "turn": 0,
+    "eat_apple": 0,
+    "eat_banana": 0,
+    "offer_apple": 0,
+    "offer_banana": 0,
+    "offer_cancel": 0,
+    "hold": 1,
+    "shove": 0,
+}
 # Notice that SHOVE includes both `hold` and `shove` parts.
-SHOVE       = {"move": 0, "turn":  0, "eat_apple": 0, "eat_banana": 0, "offer_apple": 0, "offer_banana": 0, "offer_cancel": 0, "hold": 1, "shove":  1}
-PULL        = {"move": 0, "turn":  0, "eat_apple": 0, "eat_banana": 0, "offer_apple": 0, "offer_banana": 0, "offer_cancel": 0, "hold": 1, "shove": -1}
+SHOVE = {
+    "move": 0,
+    "turn": 0,
+    "eat_apple": 0,
+    "eat_banana": 0,
+    "offer_apple": 0,
+    "offer_banana": 0,
+    "offer_cancel": 0,
+    "hold": 1,
+    "shove": 1,
+}
+PULL = {
+    "move": 0,
+    "turn": 0,
+    "eat_apple": 0,
+    "eat_banana": 0,
+    "offer_apple": 0,
+    "offer_banana": 0,
+    "offer_cancel": 0,
+    "hold": 1,
+    "shove": -1,
+}
 # pyformat: enable
 # pylint: enable=bad-whitespace
 
 offer_actions = []
 # Add the cancel action
-cancel_action = {"move": 0, "turn": 0, "eat_apple": 0, "eat_banana": 0,
-                 "offer_apple": 0, "offer_banana": 0, "offer_cancel": 1,
-                 "hold": 0, "shove": 0}
+cancel_action = {
+    "move": 0,
+    "turn": 0,
+    "eat_apple": 0,
+    "eat_banana": 0,
+    "offer_apple": 0,
+    "offer_banana": 0,
+    "offer_cancel": 1,
+    "hold": 0,
+    "shove": 0,
+}
 offer_actions.append(cancel_action)
 
 for a in range(-MAX_OFFER_QUANTITY, MAX_OFFER_QUANTITY):
   for b in range(-MAX_OFFER_QUANTITY, MAX_OFFER_QUANTITY):
-    offer_action = {"move": 0, "turn": 0, "eat_apple": 0, "eat_banana": 0,
-                    "offer_apple": a, "offer_banana": b, "offer_cancel": 0,
-                    "hold": 0, "shove": 0}
+    offer_action = {
+        "move": 0,
+        "turn": 0,
+        "eat_apple": 0,
+        "eat_banana": 0,
+        "offer_apple": a,
+        "offer_banana": b,
+        "offer_cancel": 0,
+        "hold": 0,
+        "shove": 0,
+    }
     if a > 0 and b < 0:
       offer_actions.append(offer_action)
     elif a < 0 and b > 0:
@@ -781,7 +944,6 @@ def create_prefabs() -> PrefabConfig:
       "wall_shadow_s": WALL_SHADOW_S,
       "wall_shadow_se": WALL_SHADOW_SE,
       "stone_wall": STONE_WALL,
-
       # non-wall prefabs
       "spawn_point": SPAWN_POINT,
       "river": get_water(),
@@ -808,7 +970,7 @@ def create_scene():
                   "stateConfigs": [{
                       "state": "scene",
                   }],
-              }
+              },
           },
           {
               "component": "Transform",
@@ -816,14 +978,15 @@ def create_scene():
           {
               "component": "TradeManager",
           },
-      ]
+      ],
   }
   return scene
 
 
-def _create_stamina_overlay(player_idx: int,
-                            max_stamina_bar_states: int,
-                            ) -> Generator[Dict[str, Any], None, None]:
+def _create_stamina_overlay(
+    player_idx: int,
+    max_stamina_bar_states: int,
+) -> Generator[Dict[str, Any], None, None]:
   """Create stamina marker overlay objects."""
   # Lua is 1-indexed.
   lua_idx = player_idx + 1
@@ -842,10 +1005,11 @@ def _create_stamina_overlay(player_idx: int,
   # Declare one state per level of the stamina bar.
   for i in range(max_stamina_bar_states):
     sprite_name = f"sprite_for_level_{i}"
-    stamina_bar_state_configs.append(
-        {"state": f"level_{i}",
-         "layer": stamina_bar_layer,
-         "sprite": sprite_name})
+    stamina_bar_state_configs.append({
+        "state": f"level_{i}",
+        "layer": stamina_bar_layer,
+        "sprite": sprite_name,
+    })
     stamina_bar_sprite_names.append(sprite_name)
     xs = "\nxxxxxxxx"
     blank_space = xs * 7
@@ -855,8 +1019,14 @@ def _create_stamina_overlay(player_idx: int,
     if i >= 13:
       level = blank_space + xs
     else:
-      level = (blank_space + "\nx" + "G" * number_of_gs + "Y" * number_of_ys +
-               "R" * number_of_rs + "x")
+      level = (
+          blank_space
+          + "\nx"
+          + "G" * number_of_gs
+          + "Y" * number_of_ys
+          + "R" * number_of_rs
+          + "x"
+      )
     empty = "\n".join(["x" * 8] * 8)
     # Replace the east/south/west sprites with invisible sprites so the only
     # stamina bar rendered is the one in the direction that the current player
@@ -873,8 +1043,8 @@ def _create_stamina_overlay(player_idx: int,
                 "component": "StateManager",
                 "kwargs": {
                     "initialState": "staminaBarWait",
-                    "stateConfigs": stamina_bar_state_configs
-                }
+                    "stateConfigs": stamina_bar_state_configs,
+                },
             },
             {
                 "component": "Transform",
@@ -885,12 +1055,14 @@ def _create_stamina_overlay(player_idx: int,
                     "renderMode": "ascii_shape",
                     "spriteNames": stamina_bar_sprite_names,
                     "spriteShapes": stamina_bar_sprite_shapes,
-                    "palettes": [{"G": (62, 137, 72, 255),
-                                  "Y": (255, 216, 97, 255),
-                                  "R": (162, 38, 51, 255),
-                                  "x": INVISIBLE,}] * max_stamina_bar_states,
-                    "noRotates": [True] * max_stamina_bar_states
-                }
+                    "palettes": [{
+                        "G": (62, 137, 72, 255),
+                        "Y": (255, 216, 97, 255),
+                        "R": (162, 38, 51, 255),
+                        "x": INVISIBLE,
+                    }] * max_stamina_bar_states,
+                    "noRotates": [True] * max_stamina_bar_states,
+                },
             },
             {
                 "component": "StaminaBar",
@@ -898,16 +1070,16 @@ def _create_stamina_overlay(player_idx: int,
                     "playerIndex": lua_idx,
                     "waitState": "staminaBarWait",
                     "layer": stamina_bar_layer,
-                    "direction": direction
-                }
+                    "direction": direction,
+                },
             },
-        ]
+        ],
     }
 
 
-def create_avatar_object(player_idx: int,
-                         specialty: str,
-                         max_stamina_bar_states: int) -> Dict[str, Any]:
+def create_avatar_object(
+    player_idx: int, specialty: str, max_stamina_bar_states: int
+) -> Dict[str, Any]:
   """Create an avatar object."""
   # Lua is 1-indexed.
   lua_index = player_idx + 1
@@ -930,10 +1102,7 @@ def create_avatar_object(player_idx: int,
   avatar_palette["P"] = (196, 77, 190, 200)
   avatar_palette["p"] = (184, 72, 178, 150)
 
-  map_specialty_to_complement = {
-      "apple": "banana",
-      "banana": "apple"
-  }
+  map_specialty_to_complement = {"apple": "banana", "banana": "apple"}
   avatar_object = {
       "name": "avatar",
       "components": [
@@ -943,26 +1112,31 @@ def create_avatar_object(player_idx: int,
                   "initialState": live_state_name,
                   "stateConfigs": [
                       # Initial player state.
-                      {"state": live_state_name,
-                       "layer": "upperPhysical",
-                       "sprite": source_sprite_self,
-                       "contact": "avatar",
-                       "groups": ["players"]},
-                      {"state": grappling_state_name,
-                       "layer": "upperPhysical",
-                       "sprite": grappling_sprite,
-                       "contact": "avatar",
-                       "groups": ["players"]},
-                      {"state": grappled_state_name,
-                       "layer": "upperPhysical",
-                       "sprite": grappled_sprite,
-                       "contact": "avatar",
-                       "groups": ["players"]},
+                      {
+                          "state": live_state_name,
+                          "layer": "upperPhysical",
+                          "sprite": source_sprite_self,
+                          "contact": "avatar",
+                          "groups": ["players"],
+                      },
+                      {
+                          "state": grappling_state_name,
+                          "layer": "upperPhysical",
+                          "sprite": grappling_sprite,
+                          "contact": "avatar",
+                          "groups": ["players"],
+                      },
+                      {
+                          "state": grappled_state_name,
+                          "layer": "upperPhysical",
+                          "sprite": grappled_sprite,
+                          "contact": "avatar",
+                          "groups": ["players"],
+                      },
                       # Player wait type for times when they are zapped out.
-                      {"state": "playerWait",
-                       "groups": ["playerWaits"]},
-                  ]
-              }
+                      {"state": "playerWait", "groups": ["playerWaits"]},
+                  ],
+              },
           },
           {
               "component": "Transform",
@@ -971,22 +1145,29 @@ def create_avatar_object(player_idx: int,
               "component": "Appearance",
               "kwargs": {
                   "renderMode": "ascii_shape",
-                  "spriteNames": [source_sprite_self, grappling_sprite,
-                                  grappled_sprite],
-                  "spriteShapes": [shapes.CUTE_AVATAR,
-                                   shapes.CUTE_AVATAR_ARMS_UP,
-                                   shapes.MAGIC_GRAPPLED_AVATAR],
+                  "spriteNames": [
+                      source_sprite_self,
+                      grappling_sprite,
+                      grappled_sprite,
+                  ],
+                  "spriteShapes": [
+                      shapes.CUTE_AVATAR,
+                      shapes.CUTE_AVATAR_ARMS_UP,
+                      shapes.MAGIC_GRAPPLED_AVATAR,
+                  ],
                   "palettes": [avatar_palette] * 3,
                   "noRotates": [True] * 3,
-              }
+              },
           },
           {
               "component": "Avatar",
               "kwargs": {
                   "index": lua_index,
                   "aliveState": live_state_name,
-                  "additionalLiveStates": [grappled_state_name,
-                                           grappling_state_name],
+                  "additionalLiveStates": [
+                      grappled_state_name,
+                      grappling_state_name,
+                  ],
                   "waitState": "playerWait",
                   "spawnGroup": "spawnPoints",
                   "actionOrder": [
@@ -1010,10 +1191,16 @@ def create_avatar_object(player_idx: int,
                       # Trade actions
                       "eat_apple": {"default": 0, "min": 0, "max": 1},
                       "eat_banana": {"default": 0, "min": 0, "max": 1},
-                      "offer_apple": {"default": 0, "min": -MAX_OFFER_QUANTITY,
-                                      "max": MAX_OFFER_QUANTITY},
-                      "offer_banana": {"default": 0, "min": -MAX_OFFER_QUANTITY,
-                                       "max": MAX_OFFER_QUANTITY},
+                      "offer_apple": {
+                          "default": 0,
+                          "min": -MAX_OFFER_QUANTITY,
+                          "max": MAX_OFFER_QUANTITY,
+                      },
+                      "offer_banana": {
+                          "default": 0,
+                          "min": -MAX_OFFER_QUANTITY,
+                          "max": MAX_OFFER_QUANTITY,
+                      },
                       "offer_cancel": {"default": 0, "min": 0, "max": 1},
                       # Grappling actions
                       "hold": {"default": 0, "min": 0, "max": 1},
@@ -1024,9 +1211,9 @@ def create_avatar_object(player_idx: int,
                       "right": 5,
                       "forward": 9,
                       "backward": 1,
-                      "centered": False
+                      "centered": False,
                   },
-              }
+              },
           },
           {
               "component": "Inventory",
@@ -1042,14 +1229,14 @@ def create_avatar_object(player_idx: int,
                   "weakAmount": 2,
                   "strongProbability": 1,
                   "weakProbability": 0.04,
-              }
+              },
           },
           {
               "component": "Trading",
               "kwargs": {
                   "maxOfferQuantity": 3,  # The highest possible offer.
                   "radius": 4,  # Size of neighborhood where trade is possible.
-              }
+              },
           },
           {
               "component": "Taste",
@@ -1057,7 +1244,7 @@ def create_avatar_object(player_idx: int,
                   "mostTastyFruit": map_specialty_to_complement[specialty],
                   "mostTastyReward": 8,
                   "defaultReward": 1,
-              }
+              },
           },
           {
               "component": "PeriodicNeed",  # The hunger mechanic
@@ -1076,7 +1263,7 @@ def create_avatar_object(player_idx: int,
                   "liveState": live_state_name,
                   "grappledState": grappled_state_name,
                   "grapplingState": grappling_state_name,
-              }
+              },
           },
           {
               "component": "ReadyToShootObservation",
@@ -1084,7 +1271,7 @@ def create_avatar_object(player_idx: int,
                   # In this case READY_TO_SHOOT will be 1 if hold is allowed and
                   # will be 0 if not.
                   "zapperComponent": "Grappling",
-              }
+              },
           },
           {
               "component": "Stamina",
@@ -1105,7 +1292,7 @@ def create_avatar_object(player_idx: int,
                   "amountYellow": 6,
                   "amountRed": 1,
                   "costlyActions": ["move"],
-              }
+              },
           },
           {
               "component": "StaminaModulatedByNeed",
@@ -1113,13 +1300,13 @@ def create_avatar_object(player_idx: int,
                   # Reduce stamina by `lossPerStepBeyondThreshold` per timestep
                   # after hunger exceeds its threshold.
                   "lossPerStepBeyondThreshold": 1,
-              }
+              },
           },
           {
               "component": "StaminaObservation",
               "kwargs": {
                   "staminaComponent": "Stamina",
-              }
+              },
           },
           {
               "component": "InventoryObserver",
@@ -1131,7 +1318,7 @@ def create_avatar_object(player_idx: int,
               "component": "AllOffersObserver",
               "kwargs": {
                   "flatten": True,
-              }
+              },
           },
           {
               "component": "HungerObserver",
@@ -1139,7 +1326,7 @@ def create_avatar_object(player_idx: int,
                   "needComponent": "PeriodicNeed",
               },
           },
-      ]
+      ],
   }
   if _ENABLE_DEBUG_OBSERVATIONS:
     avatar_object["components"].append({
@@ -1150,8 +1337,9 @@ def create_avatar_object(player_idx: int,
   return avatar_object
 
 
-def create_avatar_objects(roles: Sequence[str],
-                          max_stamina_bar_states: int = 19):
+def create_avatar_objects(
+    roles: Sequence[str], max_stamina_bar_states: int = 19
+):
   """Returns list of avatar objects of length 'num_players'."""
   avatar_objects = []
   for player_idx, role in enumerate(roles):
@@ -1168,11 +1356,12 @@ def create_avatar_objects(roles: Sequence[str],
       specialty = "banana"
     else:
       raise ValueError(f"Unsupported role: {role}")
-    game_object = create_avatar_object(player_idx,
-                                       specialty,
-                                       max_stamina_bar_states - 1)
-    stamina_bar_objects = _create_stamina_overlay(player_idx,
-                                                  max_stamina_bar_states)
+    game_object = create_avatar_object(
+        player_idx, specialty, max_stamina_bar_states - 1
+    )
+    stamina_bar_objects = _create_stamina_overlay(
+        player_idx, max_stamina_bar_states
+    )
     avatar_objects.append(game_object)
     avatar_objects.extend(stamina_bar_objects)
 

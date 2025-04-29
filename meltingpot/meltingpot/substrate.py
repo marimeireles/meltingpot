@@ -67,7 +67,8 @@ def get_factory(name: str) -> substrate_factory.SubstrateFactory:
 
 
 def get_factory_from_config(
-    config: config_dict.ConfigDict) -> substrate_factory.SubstrateFactory:
+    config: config_dict.ConfigDict,
+) -> substrate_factory.SubstrateFactory:
   """Returns a factory from the provided config."""
 
   def lab2d_settings_builder(roles):
@@ -81,4 +82,5 @@ def get_factory_from_config(
       timestep_spec=config.timestep_spec,
       action_spec=config.action_spec,
       valid_roles=config.valid_roles,
-      default_player_roles=config.default_player_roles)
+      default_player_roles=config.default_player_roles,
+  )

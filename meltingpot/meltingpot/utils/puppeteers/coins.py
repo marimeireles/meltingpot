@@ -30,6 +30,7 @@ class ReciprocatorState:
     recent_defection: level of defection on previous timesteps (ordered from
       oldest to most recent).
   """
+
   step_count: int
   spite_until: int
   defect_until: int
@@ -91,28 +92,31 @@ class Reciprocator(puppeteer.Puppeteer[ReciprocatorState]):
     if threshold > 0:
       self._threshold = threshold
     else:
-      raise ValueError('threshold must be positive')
+      raise ValueError("threshold must be positive")
 
     if recency_window > 0:
       self._recency_window = recency_window
     else:
-      raise ValueError('recency_window must be positive')
+      raise ValueError("recency_window must be positive")
 
     if frames_to_punish > 0:
       self._frames_to_punish = frames_to_punish
     else:
-      raise ValueError('frames_to_punish must be positive.')
+      raise ValueError("frames_to_punish must be positive.")
 
     if 0 <= spiteful_punishment_window <= frames_to_punish:
       self._spiteful_punishment_window = spiteful_punishment_window
     else:
-      raise ValueError('spiteful_punishment_window must nonegative and lower '
-                       'than frames_to_punish')
+      raise ValueError(
+          "spiteful_punishment_window must nonegative and lower "
+          "than frames_to_punish"
+      )
 
   def initial_state(self) -> ReciprocatorState:
     """See base class."""
     return ReciprocatorState(
-        step_count=0, spite_until=0, defect_until=0, recent_defection=())
+        step_count=0, spite_until=0, defect_until=0, recent_defection=()
+    )
 
   def step(
       self, timestep: dm_env.TimeStep, prev_state: ReciprocatorState
@@ -126,9 +130,10 @@ class Reciprocator(puppeteer.Puppeteer[ReciprocatorState]):
     recent_defection = prev_state.recent_defection
 
     partner_defection = int(
-        timestep.observation[self._partner_defection_signal])
+        timestep.observation[self._partner_defection_signal]
+    )
     recent_defection += (partner_defection,)
-    recent_defection = recent_defection[-self._recency_window:]
+    recent_defection = recent_defection[-self._recency_window :]
 
     total_recent_defection = sum(recent_defection)
     if total_recent_defection >= self._threshold:
@@ -148,5 +153,6 @@ class Reciprocator(puppeteer.Puppeteer[ReciprocatorState]):
         step_count=step_count + 1,
         spite_until=spite_until,
         defect_until=defect_until,
-        recent_defection=recent_defection)
+        recent_defection=recent_defection,
+    )
     return timestep, next_state

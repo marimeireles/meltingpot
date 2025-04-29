@@ -46,8 +46,11 @@ class CollectiveRewardWrapper(observables.ObservableLab2dWrapper):
         step_type=input_timestep.step_type,
         reward=input_timestep.reward,
         discount=input_timestep.discount,
-        observation=[{_COLLECTIVE_REWARD_OBS: np.sum(input_timestep.reward),
-                      **obs} for obs in input_timestep.observation])
+        observation=[
+            {_COLLECTIVE_REWARD_OBS: np.sum(input_timestep.reward), **obs}
+            for obs in input_timestep.observation
+        ],
+    )
 
   def reset(self, *args, **kwargs) -> dm_env.TimeStep:
     """See base class."""
@@ -55,7 +58,8 @@ class CollectiveRewardWrapper(observables.ObservableLab2dWrapper):
     return self._get_timestep(timestep)
 
   def step(
-      self, actions: Sequence[Mapping[str, np.ndarray]]) -> dm_env.TimeStep:
+      self, actions: Sequence[Mapping[str, np.ndarray]]
+  ) -> dm_env.TimeStep:
     """See base class."""
     timestep = super().step(actions)
     return self._get_timestep(timestep)
@@ -65,5 +69,6 @@ class CollectiveRewardWrapper(observables.ObservableLab2dWrapper):
     observation_spec = copy.copy(super().observation_spec())
     for obs in observation_spec:
       obs[_COLLECTIVE_REWARD_OBS] = dm_env.specs.Array(
-          shape=(), dtype=np.float64, name=_COLLECTIVE_REWARD_OBS)
+          shape=(), dtype=np.float64, name=_COLLECTIVE_REWARD_OBS
+      )
     return observation_spec

@@ -28,8 +28,9 @@ class BotTest(test_utils.BotTestCase):
       self.assert_compatible(
           policy,
           timestep_spec=factory.timestep_spec(),
-          action_spec=factory.action_spec())
+          action_spec=factory.action_spec(),
+      )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
   absltest.main()

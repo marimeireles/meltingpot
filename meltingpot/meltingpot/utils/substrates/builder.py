@@ -31,13 +31,14 @@ import tree
 
 Settings = Union[config_dict.ConfigDict, Mapping[str, Any]]
 
-_MAX_SEED = 2 ** 32 - 1
+_MAX_SEED = 2**32 - 1
 _DMLAB2D_ROOT = runfiles_helper.find()
 
 
 def _find_root() -> str:
   import re  # pylint: disable=g-import-not-at-top
-  return re.sub('^(.*)/meltingpot/.*?$', r'\1', __file__)
+
+  return re.sub("^(.*)/meltingpot/.*?$", r"\1", __file__)
 
 
 _MELTINGPOT_ROOT = _find_root()
@@ -53,7 +54,8 @@ def _config_dict_to_dict(value):
 
 
 def parse_python_settings_for_dmlab2d(
-    lab2d_settings: config_dict.ConfigDict) -> dict[str, Any]:
+    lab2d_settings: config_dict.ConfigDict,
+) -> dict[str, Any]:
   """Flatten lab2d_settings into Lua-friendly properties."""
   # Since config_dicts disallow "." in keys, we must use a different character,
   # "$", in our config and then convert it to "." here. This is particularly
@@ -69,7 +71,8 @@ def parse_python_settings_for_dmlab2d(
 
 def apply_prefab_overrides(
     lab2d_settings: config_dict.ConfigDict,
-    prefab_overrides: Optional[Settings] = None) -> None:
+    prefab_overrides: Optional[Settings] = None,
+) -> None:
   """Apply prefab overrides to lab2d_settings."""
   if "gameObjects" not in lab2d_settings.simulation:
     lab2d_settings.simulation.gameObjects = []
@@ -80,15 +83,18 @@ def apply_prefab_overrides(
       for component, arg_overrides in override.items():
         for arg_name, arg_override in arg_overrides.items():
           if prefab not in lab2d_settings.simulation.prefabs:
-            raise ValueError(f"Prefab override for '{prefab}' given, but not " +
-                             "available in `prefabs`.")
+            raise ValueError(
+                f"Prefab override for '{prefab}' given, but not "
+                + "available in `prefabs`."
+            )
           game_object_utils.get_first_named_component(
-              lab2d_settings.simulation.prefabs[prefab],
-              component)["kwargs"][arg_name] = arg_override
+              lab2d_settings.simulation.prefabs[prefab], component
+          )["kwargs"][arg_name] = arg_override
 
 
 def maybe_build_and_add_avatar_objects(
-    lab2d_settings: config_dict.ConfigDict) -> None:
+    lab2d_settings: config_dict.ConfigDict,
+) -> None:
   """If requested, build the avatar objects and add them to lab2d_settings.
 
   Avatars will be built here if and only if:
@@ -106,30 +112,40 @@ def maybe_build_and_add_avatar_objects(
   """
   # Whether the avatars will be built in Lua (False) or here (True). This is
   # roughly the opposite of the `buildAvatars` setting.
-  build_avatars_here = ("avatar" in lab2d_settings.simulation.prefabs)
-  if ("buildAvatars" in lab2d_settings.simulation
-      and lab2d_settings.simulation.buildAvatars):
+  build_avatars_here = "avatar" in lab2d_settings.simulation.prefabs
+  if (
+      "buildAvatars" in lab2d_settings.simulation
+      and lab2d_settings.simulation.buildAvatars
+  ):
     build_avatars_here = False
     if "avatar" not in lab2d_settings.simulation.prefabs:
       raise ValueError(
-          "Deferring avatar building to Lua, yet no 'avatar' prefab given.")
+          "Deferring avatar building to Lua, yet no 'avatar' prefab given."
+      )
   if build_avatars_here:
-    palettes = (lab2d_settings.simulation.playerPalettes
-                if "playerPalettes" in lab2d_settings.simulation else None)
+    palettes = (
+        lab2d_settings.simulation.playerPalettes
+        if "playerPalettes" in lab2d_settings.simulation
+        else None
+    )
     if "gameObjects" not in lab2d_settings.simulation:
       lab2d_settings.simulation.gameObjects = []
     # Create avatars.
-    logging.info("Building avatars in `meltingpot.builder` with palettes: %s",
-                 lab2d_settings.simulation.playerPalettes)
+    logging.info(
+        "Building avatars in `meltingpot.builder` with palettes: %s",
+        lab2d_settings.simulation.playerPalettes,
+    )
     avatar_objects = game_object_utils.build_avatar_objects(
         int(lab2d_settings.numPlayers),
         lab2d_settings.simulation.prefabs,
-        palettes)
+        palettes,
+    )
     lab2d_settings.simulation.gameObjects += avatar_objects
 
 
 def locate_and_overwrite_level_directory(
-    lab2d_settings: config_dict.ConfigDict) -> None:
+    lab2d_settings: config_dict.ConfigDict,
+) -> None:
   """Locates the run files, and overwrites the levelDirectory with it."""
   # Locate runfiles.
   level_name = lab2d_settings.get("levelName")
@@ -143,7 +159,8 @@ def builder(
     lab2d_settings: Settings,
     prefab_overrides: Optional[Settings] = None,
     env_seed: Optional[int] = None,
-    **settings) -> dmlab2d.Environment:
+    **settings,
+) -> dmlab2d.Environment:
   """Builds a Melting Pot environment.
 
   Args:
@@ -162,7 +179,8 @@ def builder(
 
   # Copy config, so as not to modify it.
   lab2d_settings = config_dict.ConfigDict(
-      copy.deepcopy(lab2d_settings)).unlock()
+      copy.deepcopy(lab2d_settings)
+  ).unlock()
 
   apply_prefab_overrides(lab2d_settings, prefab_overrides)
   maybe_build_and_add_avatar_objects(lab2d_settings)
@@ -182,9 +200,8 @@ def builder(
     env_raw = dmlab2d.Lab2d(_DMLAB2D_ROOT, lab2d_settings_dict)
     observation_names = env_raw.observation_names()
     return dmlab2d.Environment(
-        env=env_raw,
-        observation_names=observation_names,
-        seed=seed)
+        env=env_raw, observation_names=observation_names, seed=seed
+    )
 
   # Add a wrapper that rebuilds the environment when reset is called.
   env = reset_wrapper.ResetWrapper(build_environment)

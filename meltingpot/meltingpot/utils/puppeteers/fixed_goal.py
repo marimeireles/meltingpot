@@ -32,8 +32,9 @@ class FixedGoal(puppeteer.Puppeteer[tuple[()]]):
     """See base class."""
     return ()
 
-  def step(self, timestep: dm_env.TimeStep,
-           prev_state: tuple[()]) -> tuple[dm_env.TimeStep, tuple[()]]:
+  def step(
+      self, timestep: dm_env.TimeStep, prev_state: tuple[()]
+  ) -> tuple[dm_env.TimeStep, tuple[()]]:
     """See base class."""
     timestep = puppeteer.puppet_timestep(timestep, self._goal)
     return timestep, prev_state

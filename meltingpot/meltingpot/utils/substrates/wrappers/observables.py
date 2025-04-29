@@ -41,6 +41,7 @@ class Lab2dObservables:
       with the Substrate. Each individual event is emitted as a single element:
       (event_name, event_item).
   """
+
   action: reactivex.Observable[Sequence[int]]
   timestep: reactivex.Observable[dm_env.TimeStep]
   events: reactivex.Observable[tuple[str, Any]]

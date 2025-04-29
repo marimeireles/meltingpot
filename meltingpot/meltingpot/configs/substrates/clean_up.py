@@ -89,11 +89,41 @@ CHAR_PREFAB_MAP = {
     "f": {"type": "all", "list": ["sand", "shadow_w", "shadow_n"]},
     ";": {"type": "all", "list": ["sand", "grass_edge", "shadow_e"]},
     ",": {"type": "all", "list": ["sand", "grass_edge", "shadow_w"]},
-    "^": {"type": "all", "list": ["sand", "grass_edge",]},
-    "=": {"type": "all", "list": ["sand", "shadow_n",]},
-    ">": {"type": "all", "list": ["sand", "shadow_w",]},
-    "<": {"type": "all", "list": ["sand", "shadow_e",]},
-    "~": {"type": "all", "list": ["river", "shadow_w",]},
+    "^": {
+        "type": "all",
+        "list": [
+            "sand",
+            "grass_edge",
+        ],
+    },
+    "=": {
+        "type": "all",
+        "list": [
+            "sand",
+            "shadow_n",
+        ],
+    },
+    ">": {
+        "type": "all",
+        "list": [
+            "sand",
+            "shadow_w",
+        ],
+    },
+    "<": {
+        "type": "all",
+        "list": [
+            "sand",
+            "shadow_e",
+        ],
+    },
+    "~": {
+        "type": "all",
+        "list": [
+            "river",
+            "shadow_w",
+        ],
+    },
     "T": {"type": "all", "list": ["sand", "grass_edge", "potential_apple"]},
     "S": "river",
     "H": {"type": "all", "list": ["river", "potential_dirt"]},
@@ -114,7 +144,7 @@ SAND = {
                     "layer": "background",
                     "sprite": "Sand",
                 }],
-            }
+            },
         },
         {
             "component": "Appearance",
@@ -122,15 +152,16 @@ SAND = {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["Sand"],
                 "spriteShapes": [shapes.GRAINY_FLOOR],
-                "palettes": [{"+": (222, 221, 189, 255),
-                              "*": (219, 218, 186, 255)}],
-                "noRotates": [False]
-            }
+                "palettes": [
+                    {"+": (222, 221, 189, 255), "*": (219, 218, 186, 255)}
+                ],
+                "noRotates": [False],
+            },
         },
         {
             "component": "Transform",
         },
-    ]
+    ],
 }
 
 GRASS = {
@@ -145,7 +176,7 @@ GRASS = {
                     "layer": "background",
                     "sprite": "Grass",
                 }],
-            }
+            },
         },
         {
             "component": "Appearance",
@@ -153,16 +184,18 @@ GRASS = {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["Grass"],
                 "spriteShapes": [shapes.GRASS_STRAIGHT],
-                "palettes": [{"*": (164, 189, 75, 255),
-                              "@": (182, 207, 95, 255),
-                              "x": (0, 0, 0, 0)}],
-                "noRotates": [False]
-            }
+                "palettes": [{
+                    "*": (164, 189, 75, 255),
+                    "@": (182, 207, 95, 255),
+                    "x": (0, 0, 0, 0),
+                }],
+                "noRotates": [False],
+            },
         },
         {
             "component": "Transform",
         },
-    ]
+    ],
 }
 
 GRASS_EDGE = {
@@ -177,7 +210,7 @@ GRASS_EDGE = {
                     "layer": "lowerPhysical",
                     "sprite": "GrassEdge",
                 }],
-            }
+            },
         },
         {
             "component": "Appearance",
@@ -185,16 +218,18 @@ GRASS_EDGE = {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["GrassEdge"],
                 "spriteShapes": [shapes.GRASS_STRAIGHT_N_EDGE],
-                "palettes": [{"*": (164, 189, 75, 255),
-                              "@": (182, 207, 95, 255),
-                              "x": (0, 0, 0, 0)}],
-                "noRotates": [False]
-            }
+                "palettes": [{
+                    "*": (164, 189, 75, 255),
+                    "@": (182, 207, 95, 255),
+                    "x": (0, 0, 0, 0),
+                }],
+                "noRotates": [False],
+            },
         },
         {
             "component": "Transform",
         },
-    ]
+    ],
 }
 
 SHADOW_W = {
@@ -209,7 +244,7 @@ SHADOW_W = {
                     "layer": "upperPhysical",
                     "sprite": "ShadowW",
                 }],
-            }
+            },
         },
         {
             "component": "Appearance",
@@ -218,13 +253,13 @@ SHADOW_W = {
                 "spriteNames": ["ShadowW"],
                 "spriteShapes": [shapes.SHADOW_W],
                 "palettes": [shapes.SHADOW_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {
             "component": "Transform",
         },
-    ]
+    ],
 }
 
 SHADOW_E = {
@@ -239,7 +274,7 @@ SHADOW_E = {
                     "layer": "upperPhysical",
                     "sprite": "ShadowE",
                 }],
-            }
+            },
         },
         {
             "component": "Appearance",
@@ -248,13 +283,13 @@ SHADOW_E = {
                 "spriteNames": ["ShadowE"],
                 "spriteShapes": [shapes.SHADOW_E],
                 "palettes": [shapes.SHADOW_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {
             "component": "Transform",
         },
-    ]
+    ],
 }
 
 SHADOW_N = {
@@ -269,7 +304,7 @@ SHADOW_N = {
                     "layer": "overlay",
                     "sprite": "ShadowN",
                 }],
-            }
+            },
         },
         {
             "component": "Appearance",
@@ -278,13 +313,13 @@ SHADOW_N = {
                 "spriteNames": ["ShadowN"],
                 "spriteShapes": [shapes.SHADOW_N],
                 "palettes": [shapes.SHADOW_PALETTE],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {
             "component": "Transform",
         },
-    ]
+    ],
 }
 
 WALL = {
@@ -299,7 +334,7 @@ WALL = {
                     "layer": "superOverlay",
                     "sprite": "Wall",
                 }],
-            }
+            },
         },
         {
             "component": "Appearance",
@@ -307,29 +342,21 @@ WALL = {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["Wall"],
                 "spriteShapes": [shapes.WALL],
-                "palettes": [{"*": (95, 95, 95, 255),
-                              "&": (100, 100, 100, 255),
-                              "@": (109, 109, 109, 255),
-                              "#": (152, 152, 152, 255)}],
-                "noRotates": [False]
-            }
+                "palettes": [{
+                    "*": (95, 95, 95, 255),
+                    "&": (100, 100, 100, 255),
+                    "@": (109, 109, 109, 255),
+                    "#": (152, 152, 152, 255),
+                }],
+                "noRotates": [False],
+            },
         },
         {
             "component": "Transform",
         },
-        {
-            "component": "BeamBlocker",
-            "kwargs": {
-                "beamType": "zapHit"
-            }
-        },
-        {
-            "component": "BeamBlocker",
-            "kwargs": {
-                "beamType": "cleanHit"
-            }
-        },
-    ]
+        {"component": "BeamBlocker", "kwargs": {"beamType": "zapHit"}},
+        {"component": "BeamBlocker", "kwargs": {"beamType": "cleanHit"}},
+    ],
 }
 
 SPAWN_POINT = {
@@ -342,14 +369,14 @@ SPAWN_POINT = {
                 "stateConfigs": [{
                     "state": "spawnPoint",
                     "layer": "logic",
-                    "groups": ["spawnPoints"]
+                    "groups": ["spawnPoints"],
                 }],
-            }
+            },
         },
         {
             "component": "Transform",
         },
-    ]
+    ],
 }
 
 POTENTIAL_APPLE = {
@@ -365,10 +392,9 @@ POTENTIAL_APPLE = {
                         "sprite": "Apple",
                         "layer": "upperPhysical",
                     },
-                    {
-                        "state": "appleWait"
-                    }],
-            }
+                    {"state": "appleWait"},
+                ],
+            },
         },
         {
             "component": "Transform",
@@ -384,9 +410,10 @@ POTENTIAL_APPLE = {
                     "*": (212, 80, 57, 255),
                     "#": (173, 66, 47, 255),
                     "o": (43, 127, 53, 255),
-                    "|": (79, 47, 44, 255)}],
-                "noRotates": [True]
-            }
+                    "|": (79, 47, 44, 255),
+                }],
+                "noRotates": [True],
+            },
         },
         {
             "component": "Edible",
@@ -394,7 +421,7 @@ POTENTIAL_APPLE = {
                 "liveState": "apple",
                 "waitState": "appleWait",
                 "rewardForEating": 1.0,
-            }
+            },
         },
         {
             "component": "AppleGrow",
@@ -402,9 +429,9 @@ POTENTIAL_APPLE = {
                 "maxAppleGrowthRate": 0.05,
                 "thresholdDepletion": 0.4,
                 "thresholdRestoration": 0.0,
-            }
-        }
-    ]
+            },
+        },
+    ],
 }
 
 
@@ -428,7 +455,7 @@ def create_dirt_prefab(initial_state):
                           "sprite": "Dirt",
                       },
                   ],
-              }
+              },
           },
           {
               "component": "Transform",
@@ -440,36 +467,34 @@ def create_dirt_prefab(initial_state):
                   # This color is greenish, and quite transparent to expose the
                   # animated water below.
                   "spriteRGBColors": [(2, 245, 80, 50)],
-              }
+              },
           },
           {
               "component": "DirtTracker",
               "kwargs": {
                   "activeState": "dirt",
                   "inactiveState": "dirtWait",
-              }
+              },
           },
-          {
-              "component": "DirtCleaning",
-              "kwargs": {}
-          },
-      ]
+          {"component": "DirtCleaning", "kwargs": {}},
+      ],
   }
   return dirt_prefab
+
 
 # Primitive action components.
 # pylint: disable=bad-whitespace
 # pyformat: disable
-NOOP        = {"move": 0, "turn":  0, "fireZap": 0,  "deathZap": 1, "fireClean": 0}
-FORWARD     = {"move": 1, "turn":  0, "fireZap": 0,  "deathZap": 1, "fireClean": 0}
-STEP_RIGHT  = {"move": 2, "turn":  0, "fireZap": 0,  "deathZap": 1, "fireClean": 0}
-BACKWARD    = {"move": 3, "turn":  0, "fireZap": 0,  "deathZap": 1, "fireClean": 0}
-STEP_LEFT   = {"move": 4, "turn":  0, "fireZap": 0,  "deathZap": 1, "fireClean": 0}
-TURN_LEFT   = {"move": 0, "turn": -1, "fireZap": 0,  "deathZap": 1, "fireClean": 0}
-TURN_RIGHT  = {"move": 0, "turn":  1, "fireZap": 0,  "deathZap": 1, "fireClean": 0}
-FIRE_ZAP    = {"move": 0, "turn":  0, "fireZap": 1,  "deathZap": 1, "fireClean": 0}
-DEATH_ZAP    = {"move": 0, "turn":  0, "fireZap": 0, "deathZap": 1, "fireClean": 0}
-FIRE_CLEAN  = {"move": 0, "turn":  0, "fireZap": 0,  "deathZap": 1, "fireClean": 1}
+NOOP = {"move": 0, "turn": 0, "fireZap": 0, "deathZap": 1, "fireClean": 0}
+FORWARD = {"move": 1, "turn": 0, "fireZap": 0, "deathZap": 1, "fireClean": 0}
+STEP_RIGHT = {"move": 2, "turn": 0, "fireZap": 0, "deathZap": 1, "fireClean": 0}
+BACKWARD = {"move": 3, "turn": 0, "fireZap": 0, "deathZap": 1, "fireClean": 0}
+STEP_LEFT = {"move": 4, "turn": 0, "fireZap": 0, "deathZap": 1, "fireClean": 0}
+TURN_LEFT = {"move": 0, "turn": -1, "fireZap": 0, "deathZap": 1, "fireClean": 0}
+TURN_RIGHT = {"move": 0, "turn": 1, "fireZap": 0, "deathZap": 1, "fireClean": 0}
+FIRE_ZAP = {"move": 0, "turn": 0, "fireZap": 1, "deathZap": 1, "fireClean": 0}
+DEATH_ZAP = {"move": 0, "turn": 0, "fireZap": 0, "deathZap": 1, "fireClean": 0}
+FIRE_CLEAN = {"move": 0, "turn": 0, "fireZap": 0, "deathZap": 1, "fireClean": 1}
 # pyformat: enable
 # pylint: enable=bad-whitespace
 
@@ -483,7 +508,7 @@ ACTION_SET = (
     TURN_RIGHT,
     FIRE_ZAP,
     DEATH_ZAP,
-    FIRE_CLEAN
+    FIRE_CLEAN,
 )
 
 # Remove the first entry from human_readable_colors after using it for the self
@@ -508,39 +533,54 @@ def get_water():
               "kwargs": {
                   "initialState": "water_1",
                   "stateConfigs": [
-                      {"state": "water_1",
-                       "layer": layer,
-                       "sprite": "water_1",
-                       "groups": ["water"]},
-                      {"state": "water_2",
-                       "layer": layer,
-                       "sprite": "water_2",
-                       "groups": ["water"]},
-                      {"state": "water_3",
-                       "layer": layer,
-                       "sprite": "water_3",
-                       "groups": ["water"]},
-                      {"state": "water_4",
-                       "layer": layer,
-                       "sprite": "water_4",
-                       "groups": ["water"]},
-                  ]
-              }
+                      {
+                          "state": "water_1",
+                          "layer": layer,
+                          "sprite": "water_1",
+                          "groups": ["water"],
+                      },
+                      {
+                          "state": "water_2",
+                          "layer": layer,
+                          "sprite": "water_2",
+                          "groups": ["water"],
+                      },
+                      {
+                          "state": "water_3",
+                          "layer": layer,
+                          "sprite": "water_3",
+                          "groups": ["water"],
+                      },
+                      {
+                          "state": "water_4",
+                          "layer": layer,
+                          "sprite": "water_4",
+                          "groups": ["water"],
+                      },
+                  ],
+              },
           },
-          {"component": "Transform",},
+          {
+              "component": "Transform",
+          },
           {
               "component": "Appearance",
               "kwargs": {
                   "renderMode": "ascii_shape",
                   "spriteNames": ["water_1", "water_2", "water_3", "water_4"],
-                  "spriteShapes": [shapes.WATER_1, shapes.WATER_2,
-                                   shapes.WATER_3, shapes.WATER_4],
+                  "spriteShapes": [
+                      shapes.WATER_1,
+                      shapes.WATER_2,
+                      shapes.WATER_3,
+                      shapes.WATER_4,
+                  ],
                   "palettes": [{
                       "@": (66, 173, 212, 255),
                       "*": (35, 133, 168, 255),
                       "o": (34, 129, 163, 255),
-                      "~": (33, 125, 158, 255),}] * 4,
-              }
+                      "~": (33, 125, 158, 255),
+                  }] * 4,
+              },
           },
           {
               "component": "Animation",
@@ -550,9 +590,9 @@ def get_water():
                   "loop": True,
                   "randomStartFrame": True,
                   "group": "water",
-              }
+              },
           },
-      ]
+      ],
   }
   return water
 
@@ -592,7 +632,7 @@ def create_scene():
                   "stateConfigs": [{
                       "state": "scene",
                   }],
-              }
+              },
           },
           {
               "component": "Transform",
@@ -613,19 +653,20 @@ def create_scene():
               "kwargs": {
                   "minimumFramesPerEpisode": 1000,
                   "intervalLength": 100,  # Set equal to unroll length.
-                  "probabilityTerminationPerInterval": 0.2
-              }
+                  "probabilityTerminationPerInterval": 0.2,
+              },
           },
           {
               "component": "GlobalData",
           },
-      ]
+      ],
   }
   return scene
 
 
-def create_avatar_object(player_idx: int,
-                         target_sprite_self: Dict[str, Any]) -> Dict[str, Any]:
+def create_avatar_object(
+    player_idx: int, target_sprite_self: Dict[str, Any]
+) -> Dict[str, Any]:
   """Create an avatar object that always sees itself as blue."""
   # Lua is 1-indexed.
   lua_index = player_idx + 1
@@ -644,17 +685,17 @@ def create_avatar_object(player_idx: int,
                   "initialState": live_state_name,
                   "stateConfigs": [
                       # Initial player state.
-                      {"state": live_state_name,
-                       "layer": "superOverlay",
-                       "sprite": source_sprite_self,
-                       "contact": "avatar",
-                       "groups": ["players"]},
-
+                      {
+                          "state": live_state_name,
+                          "layer": "superOverlay",
+                          "sprite": source_sprite_self,
+                          "contact": "avatar",
+                          "groups": ["players"],
+                      },
                       # Player wait type for times when they are zapped out.
-                      {"state": "playerWait",
-                       "groups": ["playerWaits"]},
-                  ]
-              }
+                      {"state": "playerWait", "groups": ["playerWaits"]},
+                  ],
+              },
           },
           {
               "component": "Transform",
@@ -665,10 +706,11 @@ def create_avatar_object(player_idx: int,
                   "renderMode": "ascii_shape",
                   "spriteNames": [source_sprite_self],
                   "spriteShapes": [shapes.CUTE_AVATAR],
-                  "palettes": [shapes.get_palette(
-                      human_readable_colors[player_idx])],
-                  "noRotates": [True]
-              }
+                  "palettes": [
+                      shapes.get_palette(human_readable_colors[player_idx])
+                  ],
+                  "noRotates": [True],
+              },
           },
           {
               "component": "AdditionalSprites",
@@ -678,7 +720,7 @@ def create_avatar_object(player_idx: int,
                   "customSpriteShapes": [target_sprite_self["shape"]],
                   "customPalettes": [target_sprite_self["palette"]],
                   "customNoRotates": [target_sprite_self["noRotate"]],
-              }
+              },
           },
           {
               "component": "Avatar",
@@ -687,11 +729,13 @@ def create_avatar_object(player_idx: int,
                   "aliveState": live_state_name,
                   "waitState": "playerWait",
                   "spawnGroup": "spawnPoints",
-                  "actionOrder": ["move",
-                                  "turn",
-                                  "fireZap",
-                                  "deathZap",
-                                  "fireClean"],
+                  "actionOrder": [
+                      "move",
+                      "turn",
+                      "fireZap",
+                      "deathZap",
+                      "fireClean",
+                  ],
                   "actionSpec": {
                       "move": {"default": 0, "min": 0, "max": len(_COMPASS)},
                       "turn": {"default": 0, "min": -1, "max": 1},
@@ -704,10 +748,10 @@ def create_avatar_object(player_idx: int,
                       "right": 5,
                       "forward": 9,
                       "backward": 1,
-                      "centered": False
+                      "centered": False,
                   },
                   "spriteMap": custom_sprite_map,
-              }
+              },
           },
           {
               "component": "Zapper",
@@ -719,7 +763,10 @@ def create_avatar_object(player_idx: int,
                   "penaltyForBeingZapped": 0,
                   "rewardForZapping": 0,
                   "removeHitPlayer": True,
-              }
+                  "deathRayThreshold": (
+                      10
+                  ),  # number of reward zapper agent must have gathered in order to death zap another agent
+              },
           },
           {
               "component": "ReadyToShootObservation",
@@ -730,19 +777,19 @@ def create_avatar_object(player_idx: int,
                   "cooldownTime": 2,
                   "beamLength": 3,
                   "beamRadius": 1,
-              }
+              },
           },
           {
               "component": "Taste",
               "kwargs": {
                   "role": "free",
                   "rewardAmount": 1,
-              }
+              },
           },
           {
               "component": "AllNonselfCumulants",
           },
-      ]
+      ],
   }
   # Signals needed for puppeteers.
   metrics = [
@@ -790,10 +837,9 @@ def create_avatar_object(player_idx: int,
     })
 
   # Add the metrics reporter.
-  avatar_object["components"].append({
-      "component": "AvatarMetricReporter",
-      "kwargs": {"metrics": metrics}
-  })
+  avatar_object["components"].append(
+      {"component": "AvatarMetricReporter", "kwargs": {"metrics": metrics}}
+  )
 
   return avatar_object
 
@@ -802,8 +848,7 @@ def create_avatar_objects(num_players):
   """Returns list of avatar objects of length 'num_players'."""
   avatar_objects = []
   for player_idx in range(0, num_players):
-    game_object = create_avatar_object(player_idx,
-                                       TARGET_SPRITE_SELF)
+    game_object = create_avatar_object(player_idx, TARGET_SPRITE_SELF)
     avatar_objects.append(game_object)
 
   return avatar_objects
@@ -867,5 +912,5 @@ def build(
           "prefabs": create_prefabs(),
           "charPrefabMap": CHAR_PREFAB_MAP,
       },
-    )
+  )
   return substrate_definition

@@ -429,7 +429,6 @@ function Avatar:getAllConnectedObjectsWithNamedComponent(componentName)
 end
 
 function Avatar:onStateChange(oldState)
-  print('Avatar:onStateChange(oldState)', oldState, newState)
   local newState = self.gameObject:getState()
   local waitState = self:getWaitState()
   local behavior
@@ -636,7 +635,6 @@ function Zapper:registerUpdaters(updaterRegistry)
             self.gameObject:hitBeam(
                 'zapHit', self._config.beamLength, self._config.beamRadius)
           elseif actions['deathZap'] == 1 then
-            print('☀️ deathZap in registerUpdaters')
             self._coolingTimer = self._config.cooldownTime
             self.gameObject:hitBeam(
                 'deathHit', self._config.beamLength, self._config.beamRadius)
@@ -652,10 +650,7 @@ function Zapper:registerUpdaters(updaterRegistry)
   }
 
   local respawn = function()
-    print('respawn 😇')
-    print('self._lastHitWasDeath inside respawn', self._lastHitWasDeath)
     if self._lastHitWasDeath then
-      print('last hit was death 🪦')
       return
     end
     local spawnGroup = self.gameObject:getComponent('Avatar'):getSpawnGroup()
@@ -674,7 +669,6 @@ end
 
 function Zapper:onHit(hittingGameObject, hitName)
   self._lastHitWasDeath = (hitName == 'deathHit')
-  print('🌸 self._lastHitWasDeath was updated', self._lastHitWasDeath)
   if hitName == 'zapHit' then
     local zappedAvatar = self.gameObject:getComponent('Avatar')
     local zappedIndex = zappedAvatar:getIndex()
@@ -704,7 +698,6 @@ function Zapper:onHit(hittingGameObject, hitName)
     return true
   end
   if hitName == 'deathHit' then
-    print("⚡️ Zapper:onHit is triggered")
     local zappedAvatar = self.gameObject:getComponent('Avatar')
     local zappedIndex = zappedAvatar:getIndex()
     local zapperAvatar = hittingGameObject:getComponent('Avatar')
@@ -735,15 +728,12 @@ function Zapper:onHit(hittingGameObject, hitName)
 end
 
 function Zapper:onStateChange()
-  -- reset the countdown to the configured base
   self._respawnTimer = self._config.framesTillRespawn
 
   -- if the last hit was a deathHit, push timer to 'infinite'
   if self._lastHitWasDeath then
     self._respawnTimer = INFINITE_RESPAWN
   end
-
-  print('Zapper:onStateChange() was triggered, respawnTimer=', self._respawnTimer)
 end
 
 

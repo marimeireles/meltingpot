@@ -23,7 +23,7 @@ from meltingpot.utils.puppeteers import coins
 _COOPERATE = mock.sentinel.cooperate
 _DEFECT = mock.sentinel.defect
 _SPITE = mock.sentinel.spite
-_NUM_DEFECTIONS_KEY = 'DEFECTIONS'
+_NUM_DEFECTIONS_KEY = "DEFECTIONS"
 
 
 def _goals(puppeteer, num_defections, state=None):
@@ -85,7 +85,8 @@ class ReciprocatorTest(parameterized.TestCase):
     )
     num_defections = [1, 0, 0, 0]
     expected = (
-        [_SPITE] + [_DEFECT] * (duration - 1) + [_COOPERATE] * (4 - duration))
+        [_SPITE] + [_DEFECT] * (duration - 1) + [_COOPERATE] * (4 - duration)
+    )
     actual, _ = _goals(puppeteer, num_defections)
     self.assertSequenceEqual(actual, expected)
 
@@ -188,5 +189,5 @@ class ReciprocatorTest(parameterized.TestCase):
     self.assertSequenceEqual(actual, expected)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
   absltest.main()

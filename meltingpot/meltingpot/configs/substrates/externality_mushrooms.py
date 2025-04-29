@@ -84,7 +84,7 @@ NW_WALL_CORNER = {
                     "layer": "upperPhysical",
                     "sprite": "NwWallCorner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -94,11 +94,11 @@ NW_WALL_CORNER = {
                 "spriteNames": ["NwWallCorner"],
                 "spriteShapes": [shapes.FENCE_NW_CORNER],
                 "palettes": [shapes.FENCE_PALETTE_BROWN],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "zapHit"}},
-    ]
+    ],
 }
 
 NE_WALL_CORNER = {
@@ -113,7 +113,7 @@ NE_WALL_CORNER = {
                     "layer": "upperPhysical",
                     "sprite": "NeWallCorner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -123,11 +123,11 @@ NE_WALL_CORNER = {
                 "spriteNames": ["NeWallCorner"],
                 "spriteShapes": [shapes.FENCE_NE_CORNER],
                 "palettes": [shapes.FENCE_PALETTE_BROWN],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "zapHit"}},
-    ]
+    ],
 }
 
 NE_INNER_WALL_CORNER = {
@@ -142,7 +142,7 @@ NE_INNER_WALL_CORNER = {
                     "layer": "upperPhysical",
                     "sprite": "ne_inner_wall_corner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -152,11 +152,11 @@ NE_INNER_WALL_CORNER = {
                 "spriteNames": ["ne_inner_wall_corner"],
                 "spriteShapes": [shapes.FENCE_INNER_NE_CORNER],
                 "palettes": [shapes.FENCE_PALETTE_BROWN],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "zapHit"}},
-    ]
+    ],
 }
 
 NW_INNER_WALL_CORNER = {
@@ -171,7 +171,7 @@ NW_INNER_WALL_CORNER = {
                     "layer": "upperPhysical",
                     "sprite": "nw_inner_wall_corner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -181,11 +181,11 @@ NW_INNER_WALL_CORNER = {
                 "spriteNames": ["nw_inner_wall_corner"],
                 "spriteShapes": [shapes.FENCE_INNER_NW_CORNER],
                 "palettes": [shapes.FENCE_PALETTE_BROWN],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "zapHit"}},
-    ]
+    ],
 }
 
 SE_WALL_CORNER = {
@@ -200,7 +200,7 @@ SE_WALL_CORNER = {
                     "layer": "upperPhysical",
                     "sprite": "SeWallCorner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -210,11 +210,11 @@ SE_WALL_CORNER = {
                 "spriteNames": ["SeWallCorner"],
                 "spriteShapes": [shapes.FENCE_SE_CORNER],
                 "palettes": [shapes.FENCE_PALETTE_BROWN],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "zapHit"}},
-    ]
+    ],
 }
 
 SW_WALL_CORNER = {
@@ -229,7 +229,7 @@ SW_WALL_CORNER = {
                     "layer": "upperPhysical",
                     "sprite": "SwWallCorner",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -239,11 +239,11 @@ SW_WALL_CORNER = {
                 "spriteNames": ["SwWallCorner"],
                 "spriteShapes": [shapes.FENCE_SW_CORNER],
                 "palettes": [shapes.FENCE_PALETTE_BROWN],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "zapHit"}},
-    ]
+    ],
 }
 
 WALL_SHADOW_SW = {
@@ -258,7 +258,7 @@ WALL_SHADOW_SW = {
                     "layer": "upperPhysical",
                     "sprite": "wall_shadow_sw",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -268,11 +268,11 @@ WALL_SHADOW_SW = {
                 "spriteNames": ["wall_shadow_sw"],
                 "spriteShapes": [shapes.FENCE_SHADOW_SW],
                 "palettes": [shapes.FENCE_PALETTE_BROWN],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "zapHit"}},
-    ]
+    ],
 }
 
 WALL_SHADOW_S = {
@@ -287,7 +287,7 @@ WALL_SHADOW_S = {
                     "layer": "upperPhysical",
                     "sprite": "wall_shadow_s",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -297,11 +297,11 @@ WALL_SHADOW_S = {
                 "spriteNames": ["wall_shadow_s"],
                 "spriteShapes": [shapes.FENCE_SHADOW_S],
                 "palettes": [shapes.FENCE_PALETTE_BROWN],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "zapHit"}},
-    ]
+    ],
 }
 
 WALL_SHADOW_SE = {
@@ -316,7 +316,7 @@ WALL_SHADOW_SE = {
                     "layer": "upperPhysical",
                     "sprite": "wall_shadow_se",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -326,11 +326,11 @@ WALL_SHADOW_SE = {
                 "spriteNames": ["wall_shadow_se"],
                 "spriteShapes": [shapes.FENCE_SHADOW_SE],
                 "palettes": [shapes.FENCE_PALETTE_BROWN],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "zapHit"}},
-    ]
+    ],
 }
 
 WALL_NORTH = {
@@ -345,7 +345,7 @@ WALL_NORTH = {
                     "layer": "upperPhysical",
                     "sprite": "WallNorth",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -355,11 +355,11 @@ WALL_NORTH = {
                 "spriteNames": ["WallNorth"],
                 "spriteShapes": [shapes.FENCE_N],
                 "palettes": [shapes.FENCE_PALETTE_BROWN],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "zapHit"}},
-    ]
+    ],
 }
 
 WALL_EAST = {
@@ -374,7 +374,7 @@ WALL_EAST = {
                     "layer": "upperPhysical",
                     "sprite": "WallEast",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -384,11 +384,11 @@ WALL_EAST = {
                 "spriteNames": ["WallEast"],
                 "spriteShapes": [shapes.FENCE_E],
                 "palettes": [shapes.FENCE_PALETTE_BROWN],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "zapHit"}},
-    ]
+    ],
 }
 
 WALL_SOUTH = {
@@ -403,7 +403,7 @@ WALL_SOUTH = {
                     "layer": "upperPhysical",
                     "sprite": "WallSouth",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -413,11 +413,11 @@ WALL_SOUTH = {
                 "spriteNames": ["WallSouth"],
                 "spriteShapes": [shapes.FENCE_S],
                 "palettes": [shapes.FENCE_PALETTE_BROWN],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "zapHit"}},
-    ]
+    ],
 }
 
 
@@ -433,7 +433,7 @@ WALL_WEST = {
                     "layer": "upperPhysical",
                     "sprite": "WallWest",
                 }],
-            }
+            },
         },
         {"component": "Transform"},
         {
@@ -443,11 +443,11 @@ WALL_WEST = {
                 "spriteNames": ["WallWest"],
                 "spriteShapes": [shapes.FENCE_W],
                 "palettes": [shapes.FENCE_PALETTE_BROWN],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {"component": "BeamBlocker", "kwargs": {"beamType": "zapHit"}},
-    ]
+    ],
 }
 
 
@@ -455,6 +455,7 @@ def get_marking_palette(alpha: float) -> Mapping[str, Sequence[int]]:
   alpha_uint8 = int(alpha * 255)
   assert alpha_uint8 >= 0.0 and alpha_uint8 <= 255, "Color value out of range."
   return {"x": shapes.ALPHA, "o": (0, 0, 0, alpha_uint8)}
+
 
 DIRT = {
     "name": "dirt",
@@ -468,7 +469,7 @@ DIRT = {
                     "layer": "background",
                     "sprite": "Dirt",
                 }],
-            }
+            },
         },
         {
             "component": "Appearance",
@@ -480,13 +481,13 @@ DIRT = {
                     "x": (81, 70, 32, 255),
                     "X": (89, 77, 36, 255),
                 }],
-                "noRotates": [False]
-            }
+                "noRotates": [False],
+            },
         },
         {
             "component": "Transform",
         },
-    ]
+    ],
 }
 
 SPAWN_POINT = {
@@ -499,14 +500,14 @@ SPAWN_POINT = {
                 "stateConfigs": [{
                     "state": "spawnPoint",
                     "layer": "logic",
-                    "groups": ["spawnPoints"]
+                    "groups": ["spawnPoints"],
                 }],
-            }
+            },
         },
         {
             "component": "Transform",
         },
-    ]
+    ],
 }
 
 
@@ -549,7 +550,7 @@ def create_mushroom(initial_state: str = "wait"):
                           "state": "wait",
                       },
                   ],
-              }
+              },
           },
           {
               "component": "Transform",
@@ -558,10 +559,12 @@ def create_mushroom(initial_state: str = "wait"):
               "component": "Appearance",
               "kwargs": {
                   "renderMode": "ascii_shape",
-                  "spriteNames": ["FullInternalityZeroExternality",
-                                  "HalfInternalityHalfExternality",
-                                  "ZeroInternalityFullExternality",
-                                  "NegativeInternalityNegativeExternality"],
+                  "spriteNames": [
+                      "FullInternalityZeroExternality",
+                      "HalfInternalityHalfExternality",
+                      "ZeroInternalityFullExternality",
+                      "NegativeInternalityNegativeExternality",
+                  ],
                   "spriteShapes": [shapes.MUSHROOM] * 4,
                   "palettes": [
                       shapes.MUSHROOM_RED_PALETTE,
@@ -569,8 +572,8 @@ def create_mushroom(initial_state: str = "wait"):
                       shapes.MUSHROOM_BLUE_PALETTE,
                       shapes.MUSHROOM_ORANGE_PALETTE,
                   ],
-                  "noRotates": [True] * 4
-              }
+                  "noRotates": [True] * 4,
+              },
           },
           {
               "component": "MushroomEating",
@@ -581,10 +584,12 @@ def create_mushroom(initial_state: str = "wait"):
                       "zeroInternalityFullExternality": 3,
                       "negativeInternalityNegativeExternality": -1.0,
                   },
-                  "liveStates": ("fullInternalityZeroExternality",
-                                 "halfInternalityHalfExternality",
-                                 "zeroInternalityFullExternality",
-                                 "negativeInternalityNegativeExternality"),
+                  "liveStates": (
+                      "fullInternalityZeroExternality",
+                      "halfInternalityHalfExternality",
+                      "zeroInternalityFullExternality",
+                      "negativeInternalityNegativeExternality",
+                  ),
                   "numSporesReleasedWhenEaten": {
                       "fullInternalityZeroExternality": 3,
                       "halfInternalityHalfExternality": 3,
@@ -600,20 +605,18 @@ def create_mushroom(initial_state: str = "wait"):
                   "destroyOnEating": {
                       "negativeInternalityNegativeExternality": {
                           "typeToDestroy": "fullInternalityZeroExternality",
-                          "percentToDestroy": 0.25},
+                          "percentToDestroy": 0.25,
+                      },
                   },
               },
           },
-          {
-              "component": "MushroomGrowable",
-              "kwargs": {}
-          },
+          {"component": "MushroomGrowable", "kwargs": {}},
           {
               "component": "Destroyable",
               "kwargs": {
                   "initialHealth": 1,
                   "waitState": "wait",
-              }
+              },
           },
           {
               "component": "Perishable",
@@ -624,10 +627,10 @@ def create_mushroom(initial_state: str = "wait"):
                       "halfInternalityHalfExternality": 100,
                       "zeroInternalityFullExternality": 75,
                       "negativeInternalityNegativeExternality": 1e7,
-                  }
-              }
+                  },
+              },
           },
-      ]
+      ],
   }
   return mushroom_prefab
 
@@ -635,14 +638,14 @@ def create_mushroom(initial_state: str = "wait"):
 # Primitive action components.
 # pylint: disable=bad-whitespace
 # pyformat: disable
-NOOP        = {"move": 0, "turn":  0, "fireZap": 0}
-FORWARD     = {"move": 1, "turn":  0, "fireZap": 0}
-STEP_RIGHT  = {"move": 2, "turn":  0, "fireZap": 0}
-BACKWARD    = {"move": 3, "turn":  0, "fireZap": 0}
-STEP_LEFT   = {"move": 4, "turn":  0, "fireZap": 0}
-TURN_LEFT   = {"move": 0, "turn": -1, "fireZap": 0}
-TURN_RIGHT  = {"move": 0, "turn":  1, "fireZap": 0}
-FIRE_ZAP    = {"move": 0, "turn":  0, "fireZap": 1}
+NOOP = {"move": 0, "turn": 0, "fireZap": 0}
+FORWARD = {"move": 1, "turn": 0, "fireZap": 0}
+STEP_RIGHT = {"move": 2, "turn": 0, "fireZap": 0}
+BACKWARD = {"move": 3, "turn": 0, "fireZap": 0}
+STEP_LEFT = {"move": 4, "turn": 0, "fireZap": 0}
+TURN_LEFT = {"move": 0, "turn": -1, "fireZap": 0}
+TURN_RIGHT = {"move": 0, "turn": 1, "fireZap": 0}
+FIRE_ZAP = {"move": 0, "turn": 0, "fireZap": 1}
 # pyformat: enable
 # pylint: enable=bad-whitespace
 
@@ -659,8 +662,7 @@ ACTION_SET = (
 
 # Remove the first entry from human_readable_colors after using it for the self
 # color to prevent it from being used again as another avatar color.
-light_desaturated_avatar_palette = list(
-    colors.light_desaturated_avatar_palette)
+light_desaturated_avatar_palette = list(colors.light_desaturated_avatar_palette)
 TARGET_SPRITE_SELF = {
     "name": "Self",
     "shape": shapes.CUTE_AVATAR,
@@ -679,13 +681,17 @@ def create_prefabs() -> PrefabConfig:
       "dirt": DIRT,
       "spawn_point": SPAWN_POINT,
       "red_mushroom": create_mushroom(
-          initial_state="fullInternalityZeroExternality"),
+          initial_state="fullInternalityZeroExternality"
+      ),
       "green_mushroom": create_mushroom(
-          initial_state="halfInternalityHalfExternality"),
+          initial_state="halfInternalityHalfExternality"
+      ),
       "blue_mushroom": create_mushroom(
-          initial_state="zeroInternalityFullExternality"),
+          initial_state="zeroInternalityFullExternality"
+      ),
       "orange_mushroom": create_mushroom(
-          initial_state="negativeInternalityNegativeExternality"),
+          initial_state="negativeInternalityNegativeExternality"
+      ),
       "potential_mushroom": create_mushroom(initial_state="wait"),
       # fence prefabs
       "nw_wall_corner": NW_WALL_CORNER,
@@ -717,7 +723,7 @@ def create_scene():
                   "stateConfigs": [{
                       "state": "scene",
                   }],
-              }
+              },
           },
           {
               "component": "Transform",
@@ -752,23 +758,24 @@ def create_scene():
                       },
                   },
                   "minPotentialMushrooms": 1,
-              }
+              },
           },
           {
               "component": "StochasticIntervalEpisodeEnding",
               "kwargs": {
                   "minimumFramesPerEpisode": 1000,
                   "intervalLength": 100,  # Set equal to unroll length.
-                  "probabilityTerminationPerInterval": 0.2
-              }
+                  "probabilityTerminationPerInterval": 0.2,
+              },
           },
-      ]
+      ],
   }
   return scene
 
 
-def create_avatar_object(player_idx: int,
-                         target_sprite_self: Dict[str, Any]) -> Dict[str, Any]:
+def create_avatar_object(
+    player_idx: int, target_sprite_self: Dict[str, Any]
+) -> Dict[str, Any]:
   """Create an avatar object that always sees itself as blue."""
   # Lua is 1-indexed.
   lua_index = player_idx + 1
@@ -787,17 +794,17 @@ def create_avatar_object(player_idx: int,
                   "initialState": live_state_name,
                   "stateConfigs": [
                       # Initial player state.
-                      {"state": live_state_name,
-                       "layer": "upperPhysical",
-                       "sprite": source_sprite_self,
-                       "contact": "avatar",
-                       "groups": ["players"]},
-
+                      {
+                          "state": live_state_name,
+                          "layer": "upperPhysical",
+                          "sprite": source_sprite_self,
+                          "contact": "avatar",
+                          "groups": ["players"],
+                      },
                       # Player wait type for times when they are zapped out.
-                      {"state": "playerWait",
-                       "groups": ["playerWaits"]},
-                  ]
-              }
+                      {"state": "playerWait", "groups": ["playerWaits"]},
+                  ],
+              },
           },
           {
               "component": "Transform",
@@ -810,10 +817,11 @@ def create_avatar_object(player_idx: int,
                   "spriteShapes": [shapes.CUTE_AVATAR],
                   "palettes": [
                       shapes.get_palette(
-                          light_desaturated_avatar_palette[player_idx])
+                          light_desaturated_avatar_palette[player_idx]
+                      )
                   ],
-                  "noRotates": [True]
-              }
+                  "noRotates": [True],
+              },
           },
           {
               "component": "AdditionalSprites",
@@ -823,7 +831,7 @@ def create_avatar_object(player_idx: int,
                   "customSpriteShapes": [target_sprite_self["shape"]],
                   "customPalettes": [target_sprite_self["palette"]],
                   "customNoRotates": [target_sprite_self["noRotate"]],
-              }
+              },
           },
           {
               "component": "Avatar",
@@ -832,9 +840,7 @@ def create_avatar_object(player_idx: int,
                   "aliveState": live_state_name,
                   "waitState": "playerWait",
                   "spawnGroup": "spawnPoints",
-                  "actionOrder": ["move",
-                                  "turn",
-                                  "fireZap"],
+                  "actionOrder": ["move", "turn", "fireZap"],
                   "actionSpec": {
                       "move": {"default": 0, "min": 0, "max": len(_COMPASS)},
                       "turn": {"default": 0, "min": -1, "max": 1},
@@ -845,10 +851,10 @@ def create_avatar_object(player_idx: int,
                       "right": 5,
                       "forward": 9,
                       "backward": 1,
-                      "centered": False
+                      "centered": False,
                   },
                   "spriteMap": custom_sprite_map,
-              }
+              },
           },
           {
               "component": "Zapper",
@@ -861,7 +867,7 @@ def create_avatar_object(player_idx: int,
                   "rewardForZapping": 0,
                   # GraduatedSanctionsMarking handles removal instead of Zapper.
                   "removeHitPlayer": False,
-              }
+              },
           },
           {
               "component": "ReadyToShootObservation",
@@ -869,7 +875,7 @@ def create_avatar_object(player_idx: int,
           {
               "component": "Cumulants",
           },
-      ]
+      ],
   }
   if _ENABLE_DEBUG_OBSERVATIONS:
     avatar_object["components"].append({
@@ -957,18 +963,23 @@ def create_marking_overlay(player_idx: int) -> Mapping[str, Any]:
                   "initialState": "avatarMarkingWait",
                   "stateConfigs": [
                       # Declare one state per level of the hit logic.
-                      {"state": "level_1",
-                       "layer": "superOverlay",
-                       "sprite": "sprite_for_level_1"},
-                      {"state": "level_2",
-                       "layer": "superOverlay",
-                       "sprite": "sprite_for_level_2"},
-
+                      {
+                          "state": "level_1",
+                          "layer": "superOverlay",
+                          "sprite": "sprite_for_level_1",
+                      },
+                      {
+                          "state": "level_2",
+                          "layer": "superOverlay",
+                          "sprite": "sprite_for_level_2",
+                      },
                       # Invisible inactive (zapped out) overlay type.
-                      {"state": "avatarMarkingWait",
-                       "groups": ["avatarMarkingWaits"]},
-                  ]
-              }
+                      {
+                          "state": "avatarMarkingWait",
+                          "groups": ["avatarMarkingWaits"],
+                      },
+                  ],
+              },
           },
           {
               "component": "Transform",
@@ -977,14 +988,14 @@ def create_marking_overlay(player_idx: int) -> Mapping[str, Any]:
               "component": "Appearance",
               "kwargs": {
                   "renderMode": "ascii_shape",
-                  "spriteNames": ["sprite_for_level_1",
-                                  "sprite_for_level_2"],
-                  "spriteShapes": [MARKING_SPRITE,
-                                   MARKING_SPRITE],
-                  "palettes": [get_marking_palette(0.0),
-                               get_marking_palette(1.0)],
-                  "noRotates": [True] * 3
-              }
+                  "spriteNames": ["sprite_for_level_1", "sprite_for_level_2"],
+                  "spriteShapes": [MARKING_SPRITE, MARKING_SPRITE],
+                  "palettes": [
+                      get_marking_palette(0.0),
+                      get_marking_palette(1.0),
+                  ],
+                  "noRotates": [True] * 3,
+              },
           },
           {
               "component": "GraduatedSanctionsMarking",
@@ -994,18 +1005,22 @@ def create_marking_overlay(player_idx: int) -> Mapping[str, Any]:
                   "hitName": "zapHit",
                   "recoveryTime": 50,
                   "hitLogic": [
-                      {"levelIncrement": 1,
-                       "sourceReward": 0,
-                       "targetReward": 0,
-                       "freeze": 25},
-                      {"levelIncrement": -1,
-                       "sourceReward": 0,
-                       "targetReward": 0,
-                       "remove": True}
+                      {
+                          "levelIncrement": 1,
+                          "sourceReward": 0,
+                          "targetReward": 0,
+                          "freeze": 25,
+                      },
+                      {
+                          "levelIncrement": -1,
+                          "sourceReward": 0,
+                          "targetReward": 0,
+                          "remove": True,
+                      },
                   ],
-              }
+              },
           },
-      ]
+      ],
   }
   return marking_object
 
@@ -1014,8 +1029,7 @@ def create_avatar_objects(num_players):
   """Returns list of avatar objects of length 'num_players'."""
   avatar_objects = []
   for player_idx in range(0, num_players):
-    game_object = create_avatar_object(player_idx,
-                                       TARGET_SPRITE_SELF)
+    game_object = create_avatar_object(player_idx, TARGET_SPRITE_SELF)
     avatar_objects.append(game_object)
 
     marking_object = create_marking_overlay(player_idx)
@@ -1070,5 +1084,5 @@ def build(
           "prefabs": create_prefabs(),
           "charPrefabMap": config.layout.char_prefab_map,
       },
-    )
+  )
   return substrate_definition

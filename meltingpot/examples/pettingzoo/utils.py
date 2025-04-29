@@ -24,7 +24,7 @@ from pettingzoo.utils import wrappers
 
 from ..gym import utils
 
-PLAYER_STR_FORMAT = 'player_{index}'
+PLAYER_STR_FORMAT = "player_{index}"
 MAX_CYCLES = 1000
 
 
@@ -34,7 +34,8 @@ def parallel_env(env_config, max_cycles=MAX_CYCLES):
 
 def raw_env(env_config, max_cycles=MAX_CYCLES):
   return pettingzoo_utils.parallel_to_aec_wrapper(
-      parallel_env(env_config, max_cycles))
+      parallel_env(env_config, max_cycles)
+  )
 
 
 def env(env_config, max_cycles=MAX_CYCLES):
@@ -51,21 +52,26 @@ class _MeltingPotPettingZooEnv(pettingzoo_utils.ParallelEnv):
     self.env_config = config_dict.ConfigDict(env_config)
     self.max_cycles = max_cycles
     self._env = substrate.build(
-        self.env_config, roles=self.env_config.default_player_roles)
+        self.env_config, roles=self.env_config.default_player_roles
+    )
     self._num_players = len(self._env.observation_spec())
     self.possible_agents = [
         PLAYER_STR_FORMAT.format(index=index)
         for index in range(self._num_players)
     ]
     observation_space = utils.remove_world_observations_from_space(
-        utils.spec_to_space(self._env.observation_spec()[0]))
-    self.observation_space = functools.lru_cache(
-        maxsize=None)(lambda agent_id: observation_space)
+        utils.spec_to_space(self._env.observation_spec()[0])
+    )
+    self.observation_space = functools.lru_cache(maxsize=None)(
+        lambda agent_id: observation_space
+    )
     action_space = utils.spec_to_space(self._env.action_spec()[0])
     self.action_space = functools.lru_cache(maxsize=None)(
-        lambda agent_id: action_space)
+        lambda agent_id: action_space
+    )
     self.state_space = utils.spec_to_space(
-        self._env.observation_spec()[0]['WORLD.RGB'])
+        self._env.observation_spec()[0]["WORLD.RGB"]
+    )
 
   def state(self):
     return self._env.observation()
@@ -98,11 +104,11 @@ class _MeltingPotPettingZooEnv(pettingzoo_utils.ParallelEnv):
     """See base class."""
     self._env.close()
 
-  def render(self, mode='human', filename=None):
-    rgb_arr = self.state()['WORLD.RGB']
-    if mode == 'human':
+  def render(self, mode="human", filename=None):
+    rgb_arr = self.state()["WORLD.RGB"]
+    if mode == "human":
       plt.cla()
-      plt.imshow(rgb_arr, interpolation='nearest')
+      plt.imshow(rgb_arr, interpolation="nearest")
       if filename is None:
         plt.show(block=False)
       else:
@@ -112,7 +118,7 @@ class _MeltingPotPettingZooEnv(pettingzoo_utils.ParallelEnv):
 
 
 class _ParallelEnv(_MeltingPotPettingZooEnv, gym_utils.EzPickle):
-  metadata = {'render_modes': ['human', 'rgb_array']}
+  metadata = {"render_modes": ["human", "rgb_array"]}
 
   def __init__(self, env_config, max_cycles):
     gym_utils.EzPickle.__init__(self, env_config, max_cycles)

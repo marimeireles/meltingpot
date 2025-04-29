@@ -31,24 +31,26 @@ class ScenarioTest(test_utils.SubstrateTestCase):
     reward_spec = [factory.timestep_spec().reward] * num_players
     discount_spec = factory.timestep_spec().discount
     observation_spec = dict(factory.timestep_spec().observation)
-    observation_spec['COLLECTIVE_REWARD'] = dm_env.specs.Array(
-        shape=(), dtype=np.float64, name='COLLECTIVE_REWARD')
+    observation_spec["COLLECTIVE_REWARD"] = dm_env.specs.Array(
+        shape=(), dtype=np.float64, name="COLLECTIVE_REWARD"
+    )
     observation_spec = [observation_spec] * num_players
     with factory.build() as env:
-      with self.subTest('step'):
+      with self.subTest("step"):
         self.assert_step_matches_specs(env)
-      with self.subTest('discount_spec'):
+      with self.subTest("discount_spec"):
         self.assertSequenceEqual(env.action_spec(), action_spec)
-      with self.subTest('reward_spec'):
+      with self.subTest("reward_spec"):
         self.assertSequenceEqual(env.reward_spec(), reward_spec)
-      with self.subTest('discount_spec'):
+      with self.subTest("discount_spec"):
         self.assertEqual(env.discount_spec(), discount_spec)
-      with self.subTest('observation_spec'):
+      with self.subTest("observation_spec"):
         self.assertSequenceEqual(env.observation_spec(), observation_spec)
-      with self.subTest('only_permitted'):
-        self.assertContainsSubset(factory.timestep_spec().observation,
-                                  scenario.PERMITTED_OBSERVATIONS)
+      with self.subTest("only_permitted"):
+        self.assertContainsSubset(
+            factory.timestep_spec().observation, scenario.PERMITTED_OBSERVATIONS
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
   absltest.main()

@@ -20,10 +20,10 @@ import dm_env
 import immutabledict
 import numpy as np
 
-State = TypeVar('State')
-PuppetGoal = NewType('PuppetGoal', np.ndarray)
+State = TypeVar("State")
+PuppetGoal = NewType("PuppetGoal", np.ndarray)
 
-_GOAL_OBSERVATION_KEY = 'GOAL'
+_GOAL_OBSERVATION_KEY = "GOAL"
 _GOAL_DTYPE = np.int32
 
 
@@ -41,8 +41,9 @@ class Puppeteer(Generic[State], metaclass=abc.ABCMeta):
     """
 
   @abc.abstractmethod
-  def step(self, timestep: dm_env.TimeStep,
-           prev_state: State) -> Tuple[dm_env.TimeStep, State]:
+  def step(
+      self, timestep: dm_env.TimeStep, prev_state: State
+  ) -> Tuple[dm_env.TimeStep, State]:
     """Steps the puppeteer.
 
     Must not have any side effects.
@@ -57,16 +58,19 @@ class Puppeteer(Generic[State], metaclass=abc.ABCMeta):
     """
 
 
-def puppet_timestep(timestep: dm_env.TimeStep,
-                    goal: PuppetGoal) -> dm_env.TimeStep:
+def puppet_timestep(
+    timestep: dm_env.TimeStep, goal: PuppetGoal
+) -> dm_env.TimeStep:
   """Returns a timestep with a goal observation added."""
   puppet_observation = immutabledict.immutabledict(
-      timestep.observation, **{_GOAL_OBSERVATION_KEY: goal})
+      timestep.observation, **{_GOAL_OBSERVATION_KEY: goal}
+  )
   return timestep._replace(observation=puppet_observation)
 
 
-def puppet_goals(names: Sequence[str],
-                 dtype: ... = _GOAL_DTYPE) -> Mapping[str, PuppetGoal]:
+def puppet_goals(
+    names: Sequence[str], dtype: ... = _GOAL_DTYPE
+) -> Mapping[str, PuppetGoal]:
   """Returns a mapping from goal name to a one-hot goal vector for a puppet.
 
   Args:

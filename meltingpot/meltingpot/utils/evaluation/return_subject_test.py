@@ -43,11 +43,12 @@ class ReturnSubjectTest(absltest.TestCase):
         subject, timesteps
     )
 
-    with self.subTest('written_on_final_step'):
+    with self.subTest("written_on_final_step"):
       self.assertEqual(step_written, 2)
 
-    with self.subTest('returns'):
+    with self.subTest("returns"):
       np.testing.assert_equal(episode_returns, [3, 7])
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
   absltest.main()

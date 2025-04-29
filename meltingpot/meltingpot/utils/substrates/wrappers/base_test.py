@@ -22,8 +22,9 @@ import dmlab2d
 from meltingpot.utils.substrates.wrappers import base
 
 _WRAPPED_METHODS = tuple([
-    name for name, _ in inspect.getmembers(dmlab2d.Environment)
-    if not name.startswith('_')
+    name
+    for name, _ in inspect.getmembers(dmlab2d.Environment)
+    if not name.startswith("_")
 ])
 
 
@@ -34,9 +35,7 @@ class WrapperTest(parameterized.TestCase):
     wrapped = base.Lab2dWrapper(env=env)
     self.assertIsInstance(wrapped, dmlab2d.Environment)
 
-  @parameterized.named_parameters(
-      (name, name) for name in _WRAPPED_METHODS
-  )
+  @parameterized.named_parameters((name, name) for name in _WRAPPED_METHODS)
   def test_wrapped(self, method):
     env = mock.Mock(spec_set=dmlab2d.Environment)
     env_method = getattr(env, method)
@@ -44,14 +43,14 @@ class WrapperTest(parameterized.TestCase):
 
     wrapped = base.Lab2dWrapper(env=env)
     args = [object()]
-    kwargs = {'a': object()}
+    kwargs = {"a": object()}
     actual = getattr(wrapped, method)(*args, **kwargs)
 
-    with self.subTest('args'):
+    with self.subTest("args"):
       env_method.assert_called_once_with(*args, **kwargs)
-    with self.subTest('return_value'):
+    with self.subTest("return_value"):
       self.assertEqual(actual, env_method.return_value)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
   absltest.main()

@@ -36,10 +36,13 @@ def _numpy_to_placeholder(
   Returns:
     A tree of placeholders matching the template arrays' specs.
   """
+
   def fn(path, x):
-    name = '.'.join(str(x) for x in path)
-    return tf.compat.v1.placeholder(shape=x.shape, dtype=x.dtype,
-                                    name=f'{prefix}.{name}')
+    name = ".".join(str(x) for x in path)
+    return tf.compat.v1.placeholder(
+        shape=x.shape, dtype=x.dtype, name=f"{prefix}.{name}"
+    )
+
   return tree.map_structure_with_path(fn, template)
 
 
@@ -64,7 +67,7 @@ class TF2SavedModelPolicy(policy.Policy[tree.Structure[tf.Tensor]]):
   that accept unbatched inputs.
   """
 
-  def __init__(self, model_path: str, device_name: str = 'cpu') -> None:
+  def __init__(self, model_path: str, device_name: str = "cpu") -> None:
     """Initialize a policy instance.
 
     Args:
@@ -89,7 +92,8 @@ class TF2SavedModelPolicy(policy.Policy[tree.Structure[tf.Tensor]]):
         observation=tree.map_structure(_downcast, timestep.observation),
     )
     next_key, outputs = self._strategy.run(
-        self._model.step, [prev_key, timestep, prev_state])
+        self._model.step, [prev_key, timestep, prev_state]
+    )
     (action, _), next_state = outputs
     return int(action.numpy()), (next_key, next_state)
 
@@ -113,7 +117,7 @@ class TF1SavedModelPolicy(policy.Policy[tree.Structure[np.ndarray]]):
   that accept batched inputs and produce batched outputs.
   """
 
-  def __init__(self, model_path: str, device_name: str = 'cpu') -> None:
+  def __init__(self, model_path: str, device_name: str = "cpu") -> None:
     """Initialize a policy instance.
 
     Args:
@@ -158,26 +162,33 @@ class TF1SavedModelPolicy(policy.Policy[tree.Structure[np.ndarray]]):
 
     with self._build_context():
       step_type_in = tf.compat.v1.placeholder(
-          shape=[], dtype=np.int32, name='step_type')
+          shape=[], dtype=np.int32, name="step_type"
+      )
       reward_in = tf.compat.v1.placeholder(
-          shape=[], dtype=np.float32, name='reward')
+          shape=[], dtype=np.float32, name="reward"
+      )
       discount_in = tf.compat.v1.placeholder(
-          shape=[], dtype=np.float32, name='discount')
+          shape=[], dtype=np.float32, name="discount"
+      )
       observation_in = _numpy_to_placeholder(
-          timestep.observation, prefix='observation')
+          timestep.observation, prefix="observation"
+      )
       timestep_in = dm_env.TimeStep(
           step_type=step_type_in,
           reward=reward_in,
           discount=discount_in,
-          observation=observation_in)
+          observation=observation_in,
+      )
       prev_key_in, prev_state_in = _numpy_to_placeholder(
-          prev_state, prefix='prev_state')
-      next_key, outputs = self._model.step(prev_key_in, timestep_in,
-                                           prev_state_in)
+          prev_state, prefix="prev_state"
+      )
+      next_key, outputs = self._model.step(
+          prev_key_in, timestep_in, prev_state_in
+      )
       (action, _), next_state = outputs
       input_values = tree.flatten_with_path({
-          'timestep': timestep_in,
-          'prev_state': (prev_key_in, prev_state_in),
+          "timestep": timestep_in,
+          "prev_state": (prev_key_in, prev_state_in),
       })
       self._step_inputs = dict(input_values)
       self._step_outputs = (action, (next_key, next_state))
@@ -195,11 +206,12 @@ class TF1SavedModelPolicy(policy.Policy[tree.Structure[np.ndarray]]):
     if not self._step_inputs:
       self._build_step_graph(timestep, prev_state)
     input_values = tree.flatten_with_path({
-        'timestep': timestep,
-        'prev_state': prev_state,
+        "timestep": timestep,
+        "prev_state": prev_state,
     })
     feed_dict = {
-        self._step_inputs[path]: value for path, value in input_values
+        self._step_inputs[path]: value
+        for path, value in input_values
         if path in self._step_inputs
     }
     action, next_state = self._session.run(self._step_outputs, feed_dict)

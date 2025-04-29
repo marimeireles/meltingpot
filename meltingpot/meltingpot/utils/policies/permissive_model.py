@@ -15,7 +15,6 @@
 
 import copy
 import inspect
-
 from typing import Any, Callable, NamedTuple
 
 from absl import logging
@@ -25,6 +24,7 @@ import tree
 
 class _Function(NamedTuple):
   """Function exposing signature and expected canonical arguments."""
+
   func: Callable[..., Any]
   signature: inspect.Signature
   structured_specs: Any
@@ -58,7 +58,8 @@ class PermissiveModel:
       # Always include a VAR_KEYWORD to capture any extraneous arguments.
       if all([p.kind != inspect.Parameter.VAR_KEYWORD for p in params]):
         params.append(
-            inspect.Parameter("__unused_kwargs", inspect.Parameter.VAR_KEYWORD))
+            inspect.Parameter("__unused_kwargs", inspect.Parameter.VAR_KEYWORD)
+        )
       return params
 
     signatures = self.model.function_signatures()
@@ -94,7 +95,8 @@ class PermissiveModel:
       return
 
     all_nodes = dict(
-        main={n.name: n for n in concrete_func.graph.as_graph_def().node})
+        main={n.name: n for n in concrete_func.graph.as_graph_def().node}
+    )
     for func_def in concrete_func.graph.as_graph_def().library.function:
       all_nodes[func_def.signature.name] = {
           n.name: n for n in func_def.node_def
@@ -109,28 +111,36 @@ class PermissiveModel:
           table_op = nodes[table_name]
 
       logging.info("Initialising table for Op `%s`", table_name)
-      table_handle_name = table_op.attr["shared_name"].s  # pytype: disable=attribute-error
+      table_handle_name = table_op.attr[
+          "shared_name"
+      ].s  # pytype: disable=attribute-error
       table_handle = tf.raw_ops.HashTableV2(
           key_dtype=table_keys.dtype,
           value_dtype=table_values.dtype,
-          shared_name=table_handle_name)
+          shared_name=table_handle_name,
+      )
       tf.raw_ops.LookupTableImportV2(
-          table_handle=table_handle, keys=table_keys, values=table_values)
+          table_handle=table_handle, keys=table_keys, values=table_values
+      )
       self._initialized_tables[name] = self._tables.pop(name)  # Only init once.
 
   def _make_permissive_function(self, name: str) -> Callable[..., Any]:
     """Create a permissive version of a function in the SavedModel."""
     if name not in self.signatures:
-      raise ValueError(f"No function named {name} in SavedModel, "
-                       "options are {self.signatures}")
+      raise ValueError(
+          f"No function named {name} in SavedModel, "
+          "options are {self.signatures}"
+      )
 
     tf_func = getattr(self.model, name)
     if hasattr(tf_func, "concrete_functions"):
       # tf.RestoredFunction
-      concrete_func, = tf_func.concrete_functions  # Expect only one.
+      (concrete_func,) = tf_func.concrete_functions  # Expect only one.
     elif hasattr(tf_func, "_list_all_concrete_functions"):
       # tf.Function
-      all_concrete_funcs = tf_func._list_all_concrete_functions()  # pylint: disable=protected-access
+      all_concrete_funcs = (
+          tf_func._list_all_concrete_functions()
+      )  # pylint: disable=protected-access
       all_concrete_signatures = [
           f.structured_input_signature for f in all_concrete_funcs
       ]
@@ -143,7 +153,8 @@ class PermissiveModel:
       if len(unique_concrete_signatures) != 1:
         raise ValueError(
             "Expected exactly one unique concrete_function signature, found "
-            f"the following: {all_concrete_signatures}")
+            f"the following: {all_concrete_signatures}"
+        )
       concrete_func = all_concrete_funcs[0]
     else:
       raise ValueError(f"No concrete functions found on {tf_func}")
@@ -155,7 +166,8 @@ class PermissiveModel:
       canonical_args = concrete_func.structured_input_signature
 
       flat_bound_args = tree.flatten_with_path(
-          (bound_args.args, bound_args.kwargs))
+          (bound_args.args, bound_args.kwargs)
+      )
       flat_canonical_args = tree.flatten_with_path(canonical_args)
 
       # Check for missing arguments.
@@ -169,7 +181,9 @@ class PermissiveModel:
                 "Received unexpected argument `%s` for path %s, replaced with "
                 "None.",
                 20,
-                arg_value, arg_path)
+                arg_value,
+                arg_path,
+            )
           flat_bound_args_dict[arg_path] = None
 
       # Filter out extraneous arguments and dictionary keys.
@@ -184,7 +198,8 @@ class PermissiveModel:
           for arg_path, _ in flat_canonical_args
       ]
       filtered_args, filtered_kwargs = tree.unflatten_as(
-          canonical_args, full_flat_bound_args)
+          canonical_args, full_flat_bound_args
+      )
 
       return tf_func(*filtered_args, **filtered_kwargs)
 

@@ -78,7 +78,8 @@ def get_config():
   config = base_config.get_config()
   config.ascii_map = OPEN_ASCII_MAP
 
-  config.default_player_roles = (
-      ("player_who_likes_red",) * 8 + ("player_who_likes_green",) * 8)
+  config.default_player_roles = ("player_who_likes_red",) * 8 + (
+      "player_who_likes_green",
+  ) * 8
 
   return config

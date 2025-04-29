@@ -27,7 +27,7 @@ import numpy as np
 import reactivex
 from reactivex import subject
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 def _restrict_observation(
@@ -37,7 +37,8 @@ def _restrict_observation(
   """Restricts an observation to only the permitted keys."""
   return immutabledict.immutabledict({
       key: observation[key]
-      for key in observation if key in permitted_observations
+      for key in observation
+      if key in permitted_observations
   })
 
 
@@ -94,6 +95,7 @@ class ScenarioObservables(substrate_lib.SubstrateObservables):
     background: observables from the perspective of the background players.
     substrate: observables for the underlying substrate.
   """
+
   background: population.PopulationObservables
   substrate: substrate_lib.SubstrateObservables
 
@@ -106,7 +108,8 @@ class Scenario(substrate_lib.Substrate):
       substrate: substrate_lib.Substrate,
       background_population: population.Population,
       is_focal: Sequence[bool],
-      permitted_observations: Collection[str]) -> None:
+      permitted_observations: Collection[str],
+  ) -> None:
     """Initializes the scenario.
 
     Args:
@@ -119,8 +122,10 @@ class Scenario(substrate_lib.Substrate):
     """
     num_players = len(substrate.action_spec())
     if len(is_focal) != num_players:
-      raise ValueError(f'is_focal is length {len(is_focal)} but substrate is '
-                       f'{num_players}-player.')
+      raise ValueError(
+          f"is_focal is length {len(is_focal)} but substrate is "
+          f"{num_players}-player."
+      )
 
     self._substrate = substrate
     self._background_population = background_population
@@ -138,13 +143,15 @@ class Scenario(substrate_lib.Substrate):
         timestep=reactivex.empty(),
     )
     self._substrate_observables = self._substrate.observables()
-    self._observables = ScenarioObservables(  # pylint: disable=unexpected-keyword-arg
-        action=self._focal_action_subject,
-        events=self._events_subject,
-        timestep=self._focal_timestep_subject,
-        background=self._background_population.observables(),
-        substrate=self._substrate_observables,
-        dmlab2d=self._dmlab2d_observables,
+    self._observables = (
+        ScenarioObservables(  # pylint: disable=unexpected-keyword-arg
+            action=self._focal_action_subject,
+            events=self._events_subject,
+            timestep=self._focal_timestep_subject,
+            background=self._background_population.observables(),
+            substrate=self._substrate_observables,
+            dmlab2d=self._dmlab2d_observables,
+        )
     )
 
   def close(self) -> None:
@@ -165,16 +172,21 @@ class Scenario(substrate_lib.Substrate):
       self, timestep: dm_env.TimeStep
   ) -> tuple[dm_env.TimeStep, dm_env.TimeStep]:
     """Splits multiplayer timestep as needed by agents and bots."""
-    focal_rewards, background_rewards = _partition(timestep.reward,
-                                                   self._is_focal)
+    focal_rewards, background_rewards = _partition(
+        timestep.reward, self._is_focal
+    )
     focal_observations, background_observations = _partition(
-        timestep.observation, self._is_focal)
-    focal_observations = _restrict_observations(focal_observations,
-                                                self._permitted_observations)
+        timestep.observation, self._is_focal
+    )
+    focal_observations = _restrict_observations(
+        focal_observations, self._permitted_observations
+    )
     focal_timestep = timestep._replace(
-        reward=focal_rewards, observation=focal_observations)
+        reward=focal_rewards, observation=focal_observations
+    )
     background_timestep = timestep._replace(
-        reward=background_rewards, observation=background_observations)
+        reward=background_rewards, observation=background_observations
+    )
     return focal_timestep, background_timestep
 
   def _send_full_timestep(self, timestep: dm_env.TimeStep) -> dm_env.TimeStep:
@@ -207,8 +219,9 @@ class Scenario(substrate_lib.Substrate):
   def observation(self) -> Sequence[Mapping[str, np.ndarray]]:
     observations = self._substrate.observation()
     focal_observations, _ = _partition(observations, self._is_focal)
-    focal_observations = _restrict_observations(focal_observations,
-                                                self._permitted_observations)
+    focal_observations = _restrict_observations(
+        focal_observations, self._permitted_observations
+    )
     return focal_observations
 
   def events(self) -> Sequence[tuple[str, Any]]:
@@ -227,8 +240,9 @@ class Scenario(substrate_lib.Substrate):
     """See base class."""
     observation_spec = self._substrate.observation_spec()
     focal_observation_spec, _ = _partition(observation_spec, self._is_focal)
-    return _restrict_observations(focal_observation_spec,
-                                  self._permitted_observations)
+    return _restrict_observations(
+        focal_observation_spec, self._permitted_observations
+    )
 
   def reward_spec(self) -> Sequence[dm_env.specs.Array]:
     """See base class."""
@@ -284,14 +298,14 @@ def build_scenario(
     The constructed scenario.
   """
   if len(roles) != len(is_focal):
-    raise ValueError('roles and is_focal must be the same length.')
+    raise ValueError("roles and is_focal must be the same length.")
   background_roles = [role for n, role in enumerate(roles) if not is_focal[n]]
   background_population = population.Population(
-      policies=bots,
-      names_by_role=bots_by_role,
-      roles=background_roles)
+      policies=bots, names_by_role=bots_by_role, roles=background_roles
+  )
   return Scenario(
       substrate=substrate,
       background_population=background_population,
       is_focal=is_focal,
-      permitted_observations=permitted_observations)
+      permitted_observations=permitted_observations,
+  )

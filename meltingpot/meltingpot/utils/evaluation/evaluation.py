@@ -31,7 +31,7 @@ import numpy as np
 import pandas as pd
 from reactivex import operators as ops
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 def run_episode(
@@ -81,40 +81,53 @@ def run_and_observe_episodes(
         names=focal_observables.names.pipe(ops.map(lambda x: ())),
         action=focal_observables.action.pipe(ops.map(lambda x: ())),
         timestep=focal_observables.timestep.pipe(
-            ops.map(lambda t: t._replace(observation=(), reward=()))))
+            ops.map(lambda t: t._replace(observation=(), reward=()))
+        ),
+    )
 
   data = collections.defaultdict(list)
   with contextlib.ExitStack() as stack:
 
     def subscribe(observable, *args, **kwargs):
-      disposable = observable.subscribe(*args, **kwargs)  # pytype: disable=wrong-keyword-args
+      disposable = observable.subscribe(
+          *args, **kwargs
+      )  # pytype: disable=wrong-keyword-args
       stack.callback(disposable.dispose)
 
     if video_root:
       video_subject = video_subject_lib.VideoSubject(video_root)
       subscribe(substrate_observables.timestep, video_subject)
-      subscribe(video_subject, on_next=data['video_path'].append)
+      subscribe(video_subject, on_next=data["video_path"].append)
 
     focal_return_subject = return_subject.ReturnSubject()
     subscribe(focal_observables.timestep, focal_return_subject)
-    subscribe(focal_return_subject, on_next=data['focal_player_returns'].append)
-    subscribe(focal_return_subject.pipe(ops.map(np.mean)),
-              on_next=data['focal_per_capita_return'].append)
-    subscribe(focal_observables.names,
-              on_next=data['focal_player_names'].append)
+    subscribe(focal_return_subject, on_next=data["focal_player_returns"].append)
+    subscribe(
+        focal_return_subject.pipe(ops.map(np.mean)),
+        on_next=data["focal_per_capita_return"].append,
+    )
+    subscribe(
+        focal_observables.names, on_next=data["focal_player_names"].append
+    )
 
     background_return_subject = return_subject.ReturnSubject()
     subscribe(background_observables.timestep, background_return_subject)
-    subscribe(background_return_subject,
-              on_next=data['background_player_returns'].append)
-    subscribe(background_return_subject.pipe(ops.map(np.mean)),
-              on_next=data['background_per_capita_return'].append)
-    subscribe(background_observables.names,
-              on_next=data['background_player_names'].append)
+    subscribe(
+        background_return_subject,
+        on_next=data["background_player_returns"].append,
+    )
+    subscribe(
+        background_return_subject.pipe(ops.map(np.mean)),
+        on_next=data["background_per_capita_return"].append,
+    )
+    subscribe(
+        background_observables.names,
+        on_next=data["background_player_names"].append,
+    )
 
     for n in range(num_episodes):
       run_episode(population, substrate)
-      logging.info('%4d / %4d episodes completed...', n + 1, num_episodes)
+      logging.info("%4d / %4d episodes completed...", n + 1, num_episodes)
 
   return pd.DataFrame(data).sort_index(axis=1)
 
@@ -147,13 +160,15 @@ def evaluate_population_on_scenario(
   focal_population = population_lib.Population(
       policies=population,
       names_by_role=names_by_role,
-      roles=factory.focal_player_roles())
+      roles=factory.focal_player_roles(),
+  )
   with factory.build() as env:
     return run_and_observe_episodes(
         population=focal_population,
         substrate=env,
         num_episodes=num_episodes,
-        video_root=video_root)
+        video_root=video_root,
+    )
 
 
 def evaluate_population_on_substrate(
@@ -183,15 +198,15 @@ def evaluate_population_on_substrate(
   factory = meltingpot.substrate.get_factory(substrate)
   roles = factory.default_player_roles()
   focal_population = population_lib.Population(
-      policies=population,
-      names_by_role=names_by_role,
-      roles=roles)
+      policies=population, names_by_role=names_by_role, roles=roles
+  )
   with factory.build(roles) as env:
     return run_and_observe_episodes(
         population=focal_population,
         substrate=env,
         num_episodes=num_episodes,
-        video_root=video_root)
+        video_root=video_root,
+    )
 
 
 def evaluate_population(
@@ -224,16 +239,18 @@ def evaluate_population(
         names_by_role=names_by_role,
         scenario=scenario,
         num_episodes=num_episodes,
-        video_root=video_root)
+        video_root=video_root,
+    )
   elif scenario in meltingpot.substrate.SUBSTRATES:
     return evaluate_population_on_substrate(
         population=population,
         names_by_role=names_by_role,
         substrate=scenario,
         num_episodes=num_episodes,
-        video_root=video_root)
+        video_root=video_root,
+    )
   else:
-    raise ValueError(f'Unknown substrate or scenario: {scenario!r}')
+    raise ValueError(f"Unknown substrate or scenario: {scenario!r}")
 
 
 @contextlib.contextmanager
@@ -285,7 +302,8 @@ def evaluate_saved_models_on_scenario(
         names_by_role=names_by_role,
         scenario=scenario,
         num_episodes=num_episodes,
-        video_root=video_root)
+        video_root=video_root,
+    )
 
 
 def evaluate_saved_models_on_substrate(
@@ -318,7 +336,8 @@ def evaluate_saved_models_on_substrate(
         names_by_role=names_by_role,
         substrate=substrate,
         num_episodes=num_episodes,
-        video_root=video_root)
+        video_root=video_root,
+    )
 
 
 def evaluate_saved_models(
@@ -351,4 +370,5 @@ def evaluate_saved_models(
         names_by_role=names_by_role,
         scenario=scenario,
         num_episodes=num_episodes,
-        video_root=video_root)
+        video_root=video_root,
+    )

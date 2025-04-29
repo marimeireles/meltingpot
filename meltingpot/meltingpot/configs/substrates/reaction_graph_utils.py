@@ -117,26 +117,26 @@ def add_system_nodes(g: nx.DiGraph):
   """
   g.add_nodes_from([
       # Add a node for the "empty" compound.
-      ("empty", {"color": EMPTY_COLOR,
-                 "reactivity": "low"}),
+      ("empty", {"color": EMPTY_COLOR, "reactivity": "low"}),
       # Add a node for the "activated" compound.
-      ("activated", {"color": WHITE_COLOR,
-                     "immovable": True}),
+      ("activated", {"color": WHITE_COLOR, "immovable": True}),
       # Add unused nodes that serve only to make all standard groups valid so
       # their corresponding updater can be created.
       ("_unused_a", {"reactivity": "low"}),
       ("_unused_b", {"reactivity": "medium"}),
-      ("_unused_c", {"reactivity": "high"})
+      ("_unused_c", {"reactivity": "high"}),
   ])
 
 
-def add_compounds_to_prefabs_dictionary(prefabs,
-                                        compounds,
-                                        reactivity_levels,
-                                        sprites=False,
-                                        default_reaction_radius=None,
-                                        default_reaction_query_type=None,
-                                        priority_mode=False):
+def add_compounds_to_prefabs_dictionary(
+    prefabs,
+    compounds,
+    reactivity_levels,
+    sprites=False,
+    default_reaction_radius=None,
+    default_reaction_query_type=None,
+    priority_mode=False,
+):
   """Add compounds."""
   for compound_name in compounds.keys():
     prefabs[compound_name] = create_cell_prefab(
@@ -146,7 +146,8 @@ def add_compounds_to_prefabs_dictionary(prefabs,
         sprites=sprites,
         default_reaction_radius=default_reaction_radius,
         default_reaction_query_type=default_reaction_query_type,
-        priority_mode=priority_mode)
+        priority_mode=priority_mode,
+    )
   return prefabs
 
 
@@ -158,8 +159,9 @@ def multiply_tuple(color_tuple, factor):
 
 
 def adjust_color_opacity(color_tuple, factor):
-  apply_opacity = tuple([color_tuple[0], color_tuple[1], color_tuple[2],
-                         color_tuple[3] * factor])
+  apply_opacity = tuple(
+      [color_tuple[0], color_tuple[1], color_tuple[2], color_tuple[3] * factor]
+  )
   return tuple([int(np.min([x])) for x in apply_opacity])
 
 
@@ -186,9 +188,15 @@ def get_cytoavatar_palette(sprite_color):
   }
 
 
-def create_cell_prefab(compound_name, compounds, reactivity_levels,
-                       sprites=False, default_reaction_radius=None,
-                       default_reaction_query_type=None, priority_mode=False):
+def create_cell_prefab(
+    compound_name,
+    compounds,
+    reactivity_levels,
+    sprites=False,
+    default_reaction_radius=None,
+    default_reaction_query_type=None,
+    priority_mode=False,
+):
   """Create prefab for a cell object initially set to state=`compound_name`."""
   state_configs = []
   states_to_properties = {}
@@ -211,7 +219,7 @@ def create_cell_prefab(compound_name, compounds, reactivity_levels,
         "state": compound,
         "sprite": compound,
         "layer": "lowerPhysical",
-        "groups": groups  + ["spawnPoints"],
+        "groups": groups + ["spawnPoints"],
     }
     state_configs.append(state_config)
     states_to_properties[compound] = attributes["properties"]
@@ -223,14 +231,16 @@ def create_cell_prefab(compound_name, compounds, reactivity_levels,
     reactivities[key] = value
 
   if sprites:
+
     def get_palette(sprite_color):
       return {
-          "x": EMPTY_COLOR[0:len(sprite_color)],
+          "x": EMPTY_COLOR[0 : len(sprite_color)],
           "a": (252,) * len(sprite_color),
           "b": sprite_color,
           "c": multiply_tuple(sprite_color, 0.2),
-          "d": sprite_color
+          "d": sprite_color,
       }
+
     appearance_kwargs = {
         "renderMode": "ascii_shape",
         "spriteNames": list(compounds.keys()),
@@ -258,15 +268,12 @@ def create_cell_prefab(compound_name, compounds, reactivity_levels,
               "kwargs": {
                   "initialState": compound_name,
                   "stateConfigs": state_configs,
-              }
+              },
           },
           {
               "component": "Transform",
           },
-          {
-              "component": "Appearance",
-              "kwargs": appearance_kwargs
-          },
+          {"component": "Appearance", "kwargs": appearance_kwargs},
           {
               "component": "Cell",
               "kwargs": {
@@ -288,25 +295,27 @@ def create_cell_prefab(compound_name, compounds, reactivity_levels,
                   "name": "Reactant",
                   "reactivities": reactivities,
                   "priorityMode": priority_mode,
-              }
+              },
           },
           {
               "component": "Product",
               "kwargs": {
                   "name": "Product",
-              }
+              },
           },
-      ]
+      ],
   }
   return prefab
 
 
-def create_vesicle(player_idx: int,
-                   compounds,
-                   reactivity_levels,
-                   default_reaction_radius=None,
-                   default_reaction_query_type=None,
-                   priority_mode=False):
+def create_vesicle(
+    player_idx: int,
+    compounds,
+    reactivity_levels,
+    default_reaction_radius=None,
+    default_reaction_query_type=None,
+    priority_mode=False,
+):
   """Construct prefab for an avatar's vesicle object."""
   # Lua is 1-indexed.
   lua_index = player_idx + 1
@@ -321,8 +330,7 @@ def create_vesicle(player_idx: int,
     groups = []
     sprite_shape = shapes.SINGLE_HOLDING_LIQUID
     if "reactivity" in attributes:
-      reactivity_group = (vesicle_prefix +
-                          attributes["reactivity"])
+      reactivity_group = vesicle_prefix + attributes["reactivity"]
       groups.append(reactivity_group)
     if "immovable" in attributes and attributes["immovable"]:
       groups.append("immovables")
@@ -356,9 +364,8 @@ def create_vesicle(player_idx: int,
               "component": "StateManager",
               "kwargs": {
                   "initialState": "preInit",
-                  "stateConfigs": state_configs +
-                                  [{"state": "preInit"}],
-              }
+                  "stateConfigs": state_configs + [{"state": "preInit"}],
+              },
           },
           {
               "component": "Transform",
@@ -369,9 +376,11 @@ def create_vesicle(player_idx: int,
                   "renderMode": "ascii_shape",
                   "spriteNames": [key + "_vesicle" for key in compounds.keys()],
                   "spriteShapes": sprite_shapes,
-                  "palettes": [get_matter_palette(sprite_colors[i])
-                               for i in range(len(sprite_colors))],
-                  "noRotates": [True] * len(sprite_colors)
+                  "palettes": [
+                      get_matter_palette(sprite_colors[i])
+                      for i in range(len(sprite_colors))
+                  ],
+                  "noRotates": [True] * len(sprite_colors),
               },
           },
           {
@@ -380,8 +389,8 @@ def create_vesicle(player_idx: int,
                   "playerIndex": lua_index,
                   "preInitState": "preInit",
                   "initialState": "empty",
-                  "waitState": "vesicleWait"
-              }
+                  "waitState": "vesicleWait",
+              },
           },
           {
               "component": "Cell",
@@ -404,15 +413,15 @@ def create_vesicle(player_idx: int,
                   "name": "Reactant",
                   "reactivities": reactivities,
                   "priorityMode": priority_mode,
-              }
+              },
           },
           {
               "component": "Product",
               "kwargs": {
                   "name": "Product",
-              }
+              },
           },
-      ]
+      ],
   }
   return prefab
 
@@ -423,7 +432,8 @@ def create_avatar_constant_self_view(
     target_sprite_self_empty: Dict[str, Any],
     target_sprite_self_holds_one: Dict[str, Any],
     randomize_initial_orientation: bool = True,
-    add_location_observer: bool = False) -> Dict[str, Any]:
+    add_location_observer: bool = False,
+) -> Dict[str, Any]:
   """Create an avatar prefab rewarded by reactions in `rewarding_reactions`."""
   # Lua is 1-indexed.
   lua_index = player_idx + 1
@@ -450,21 +460,23 @@ def create_avatar_constant_self_view(
               "kwargs": {
                   "initialState": live_state_name_empty,
                   "stateConfigs": [
-                      {"state": live_state_name_empty,
-                       "layer": "upperPhysical",
-                       "sprite": source_sprite_self_empty,
-                       "contact": "avatar",
-                       "groups": ["players"]},
-                      {"state": live_state_name_holds_one,
-                       "layer": "upperPhysical",
-                       "sprite": source_sprite_self_holds_one,
-                       "contact": "avatar",
-                       "groups": ["players"]},
-
-                      {"state": "playerWait",
-                       "groups": ["playerWaits"]},
-                  ]
-              }
+                      {
+                          "state": live_state_name_empty,
+                          "layer": "upperPhysical",
+                          "sprite": source_sprite_self_empty,
+                          "contact": "avatar",
+                          "groups": ["players"],
+                      },
+                      {
+                          "state": live_state_name_holds_one,
+                          "layer": "upperPhysical",
+                          "sprite": source_sprite_self_holds_one,
+                          "contact": "avatar",
+                          "groups": ["players"],
+                      },
+                      {"state": "playerWait", "groups": ["playerWaits"]},
+                  ],
+              },
           },
           {
               "component": "Transform",
@@ -473,13 +485,17 @@ def create_avatar_constant_self_view(
               "component": "Appearance",
               "kwargs": {
                   "renderMode": "ascii_shape",
-                  "spriteNames": [source_sprite_self_empty,
-                                  source_sprite_self_holds_one],
-                  "spriteShapes": [shapes.CYTOAVATAR_EMPTY,
-                                   shapes.CYTOAVATAR_HOLDING_ONE],
+                  "spriteNames": [
+                      source_sprite_self_empty,
+                      source_sprite_self_holds_one,
+                  ],
+                  "spriteShapes": [
+                      shapes.CYTOAVATAR_EMPTY,
+                      shapes.CYTOAVATAR_HOLDING_ONE,
+                  ],
                   "palettes": [cytoavatar_palette] * 2,
-                  "noRotates": [True] * 2
-              }
+                  "noRotates": [True] * 2,
+              },
           },
           {
               "component": "AdditionalSprites",
@@ -501,7 +517,7 @@ def create_avatar_constant_self_view(
                       target_sprite_self_empty["noRotate"],
                       target_sprite_self_holds_one["noRotate"],
                   ],
-              }
+              },
           },
           {
               "component": "Avatar",
@@ -522,36 +538,38 @@ def create_avatar_constant_self_view(
                       "right": 5,
                       "forward": 9,
                       "backward": 1,
-                      "centered": False
+                      "centered": False,
                   },
                   "spriteMap": custom_sprite_map,
                   "randomizeInitialOrientation": randomize_initial_orientation,
-              }
+              },
           },
           {
               "component": "IOBeam",
               "kwargs": {
                   "cooldownTime": 2,
-              }
+              },
           },
           {
               "component": "VesicleManager",
               "kwargs": {
-                  "orderedVesicles": ["vesicleOne",],
+                  "orderedVesicles": [
+                      "vesicleOne",
+                  ],
                   "cytoavatarStates": {
                       "empty": live_state_name_empty,
                       "holdingOne": live_state_name_holds_one,
                   },
-              }
+              },
           },
           {
               "component": "ReactionsToRewards",
               "kwargs": {
                   # Specify rewards for specific reactions.
                   "rewardingReactions": rewarding_reactions
-              }
+              },
           },
-      ]
+      ],
   }
   if add_location_observer:
     avatar_object["components"].append({
@@ -574,24 +592,19 @@ def create_scene(reactions, stochastic_episode_ending=False):
                   "stateConfigs": [{
                       "state": "scene",
                   }],
-              }
+              },
           },
           {
               "component": "Transform",
           },
-          {
-              "component": "ReactionAlgebra",
-              "kwargs": {
-                  "reactions": reactions
-              }
-          },
+          {"component": "ReactionAlgebra", "kwargs": {"reactions": reactions}},
           {
               "component": "GlobalMetricTracker",
               "kwargs": {
                   "name": "GlobalMetricTracker",
-              }
+              },
           },
-      ]
+      ],
   }
   if stochastic_episode_ending:
     scene["components"].append({
@@ -599,7 +612,7 @@ def create_scene(reactions, stochastic_episode_ending=False):
         "kwargs": {
             "minimumFramesPerEpisode": 1000,
             "intervalLength": 100,  # Set equal to unroll length.
-            "probabilityTerminationPerInterval": 0.2
-        }
+            "probabilityTerminationPerInterval": 0.2,
+        },
     })
   return scene

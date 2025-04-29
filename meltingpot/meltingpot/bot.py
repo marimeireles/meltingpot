@@ -24,7 +24,7 @@ from meltingpot.utils.policies import puppet_policy
 from meltingpot.utils.policies import saved_model_policy
 from meltingpot.utils.substrates import specs
 
-NOOP_BOT_NAME = 'noop_bot'
+NOOP_BOT_NAME = "noop_bot"
 NOOP_ACTION = 0
 
 BOTS = frozenset(bot_configs.BOT_CONFIGS) | {NOOP_BOT_NAME}
@@ -70,18 +70,22 @@ def get_factory(name: str) -> policy_factory.PolicyFactory:
     return policy_factory.PolicyFactory(
         timestep_spec=specs.timestep({}),
         action_spec=specs.action(NOOP_ACTION + 1),
-        builder=functools.partial(fixed_action_policy.FixedActionPolicy,
-                                  NOOP_ACTION))
+        builder=functools.partial(
+            fixed_action_policy.FixedActionPolicy, NOOP_ACTION
+        ),
+    )
   else:
     config = bot_configs.BOT_CONFIGS[name]
     return get_factory_from_config(config)
 
 
 def get_factory_from_config(
-    config: bot_configs.BotConfig) -> policy_factory.PolicyFactory:
+    config: bot_configs.BotConfig,
+) -> policy_factory.PolicyFactory:
   """Returns a factory from the provided config."""
   substrate_factory = substrate.get_factory(config.substrate)
   return policy_factory.PolicyFactory(
       timestep_spec=substrate_factory.timestep_spec(),
       action_spec=substrate_factory.action_spec(),
-      builder=lambda: build_from_config(config))
+      builder=lambda: build_from_config(config),
+  )

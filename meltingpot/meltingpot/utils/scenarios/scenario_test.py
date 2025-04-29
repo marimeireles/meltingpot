@@ -31,17 +31,17 @@ def _track(source, fields):
     getattr(source, field).subscribe(
         on_next=destination.append,
         on_error=lambda e: destination.append(type(e)),
-        on_completed=lambda: destination.append('DONE'),
+        on_completed=lambda: destination.append("DONE"),
     )
   return destination
 
 
 @parameterized.parameters(
     ((), (), (), ()),
-    (('a',), (True,), ('a',), ()),
-    (('a',), (False,), (), ('a',)),
-    (('a', 'b', 'c'), (True, True, False), ('a', 'b'), ('c',)),
-    (('a', 'b', 'c'), (False, True, False), ('b',), ('a', 'c')),
+    (("a",), (True,), ("a",), ()),
+    (("a",), (False,), (), ("a",)),
+    (("a", "b", "c"), (True, True, False), ("a", "b"), ("c",)),
+    (("a", "b", "c"), (False, True, False), ("b",), ("a", "c")),
 )
 class PartitionMergeTest(parameterized.TestCase):
 
@@ -79,17 +79,20 @@ class ScenarioWrapperTest(absltest.TestCase):
         ),
     )
     substrate.events.return_value = (
-        mock.sentinel.event_0, mock.sentinel.event_1)
+        mock.sentinel.event_0,
+        mock.sentinel.event_1,
+    )
     substrate.action_spec.return_value = tuple(
-        f'action_spec_{n}' for n in range(4)
+        f"action_spec_{n}" for n in range(4)
     )
     substrate.observation_spec.return_value = tuple(
         immutabledict.immutabledict(
-            ok=f'ok_spec_{n}', not_ok=f'not_ok_spec_{n}')
+            ok=f"ok_spec_{n}", not_ok=f"not_ok_spec_{n}"
+        )
         for n in range(4)
     )
     substrate.reward_spec.return_value = tuple(
-        f'reward_spec_{n}' for n in range(4)
+        f"reward_spec_{n}" for n in range(4)
     )
     substrate.observation.return_value = (
         immutabledict.immutabledict(ok=10, not_ok=100),
@@ -101,26 +104,28 @@ class ScenarioWrapperTest(absltest.TestCase):
     bots = {}
     for n in range(2):
       bot = mock.Mock(spec_set=policy.Policy)
-      bot.initial_state.return_value = f'bot_state_{n}'
-      bot.step.return_value = (n + 10, f'bot_state_{n}')
-      bots[f'bot_{n}'] = bot
+      bot.initial_state.return_value = f"bot_state_{n}"
+      bot.step.return_value = (n + 10, f"bot_state_{n}")
+      bots[f"bot_{n}"] = bot
     background_population = population.Population(
         policies=bots,
-        names_by_role={'role_0': {'bot_0'}, 'role_1': {'bot_1'}},
-        roles=['role_0', 'role_1'],
+        names_by_role={"role_0": {"bot_0"}, "role_1": {"bot_1"}},
+        roles=["role_0", "role_1"],
     )
 
     with scenario_utils.Scenario(
         substrate=substrate_lib.Substrate(substrate),
         background_population=background_population,
         is_focal=[True, False, True, False],
-        permitted_observations={'ok'}) as scenario:
+        permitted_observations={"ok"},
+    ) as scenario:
       observables = scenario.observables()
       received = {
-          'base': _track(observables, ['events', 'action', 'timestep']),
-          'background': _track(observables.background, ['action', 'timestep']),
-          'substrate': _track(
-              observables.substrate, ['events', 'action', 'timestep']),
+          "base": _track(observables, ["events", "action", "timestep"]),
+          "background": _track(observables.background, ["action", "timestep"]),
+          "substrate": _track(
+              observables.substrate, ["events", "action", "timestep"]
+          ),
       }
       action_spec = scenario.action_spec()
       observation_spec = scenario.observation_spec()
@@ -129,26 +134,30 @@ class ScenarioWrapperTest(absltest.TestCase):
       initial_timestep = scenario.reset()
       step_timestep = scenario.step([0, 1])
 
-    with self.subTest(name='action_spec'):
-      self.assertEqual(action_spec, ('action_spec_0', 'action_spec_2'))
-    with self.subTest(name='observation_spec'):
-      self.assertEqual(observation_spec,
-                       (immutabledict.immutabledict(ok='ok_spec_0'),
-                        immutabledict.immutabledict(ok='ok_spec_2')))
-    with self.subTest(name='reward_spec'):
-      self.assertEqual(reward_spec, ('reward_spec_0', 'reward_spec_2'))
+    with self.subTest(name="action_spec"):
+      self.assertEqual(action_spec, ("action_spec_0", "action_spec_2"))
+    with self.subTest(name="observation_spec"):
+      self.assertEqual(
+          observation_spec,
+          (
+              immutabledict.immutabledict(ok="ok_spec_0"),
+              immutabledict.immutabledict(ok="ok_spec_2"),
+          ),
+      )
+    with self.subTest(name="reward_spec"):
+      self.assertEqual(reward_spec, ("reward_spec_0", "reward_spec_2"))
 
-    with self.subTest(name='observation'):
+    with self.subTest(name="observation"):
       expected = (
           immutabledict.immutabledict(ok=10),
           immutabledict.immutabledict(ok=30),
       )
       self.assertEqual(observation, expected)
 
-    with self.subTest(name='events'):
+    with self.subTest(name="events"):
       self.assertEmpty(scenario.events())
 
-    with self.subTest(name='initial_timestep'):
+    with self.subTest(name="initial_timestep"):
       expected = dm_env.TimeStep(
           step_type=dm_env.StepType.FIRST,
           discount=0,
@@ -160,7 +169,7 @@ class ScenarioWrapperTest(absltest.TestCase):
       )
       self.assertEqual(initial_timestep, expected)
 
-    with self.subTest(name='step_timestep'):
+    with self.subTest(name="step_timestep"):
       expected = dm_env.transition(
           reward=(11, 31),
           observation=(
@@ -170,11 +179,11 @@ class ScenarioWrapperTest(absltest.TestCase):
       )
       self.assertEqual(step_timestep, expected)
 
-    with self.subTest(name='substrate_step'):
+    with self.subTest(name="substrate_step"):
       substrate.step.assert_called_once_with((0, 10, 1, 11))
 
-    with self.subTest(name='bot_0_step'):
-      actual = bots['bot_0'].step.call_args_list[0]
+    with self.subTest(name="bot_0_step"):
+      actual = bots["bot_0"].step.call_args_list[0]
       expected = mock.call(
           timestep=dm_env.TimeStep(
               step_type=dm_env.StepType.FIRST,
@@ -182,11 +191,12 @@ class ScenarioWrapperTest(absltest.TestCase):
               reward=20,
               observation=immutabledict.immutabledict(ok=20, not_ok=200),
           ),
-          prev_state='bot_state_0')
+          prev_state="bot_state_0",
+      )
       self.assertEqual(actual, expected)
 
-    with self.subTest(name='bot_1_step'):
-      actual = bots['bot_1'].step.call_args_list[0]
+    with self.subTest(name="bot_1_step"):
+      actual = bots["bot_1"].step.call_args_list[0]
       expected = mock.call(
           timestep=dm_env.TimeStep(
               step_type=dm_env.StepType.FIRST,
@@ -194,10 +204,11 @@ class ScenarioWrapperTest(absltest.TestCase):
               reward=40,
               observation=immutabledict.immutabledict(ok=40, not_ok=400),
           ),
-          prev_state='bot_state_1')
+          prev_state="bot_state_1",
+      )
       self.assertEqual(actual, expected)
 
-    with self.subTest(name='base_observables'):
+    with self.subTest(name="base_observables"):
       expected = [
           dm_env.TimeStep(
               step_type=dm_env.StepType.FIRST,
@@ -216,13 +227,13 @@ class ScenarioWrapperTest(absltest.TestCase):
                   immutabledict.immutabledict(ok=31),
               ),
           ),
-          'DONE',
-          'DONE',
-          'DONE',
+          "DONE",
+          "DONE",
+          "DONE",
       ]
-      self.assertEqual(received['base'], expected)
+      self.assertEqual(received["base"], expected)
 
-    with self.subTest(name='substrate_observables'):
+    with self.subTest(name="substrate_observables"):
       expected = [
           dm_env.TimeStep(
               step_type=dm_env.StepType.FIRST,
@@ -249,13 +260,13 @@ class ScenarioWrapperTest(absltest.TestCase):
           ),
           mock.sentinel.event_0,
           mock.sentinel.event_1,
-          'DONE',
-          'DONE',
-          'DONE',
+          "DONE",
+          "DONE",
+          "DONE",
       ]
-      self.assertEqual(received['substrate'], expected)
+      self.assertEqual(received["substrate"], expected)
 
-    with self.subTest(name='background_observables'):
+    with self.subTest(name="background_observables"):
       expected = [
           dm_env.TimeStep(
               step_type=dm_env.StepType.FIRST,
@@ -274,10 +285,11 @@ class ScenarioWrapperTest(absltest.TestCase):
                   immutabledict.immutabledict(ok=41, not_ok=401),
               ),
           ),
-          'DONE',
-          'DONE',
+          "DONE",
+          "DONE",
       ]
-      self.assertEqual(received['background'], expected)
+      self.assertEqual(received["background"], expected)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
   absltest.main()

@@ -35,10 +35,13 @@ def main():
       "--experiment_state",
       type=str,
       default="~/ray_results/PPO",
-      help="ray.tune experiment_state to load. The default setting will load"
-      " the last training run created by self_play_train.py. If you want to use"
-      " a specific run, provide a path, expected to be of the format "
-      " ~/ray_results/PPO/experiment_state-DATETIME.json")
+      help=(
+          "ray.tune experiment_state to load. The default setting will load the"
+          " last training run created by self_play_train.py. If you want to use"
+          " a specific run, provide a path, expected to be of the format "
+          " ~/ray_results/PPO/experiment_state-DATETIME.json"
+      ),
+  )
 
   args = parser.parse_args()
 
@@ -49,7 +52,8 @@ def main():
   experiment = ExperimentAnalysis(
       args.experiment_state,
       default_metric="episode_reward_mean",
-      default_mode="max")
+      default_mode="max",
+  )
 
   config = experiment.best_config
   checkpoint_path = experiment.best_checkpoint
@@ -79,15 +83,17 @@ def main():
   obs_spec = env.observation_spec()
   shape = obs_spec[0]["WORLD.RGB"].shape
   game_display = pygame.display.set_mode(
-      (int(shape[1] * scale), int(shape[0] * scale)))
+      (int(shape[1] * scale), int(shape[0] * scale))
+  )
 
   for _ in range(config["horizon"]):
     obs = timestep.observation[0]["WORLD.RGB"]
     obs = np.transpose(obs, (1, 0, 2))
     surface = pygame.surfarray.make_surface(obs)
     rect = surface.get_rect()
-    surf = pygame.transform.scale(surface,
-                                  (int(rect[2] * scale), int(rect[3] * scale)))
+    surf = pygame.transform.scale(
+        surface, (int(rect[2] * scale), int(rect[3] * scale))
+    )
 
     game_display.blit(surf, dest=(0, 0))
     pygame.display.update()
@@ -98,7 +104,8 @@ def main():
           step_type=timestep.step_type,
           reward=timestep.reward[i],
           discount=timestep.discount,
-          observation=timestep.observation[i])
+          observation=timestep.observation[i],
+      )
 
       actions[i], states[i] = bot.step(timestep_bot, states[i])
 

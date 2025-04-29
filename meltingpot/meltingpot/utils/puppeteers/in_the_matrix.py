@@ -33,7 +33,8 @@ def get_inventory(timestep: dm_env.TimeStep) -> np.ndarray:
 
 
 def get_partner_interaction_inventory(
-    timestep: dm_env.TimeStep) -> Optional[np.ndarray]:
+    timestep: dm_env.TimeStep,
+) -> Optional[np.ndarray]:
   """Returns the partner inventory from previous interaction."""
   _, partner_inventory = timestep.observation["INTERACTION_INVENTORIES"]
   if np.all(partner_inventory < 0):
@@ -51,9 +52,9 @@ def max_resource_and_margin(inventory: np.ndarray) -> tuple[int, int]:
   """Returns the index of the maximum resource and the margin of its lead."""
   sorted_resources = np.argsort(inventory)
   maximum_resource = sorted_resources[-1]
-  margin = (
-      int(inventory[sorted_resources[-1]]) -
-      int(inventory[sorted_resources[-2]]))
+  margin = int(inventory[sorted_resources[-1]]) - int(
+      inventory[sorted_resources[-2]]
+  )
   return maximum_resource, margin
 
 
@@ -100,6 +101,7 @@ class Resource:
     interact_goal: the goal that directs the puppet to interact with another
       player while playing the resource.
   """
+
   index: int
   collect_goal: puppeteer.PuppetGoal
   interact_goal: puppeteer.PuppetGoal
@@ -161,22 +163,26 @@ class Specialist(puppeteer.Puppeteer[tuple[()]]):
     """See base class."""
     return ()
 
-  def step(self, timestep: dm_env.TimeStep,
-           prev_state: tuple[()]) -> tuple[dm_env.TimeStep, tuple[()]]:
+  def step(
+      self, timestep: dm_env.TimeStep, prev_state: tuple[()]
+  ) -> tuple[dm_env.TimeStep, tuple[()]]:
     """See base class."""
     timestep = collect_or_interact_puppet_timestep(
-        timestep, self._target, self._margin)
+        timestep, self._target, self._margin
+    )
     return timestep, prev_state
 
 
 class AlternatingSpecialist(puppeteer.Puppeteer[int]):
   """Puppeteer that cycles targeted resource on a fixed schedule."""
 
-  def __init__(self,
-               *,
-               targets: Sequence[Resource],
-               interactions_per_target: int,
-               margin: int) -> None:
+  def __init__(
+      self,
+      *,
+      targets: Sequence[Resource],
+      interactions_per_target: int,
+      margin: int,
+  ) -> None:
     """Initializes the puppeteer.
 
     Args:
@@ -206,8 +212,9 @@ class AlternatingSpecialist(puppeteer.Puppeteer[int]):
     """See base class."""
     return 0
 
-  def step(self, timestep: dm_env.TimeStep,
-           prev_state: int) -> tuple[dm_env.TimeStep, int]:
+  def step(
+      self, timestep: dm_env.TimeStep, prev_state: int
+  ) -> tuple[dm_env.TimeStep, int]:
     """See base class."""
     if timestep.first():
       prev_state = self.initial_state()
@@ -218,11 +225,13 @@ class AlternatingSpecialist(puppeteer.Puppeteer[int]):
       total_interactions = prev_state
 
     target_index = (total_interactions // self._interactions_per_target) % len(
-        self._targets)
+        self._targets
+    )
     target = self._targets[target_index]
 
     timestep = collect_or_interact_puppet_timestep(
-        timestep, target, self._margin)
+        timestep, target, self._margin
+    )
 
     return timestep, total_interactions
 
@@ -272,8 +281,9 @@ class ScheduledFlip(puppeteer.Puppeteer[int]):
     """See base class."""
     return 0
 
-  def step(self, timestep: dm_env.TimeStep,
-           prev_state: int) -> tuple[dm_env.TimeStep, int]:
+  def step(
+      self, timestep: dm_env.TimeStep, prev_state: int
+  ) -> tuple[dm_env.TimeStep, int]:
     """See base class."""
     if timestep.first():
       prev_state = self.initial_state()
@@ -285,10 +295,12 @@ class ScheduledFlip(puppeteer.Puppeteer[int]):
 
     if total_interactions < self._threshold:
       timestep = collect_or_interact_puppet_timestep(
-          timestep, self._initial_target, self._initial_margin)
+          timestep, self._initial_target, self._initial_margin
+      )
     else:
       timestep = collect_or_interact_puppet_timestep(
-          timestep, self._final_target, self._final_margin)
+          timestep, self._final_target, self._final_margin
+      )
 
     return timestep, total_interactions
 
@@ -338,8 +350,9 @@ class GrimTrigger(puppeteer.Puppeteer[int]):
     """See base class."""
     return 0
 
-  def step(self, timestep: dm_env.TimeStep,
-           prev_state: int) -> tuple[dm_env.TimeStep, int]:
+  def step(
+      self, timestep: dm_env.TimeStep, prev_state: int
+  ) -> tuple[dm_env.TimeStep, int]:
     """See base class."""
     if timestep.first():
       prev_state = self.initial_state()
@@ -353,10 +366,12 @@ class GrimTrigger(puppeteer.Puppeteer[int]):
 
     if partner_defections < self._threshold:
       timestep = collect_or_interact_puppet_timestep(
-          timestep, self._cooperate_resource, self._margin)
+          timestep, self._cooperate_resource, self._margin
+      )
     else:
       timestep = collect_or_interact_puppet_timestep(
-          timestep, self._defect_resource, self._margin)
+          timestep, self._defect_resource, self._margin
+      )
     return timestep, partner_defections
 
 
@@ -408,8 +423,9 @@ class TitForTat(puppeteer.Puppeteer[bool]):
     is_cooperative = True if not tremble(self._tremble_probability) else False
     return is_cooperative
 
-  def step(self, timestep: dm_env.TimeStep,
-           prev_state: bool) -> tuple[dm_env.TimeStep, bool]:
+  def step(
+      self, timestep: dm_env.TimeStep, prev_state: bool
+  ) -> tuple[dm_env.TimeStep, bool]:
     """See base class."""
     if timestep.first():
       prev_state = self.initial_state()
@@ -427,10 +443,12 @@ class TitForTat(puppeteer.Puppeteer[bool]):
 
     if is_cooperative:
       timestep = collect_or_interact_puppet_timestep(
-          timestep, self._cooperate_resource, self._margin)
+          timestep, self._cooperate_resource, self._margin
+      )
     else:
       timestep = collect_or_interact_puppet_timestep(
-          timestep, self._defect_resource, self._margin)
+          timestep, self._defect_resource, self._margin
+      )
     return timestep, is_cooperative
 
 
@@ -443,6 +461,7 @@ class CorrigableState:
     is_cooperative: whether the puppeteer is currently cooperating (as opposed
        to defecting).
   """
+
   partner_defections: int
   is_cooperative: bool
 
@@ -529,12 +548,15 @@ class Corrigible(puppeteer.Puppeteer[CorrigableState]):
 
     if is_cooperative:
       timestep = collect_or_interact_puppet_timestep(
-          timestep, self._cooperate_resource, self._margin)
+          timestep, self._cooperate_resource, self._margin
+      )
     else:
       timestep = collect_or_interact_puppet_timestep(
-          timestep, self._defect_resource, self._margin)
+          timestep, self._defect_resource, self._margin
+      )
     next_state = CorrigableState(
-        is_cooperative=is_cooperative, partner_defections=partner_defections)
+        is_cooperative=is_cooperative, partner_defections=partner_defections
+    )
     return timestep, next_state
 
 
@@ -585,5 +607,6 @@ class RespondToPrevious(puppeteer.Puppeteer[Resource]):
     partner_resource = partner_max_resource(timestep)
     response = self._responses.get(partner_resource, prev_state)
     timestep = collect_or_interact_puppet_timestep(
-        timestep, response, self._margin)
+        timestep, response, self._margin
+    )
     return timestep, response

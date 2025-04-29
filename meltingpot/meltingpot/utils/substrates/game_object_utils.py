@@ -16,6 +16,7 @@
 import copy
 import enum
 from typing import List, Mapping, NamedTuple, Optional, Sequence, Tuple, Union
+
 from meltingpot.utils.substrates import colors
 from meltingpot.utils.substrates import shapes
 import numpy as np
@@ -49,16 +50,15 @@ TYPE_ALL = "all"
 TYPE_CHOICE = "choice"
 
 
-def get_named_components(
-    game_object_config: PrefabConfig,
-    name: str):
-  return [component for component in game_object_config["components"]
-          if component["component"] == name]
+def get_named_components(game_object_config: PrefabConfig, name: str):
+  return [
+      component
+      for component in game_object_config["components"]
+      if component["component"] == name
+  ]
 
 
-def get_first_named_component(
-    game_object_config: PrefabConfig,
-    name: str):
+def get_first_named_component(game_object_config: PrefabConfig, name: str):
   named = get_named_components(game_object_config, name)
   if not named:
     raise ValueError(f"No component with name '{name}' found.")
@@ -90,11 +90,13 @@ def build_avatar_objects(
   """Build all avatar and their associated game objects from the prefabs."""
   if not prefabs or "avatar" not in prefabs:
     raise ValueError(
-        "Building avatar objects requested, but no avatar prefab provided.")
+        "Building avatar objects requested, but no avatar prefab provided."
+    )
 
   if not player_palettes:
     player_palettes = [
-        shapes.get_palette(colors.palette[i]) for i in range(num_players)]
+        shapes.get_palette(colors.palette[i]) for i in range(num_players)
+    ]
 
   avatar_objects = []
   for idx in range(0, num_players):
@@ -103,25 +105,28 @@ def build_avatar_objects(
     # Lua is 1-indexed.
     lua_index = idx + 1
     # First, modify the prefab's sprite name.
-    sprite_name = get_first_named_component(
-        game_object, "Appearance")["kwargs"]["spriteNames"][0]
+    sprite_name = get_first_named_component(game_object, "Appearance")[
+        "kwargs"
+    ]["spriteNames"][0]
     new_sprite_name = sprite_name + str(lua_index)
-    get_first_named_component(
-        game_object,
-        "Appearance")["kwargs"]["spriteNames"][0] = new_sprite_name
+    get_first_named_component(game_object, "Appearance")["kwargs"][
+        "spriteNames"
+    ][0] = new_sprite_name
     # Second, name the same sprite in the prefab's stateManager.
-    state_configs = get_first_named_component(
-        game_object,
-        "StateManager")["kwargs"]["stateConfigs"]
+    state_configs = get_first_named_component(game_object, "StateManager")[
+        "kwargs"
+    ]["stateConfigs"]
     for state_config in state_configs:
       if "sprite" in state_config and state_config["sprite"] == sprite_name:
         state_config["sprite"] = new_sprite_name
     # Third, override the prefab's color palette for this sprite.
-    get_first_named_component(
-        game_object, "Appearance")["kwargs"]["palettes"][0] = color_palette
+    get_first_named_component(game_object, "Appearance")["kwargs"]["palettes"][
+        0
+    ] = color_palette
     # Fourth, override the avatar's player id.
-    get_first_named_component(
-        game_object, "Avatar")["kwargs"]["index"] = lua_index
+    get_first_named_component(game_object, "Avatar")["kwargs"][
+        "index"
+    ] = lua_index
     avatar_objects.append(game_object)
 
   return avatar_objects
@@ -135,33 +140,36 @@ def build_avatar_badges(
   """Build all avatar and their associated game objects from the prefabs."""
   if not prefabs or "avatar_badge" not in prefabs:
     raise ValueError(
-        "Building avatar badges requested, but no avatar_badge prefab " +
-        "provided.")
+        "Building avatar badges requested, but no avatar_badge prefab "
+        + "provided."
+    )
   game_objects = []
 
   if badge_palettes is None:
     badge_palettes = [
-        shapes.get_palette(colors.palette[i]) for i in range(num_players)]
+        shapes.get_palette(colors.palette[i]) for i in range(num_players)
+    ]
 
   for idx in range(0, num_players):
     lua_index = idx + 1
     # Add the overlaid badge on top of each avatar.
     badge_object = copy.deepcopy(prefabs["avatar_badge"])
-    sprite_name = get_first_named_component(
-        badge_object, "Appearance")["kwargs"]["spriteNames"][0]
+    sprite_name = get_first_named_component(badge_object, "Appearance")[
+        "kwargs"
+    ]["spriteNames"][0]
     new_sprite_name = sprite_name + str(lua_index)
-    get_first_named_component(
-        badge_object,
-        "Appearance")["kwargs"]["spriteNames"][0] = new_sprite_name
-    get_first_named_component(
-        badge_object,
-        "StateManager")["kwargs"]["stateConfigs"][0]["sprite"] = (
-            new_sprite_name)
-    get_first_named_component(
-        badge_object, "AvatarConnector")["kwargs"]["playerIndex"] = lua_index
-    get_first_named_component(
-        badge_object,
-        "Appearance")["kwargs"]["palettes"][0] = badge_palettes[idx]
+    get_first_named_component(badge_object, "Appearance")["kwargs"][
+        "spriteNames"
+    ][0] = new_sprite_name
+    get_first_named_component(badge_object, "StateManager")["kwargs"][
+        "stateConfigs"
+    ][0]["sprite"] = new_sprite_name
+    get_first_named_component(badge_object, "AvatarConnector")["kwargs"][
+        "playerIndex"
+    ] = lua_index
+    get_first_named_component(badge_object, "Appearance")["kwargs"]["palettes"][
+        0
+    ] = badge_palettes[idx]
     game_objects.append(badge_object)
 
   return game_objects
@@ -169,7 +177,7 @@ def build_avatar_badges(
 
 def get_game_object_positions_from_map(
     ascii_map: str, char: str, orientation_mode: str = "always_north"
-    ) -> Sequence[Transform]:
+) -> Sequence[Transform]:
   """Extract the occurrences of a character in the ascii map into transforms.
 
   For all occurrences of the given `char`, retrieves a Transform containing the
@@ -202,13 +210,14 @@ def get_game_object_positions_from_map(
 
 
 def _create_game_object(
-    prefab: PrefabConfig, transform: Transform) -> PrefabConfig:
+    prefab: PrefabConfig, transform: Transform
+) -> PrefabConfig:
   game_object = copy.deepcopy(prefab)
   go_transform = get_first_named_component(game_object, "Transform")
   go_transform["kwargs"] = {
       "position": (transform.position.x, transform.position.y),
       "orientation": transform.orientation.value,
-    }
+  }
   return game_object
 
 
@@ -216,7 +225,7 @@ def get_game_objects_from_map(
     ascii_map: str,
     char_prefab_map: Mapping[str, str],
     prefabs: Mapping[str, PrefabConfig],
-    random: np.random.RandomState = np.random.RandomState()
+    random: np.random.RandomState = np.random.RandomState(),
 ) -> List[PrefabConfig]:
   """Returns a list of game object configurations from the map and prefabs.
 
@@ -248,8 +257,10 @@ def get_game_objects_from_map(
             game_objects.append(_create_game_object(prefabs[p], transform))
         elif prefab["type"] == TYPE_CHOICE:
           game_objects.append(
-              _create_game_object(prefabs[random.choice(prefab["list"])],
-                                  transform))
+              _create_game_object(
+                  prefabs[random.choice(prefab["list"])], transform
+              )
+          )
       else:  # Typical case, since named prefab.
         game_objects.append(_create_game_object(prefabs[prefab], transform))
   return game_objects

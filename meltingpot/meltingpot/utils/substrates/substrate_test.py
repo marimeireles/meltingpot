@@ -26,7 +26,8 @@ class SubstrateTest(parameterized.TestCase):
 
   def test_observables(self):
     base = mock.create_autospec(
-        observables_lib.ObservableLab2d, instance=True, spec_set=True)
+        observables_lib.ObservableLab2d, instance=True, spec_set=True
+    )
     with substrate.Substrate(base) as env:
       received = []
       observables = env.observables()
@@ -34,7 +35,7 @@ class SubstrateTest(parameterized.TestCase):
         getattr(observables, field.name).subscribe(
             on_next=received.append,
             on_error=lambda e: received.append(type(e)),
-            on_completed=lambda: received.append('DONE'),
+            on_completed=lambda: received.append("DONE"),
         )
 
       base.reset.return_value = mock.sentinel.timestep_0
@@ -47,20 +48,23 @@ class SubstrateTest(parameterized.TestCase):
       base.events.return_value = [mock.sentinel.events_2]
       env.step(mock.sentinel.action_2)
 
-    self.assertSequenceEqual(received, [
-        mock.sentinel.timestep_0,
-        mock.sentinel.events_0,
-        mock.sentinel.action_1,
-        mock.sentinel.timestep_1,
-        mock.sentinel.events_1,
-        mock.sentinel.action_2,
-        mock.sentinel.timestep_2,
-        mock.sentinel.events_2,
-        'DONE',
-        'DONE',
-        'DONE',
-    ])
+    self.assertSequenceEqual(
+        received,
+        [
+            mock.sentinel.timestep_0,
+            mock.sentinel.events_0,
+            mock.sentinel.action_1,
+            mock.sentinel.timestep_1,
+            mock.sentinel.events_1,
+            mock.sentinel.action_2,
+            mock.sentinel.timestep_2,
+            mock.sentinel.events_2,
+            "DONE",
+            "DONE",
+            "DONE",
+        ],
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
   absltest.main()

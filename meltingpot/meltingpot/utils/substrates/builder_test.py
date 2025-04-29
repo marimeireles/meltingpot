@@ -32,9 +32,9 @@ _TEST_SETTINGS = _get_test_settings()
 
 def _get_lua_randomization_map():
   """Replaces first row of walls with items randomized by Lua."""
-  head, line, *tail = _TEST_SETTINGS['simulation']['map'].split('\n')
+  head, line, *tail = _TEST_SETTINGS["simulation"]["map"].split("\n")
   # Replace line 1 (walls) with a row of 'a' (items randomized by Lua).
-  new_map = '\n'.join([head, 'a' * len(line), *tail])
+  new_map = "\n".join([head, "a" * len(line), *tail])
   return new_map
 
 
@@ -49,62 +49,67 @@ class GeneralTestCase(parameterized.TestCase):
     env1 = self.enter_context(builder.builder(_TEST_SETTINGS, env_seed=seed))
     env2 = self.enter_context(builder.builder(_TEST_SETTINGS, env_seed=seed))
     for episode in range(5):
-      obs1 = env1.reset().observation['WORLD.RGB']
-      obs2 = env2.reset().observation['WORLD.RGB']
+      obs1 = env1.reset().observation["WORLD.RGB"]
+      obs2 = env2.reset().observation["WORLD.RGB"]
       np.testing.assert_equal(
-          obs1, obs2, f'Episode {episode} mismatch: {obs1} != {obs2} ')
+          obs1, obs2, f"Episode {episode} mismatch: {obs1} != {obs2} "
+      )
 
   @parameterized.product(seed=[None, 42, 123, 1337, 12481632])
   def test_episodes_are_randomized(self, seed):
     env = self.enter_context(builder.builder(_TEST_SETTINGS, env_seed=seed))
 
-    obs = env.reset().observation['WORLD.RGB']
+    obs = env.reset().observation["WORLD.RGB"]
     for episode in range(4):
       last_obs = obs
-      obs = env.reset().observation['WORLD.RGB']
+      obs = env.reset().observation["WORLD.RGB"]
       with self.assertRaises(
           AssertionError,
-          msg=f'Episodes {episode} and {episode+1} match: {last_obs} == {obs}'):
+          msg=f"Episodes {episode} and {episode+1} match: {last_obs} == {obs}",
+      ):
         np.testing.assert_equal(last_obs, obs)
 
   def test_no_seed_causes_nondeterminism(self):
     env1 = self.enter_context(builder.builder(_TEST_SETTINGS, env_seed=None))
     env2 = self.enter_context(builder.builder(_TEST_SETTINGS, env_seed=None))
     for episode in range(5):
-      obs1 = env1.reset().observation['WORLD.RGB']
-      obs2 = env2.reset().observation['WORLD.RGB']
+      obs1 = env1.reset().observation["WORLD.RGB"]
+      obs2 = env2.reset().observation["WORLD.RGB"]
       with self.assertRaises(
-          AssertionError, msg=f'Episode {episode} match: {obs1} == {obs2}'):
+          AssertionError, msg=f"Episode {episode} match: {obs1} == {obs2}"
+      ):
         np.testing.assert_equal(obs1, obs2)
 
   @parameterized.product(seed=[None, 42, 123, 1337, 12481632])
   def test_episodes_are_randomized_in_lua(self, seed):
     lab2d_settings = copy.deepcopy(_TEST_SETTINGS)
-    lab2d_settings['simulation']['map'] = _LUA_RANDOMIZATION_MAP
+    lab2d_settings["simulation"]["map"] = _LUA_RANDOMIZATION_MAP
     env = self.enter_context(builder.builder(lab2d_settings, env_seed=seed))
 
-    obs = env.reset().observation['WORLD.RGB'][_LUA_RANDOMIZED_LINE]
+    obs = env.reset().observation["WORLD.RGB"][_LUA_RANDOMIZED_LINE]
     for episode in range(4):
       last_obs = obs
-      obs = env.reset().observation['WORLD.RGB'][_LUA_RANDOMIZED_LINE]
+      obs = env.reset().observation["WORLD.RGB"][_LUA_RANDOMIZED_LINE]
       with self.assertRaises(
           AssertionError,
-          msg=f'Episodes {episode} and {episode+1} match: {last_obs} == {obs}'):
+          msg=f"Episodes {episode} and {episode+1} match: {last_obs} == {obs}",
+      ):
         np.testing.assert_equal(last_obs, obs)
 
   def test_no_seed_causes_nondeterminism_for_lua(self):
     lab2d_settings = copy.deepcopy(_TEST_SETTINGS)
-    lab2d_settings['simulation']['map'] = _LUA_RANDOMIZATION_MAP
+    lab2d_settings["simulation"]["map"] = _LUA_RANDOMIZATION_MAP
 
     env1 = self.enter_context(builder.builder(lab2d_settings))
     env2 = self.enter_context(builder.builder(lab2d_settings))
     for episode in range(5):
-      obs1 = env1.reset().observation['WORLD.RGB'][_LUA_RANDOMIZED_LINE]
-      obs2 = env2.reset().observation['WORLD.RGB'][_LUA_RANDOMIZED_LINE]
+      obs1 = env1.reset().observation["WORLD.RGB"][_LUA_RANDOMIZED_LINE]
+      obs2 = env2.reset().observation["WORLD.RGB"][_LUA_RANDOMIZED_LINE]
       with self.assertRaises(
-          AssertionError, msg=f'Episode {episode} match {obs1} == {obs2}'):
+          AssertionError, msg=f"Episode {episode} match {obs1} == {obs2}"
+      ):
         np.testing.assert_equal(obs1, obs2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
   absltest.main()

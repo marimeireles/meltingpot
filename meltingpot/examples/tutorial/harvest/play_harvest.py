@@ -23,22 +23,28 @@ from .configs.environment import harvest as game
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_integer('screen_width', 800,
-                     'Width, in pixels, of the game screen')
-flags.DEFINE_integer('screen_height', 600,
-                     'Height, in pixels, of the game screen')
-flags.DEFINE_integer('frames_per_second', 8, 'Frames per second of the game')
-flags.DEFINE_string('observation', 'RGB', 'Name of the observation to render')
-flags.DEFINE_bool('verbose', False, 'Whether we want verbose output')
-flags.DEFINE_bool('display_text', False,
-                  'Whether we to display a debug text message')
-flags.DEFINE_string('text_message', 'This page intentionally left blank',
-                    'Text to display if `display_text` is `True`')
+flags.DEFINE_integer(
+    "screen_width", 800, "Width, in pixels, of the game screen"
+)
+flags.DEFINE_integer(
+    "screen_height", 600, "Height, in pixels, of the game screen"
+)
+flags.DEFINE_integer("frames_per_second", 8, "Frames per second of the game")
+flags.DEFINE_string("observation", "RGB", "Name of the observation to render")
+flags.DEFINE_bool("verbose", False, "Whether we want verbose output")
+flags.DEFINE_bool(
+    "display_text", False, "Whether we to display a debug text message"
+)
+flags.DEFINE_string(
+    "text_message",
+    "This page intentionally left blank",
+    "Text to display if `display_text` is `True`",
+)
 
 
 _ACTION_MAP = {
-    'move': level_playing_utils.get_direction_pressed,
-    'turn': level_playing_utils.get_turn_pressed,
+    "move": level_playing_utils.get_direction_pressed,
+    "turn": level_playing_utils.get_turn_pressed,
 }
 
 
@@ -58,10 +64,13 @@ def main(argv):
       _ACTION_MAP,
       game.get_config(),
       level_playing_utils.RenderType.PYGAME,
-      FLAGS.screen_width, FLAGS.screen_height, FLAGS.frames_per_second,
+      FLAGS.screen_width,
+      FLAGS.screen_height,
+      FLAGS.frames_per_second,
       verbose_fn if FLAGS.verbose else None,
-      text_display_fn if FLAGS.display_text else None)
+      text_display_fn if FLAGS.display_text else None,
+  )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
   app.run(main)

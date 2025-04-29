@@ -44,29 +44,31 @@ import networkx as nx
 _ENABLE_DEBUG_OBSERVATIONS = False
 
 # Map reaction to rewards.
-DEFAULT_REWARDING_REACTIONS = {"MetabolizeFood1": 1,
-                               "MetabolizeFood2": 1,
-                               "MetabolizeFood3": 10,
-                               "MetabolizeXY": 10,}
+DEFAULT_REWARDING_REACTIONS = {
+    "MetabolizeFood1": 1,
+    "MetabolizeFood2": 1,
+    "MetabolizeFood3": 10,
+    "MetabolizeXY": 10,
+}
 
 # Define the default reaction query configuration. It can be overridden on a per
 # compount basis.
 DEFAULT_REACTION_CONFIG = {"radius": 1, "query_type": "disc"}
 
 REACTIVITY_LEVELS = {
-    "ground": {"background": 0.00001,
-               "low": 0.005,
-               "medium": 0.001,
-               "high": 0.9},
-    "vesicle": {"background": 0.0,
-                "low": 0.0025,
-                "medium": 0.25,
-                "high": 0.9},
+    "ground": {
+        "background": 0.00001,
+        "low": 0.005,
+        "medium": 0.001,
+        "high": 0.9,
+    },
+    "vesicle": {"background": 0.0, "low": 0.0025, "medium": 0.25, "high": 0.9},
 }
 
 
-def dissipate_when_paired(g: nx.MultiDiGraph, reaction_name: str,
-                          compound: str):
+def dissipate_when_paired(
+    g: nx.MultiDiGraph, reaction_name: str, compound: str
+):
   g.add_node(reaction_name, reaction=True)
   # Reactants:
   g.add_edge(compound, reaction_name)
@@ -76,8 +78,14 @@ def dissipate_when_paired(g: nx.MultiDiGraph, reaction_name: str,
   g.add_edge(reaction_name, "empty")
 
 
-def cycle(g, reaction_prefix: str, intermediates: Sequence[str], product: str,
-          secondary_product=None, food: str = "food"):
+def cycle(
+    g,
+    reaction_prefix: str,
+    intermediates: Sequence[str],
+    product: str,
+    secondary_product=None,
+    food: str = "food",
+):
   """Add a reaction cycle."""
   # Reaction cycle x, reaction 1
   reaction_1 = "{}1{}".format(reaction_prefix, product)
@@ -120,10 +128,14 @@ def cycle(g, reaction_prefix: str, intermediates: Sequence[str], product: str,
     g.add_edge(reaction_3, secondary_product)
 
 
-def greedy_cycle(g: nx.MultiDiGraph, reaction_prefix: str,
-                 intermediates: Sequence[str], product: str,
-                 secondary_product: str, food: str = "food"):
-
+def greedy_cycle(
+    g: nx.MultiDiGraph,
+    reaction_prefix: str,
+    intermediates: Sequence[str],
+    product: str,
+    secondary_product: str,
+    food: str = "food",
+):
   """Add a reaction cycle that consumes energy."""
   # Reaction cycle x, reaction 1
   reaction_1 = "{}1{}".format(reaction_prefix, product)
@@ -173,21 +185,30 @@ def make_graph():
   # First add the "empty" and "activated" nodes, which are always present.
   graph_utils.add_system_nodes(g)
 
-  cycle(g, "R",
-        intermediates=["ax", "bx", "cx"],
-        product="x",
-        secondary_product="iy",
-        food="food1")
-  cycle(g, "R",
-        intermediates=["ay", "by", "cy"],
-        product="y",
-        secondary_product="ix",
-        food="food2")
-  greedy_cycle(g, "R",
-               intermediates=["az", "bz", "cz"],
-               product="food1",
-               secondary_product="food2",
-               food="food3")
+  cycle(
+      g,
+      "R",
+      intermediates=["ax", "bx", "cx"],
+      product="x",
+      secondary_product="iy",
+      food="food1",
+  )
+  cycle(
+      g,
+      "R",
+      intermediates=["ay", "by", "cy"],
+      product="y",
+      secondary_product="ix",
+      food="food2",
+  )
+  greedy_cycle(
+      g,
+      "R",
+      intermediates=["az", "bz", "cz"],
+      product="food1",
+      secondary_product="food2",
+      food="food3",
+  )
 
   # Inhibit x with a product of the y-producing cycle.
   g.add_node("InhibitX", reaction=True)
@@ -221,7 +242,7 @@ def make_graph():
   # Products:
   g.add_edge("MetabolizeFood2", "empty")
 
-   # Food can be metabolized in the vesicle.
+  # Food can be metabolized in the vesicle.
   g.add_node("MetabolizeFood3", reaction=True)
   # Reactants:
   g.add_edge("food3", "MetabolizeFood3")
@@ -326,6 +347,7 @@ def make_graph():
 
   return g
 
+
 ASCII_MAP = """
 ~~~~~~~~~~~a~~~~~~~~~~~~~
 ~~~~~~~~c~~~~~~~~~~~~~~~~
@@ -368,14 +390,14 @@ for i in range(NUM_PLAYERS_UPPER_BOUND):
 # Primitive action components.
 # pylint: disable=bad-whitespace
 # pyformat: disable
-NOOP       = {"move": 0, "turn":  0, "ioAction": 0}
-FORWARD    = {"move": 1, "turn":  0, "ioAction": 0}
-STEP_RIGHT = {"move": 2, "turn":  0, "ioAction": 0}
-BACKWARD   = {"move": 3, "turn":  0, "ioAction": 0}
-STEP_LEFT  = {"move": 4, "turn":  0, "ioAction": 0}
-TURN_LEFT  = {"move": 0, "turn": -1, "ioAction": 0}
-TURN_RIGHT = {"move": 0, "turn":  1, "ioAction": 0}
-IO_ACTION  = {"move": 0, "turn":  0, "ioAction": 1}
+NOOP = {"move": 0, "turn": 0, "ioAction": 0}
+FORWARD = {"move": 1, "turn": 0, "ioAction": 0}
+STEP_RIGHT = {"move": 2, "turn": 0, "ioAction": 0}
+BACKWARD = {"move": 3, "turn": 0, "ioAction": 0}
+STEP_LEFT = {"move": 4, "turn": 0, "ioAction": 0}
+TURN_LEFT = {"move": 0, "turn": -1, "ioAction": 0}
+TURN_RIGHT = {"move": 0, "turn": 1, "ioAction": 0}
+IO_ACTION = {"move": 0, "turn": 0, "ioAction": 1}
 # pyformat: enable
 # pylint: enable=bad-whitespace
 
@@ -414,7 +436,8 @@ def create_avatar_objects(num_players, compounds):
         player_idx=player_idx,
         target_sprite_self_empty=TARGET_SPRITE_SELF_EMPTY,
         target_sprite_self_holds_one=TARGET_SPRITE_SELF_HOLDS_ONE,
-        add_location_observer=_ENABLE_DEBUG_OBSERVATIONS)
+        add_location_observer=_ENABLE_DEBUG_OBSERVATIONS,
+    )
     avatar_objects.append(game_object)
 
     # Add the overlaid avatar vesicle on top of each avatar.
@@ -424,7 +447,8 @@ def create_avatar_objects(num_players, compounds):
         reactivity_levels=REACTIVITY_LEVELS["vesicle"],
         default_reaction_radius=DEFAULT_REACTION_CONFIG["radius"],
         default_reaction_query_type=DEFAULT_REACTION_CONFIG["query_type"],
-        priority_mode=True)
+        priority_mode=True,
+    )
     additional_game_objects.append(avatar_vesicle)
 
   return avatar_objects, additional_game_objects
@@ -472,13 +496,18 @@ def build(
 
   cell_prefabs = {}
   cell_prefabs = graph_utils.add_compounds_to_prefabs_dictionary(
-      cell_prefabs, compounds, REACTIVITY_LEVELS["ground"], sprites=True,
+      cell_prefabs,
+      compounds,
+      REACTIVITY_LEVELS["ground"],
+      sprites=True,
       default_reaction_radius=DEFAULT_REACTION_CONFIG["radius"],
       default_reaction_query_type=DEFAULT_REACTION_CONFIG["query_type"],
-      priority_mode=True)
+      priority_mode=True,
+  )
 
-  avatar_objects, additional_objects = create_avatar_objects(num_players,
-                                                             compounds)
+  avatar_objects, additional_objects = create_avatar_objects(
+      num_players, compounds
+  )
 
   # Build the rest of the substrate definition.
   substrate_definition = dict(
@@ -491,8 +520,9 @@ def build(
       simulation={
           "map": ASCII_MAP,
           "gameObjects": avatar_objects + additional_objects,
-          "scene": graph_utils.create_scene(reactions,
-                                            stochastic_episode_ending=True),
+          "scene": graph_utils.create_scene(
+              reactions, stochastic_episode_ending=True
+          ),
           "prefabs": cell_prefabs,
           "charPrefabMap": CHAR_PREFAB_MAP,
       },

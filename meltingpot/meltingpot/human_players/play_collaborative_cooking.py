@@ -38,50 +38,57 @@ FRAMES_PER_SECOND = 8
 
 
 _ACTION_MAP = {
-    'move': level_playing_utils.get_direction_pressed,
-    'turn': level_playing_utils.get_turn_pressed,
-    'interact': level_playing_utils.get_space_key_pressed,
+    "move": level_playing_utils.get_direction_pressed,
+    "turn": level_playing_utils.get_turn_pressed,
+    "interact": level_playing_utils.get_space_key_pressed,
 }
 
 environment_configs = {
-    'collaborative_cooking__asymmetric': collaborative_cooking__asymmetric,
-    'collaborative_cooking__circuit': collaborative_cooking__circuit,
-    'collaborative_cooking__cramped': collaborative_cooking__cramped,
-    'collaborative_cooking__crowded': collaborative_cooking__crowded,
-    'collaborative_cooking__figure_eight': collaborative_cooking__figure_eight,
-    'collaborative_cooking__forced': collaborative_cooking__forced,
-    'collaborative_cooking__ring': collaborative_cooking__ring,
+    "collaborative_cooking__asymmetric": collaborative_cooking__asymmetric,
+    "collaborative_cooking__circuit": collaborative_cooking__circuit,
+    "collaborative_cooking__cramped": collaborative_cooking__cramped,
+    "collaborative_cooking__crowded": collaborative_cooking__crowded,
+    "collaborative_cooking__figure_eight": collaborative_cooking__figure_eight,
+    "collaborative_cooking__forced": collaborative_cooking__forced,
+    "collaborative_cooking__ring": collaborative_cooking__ring,
 }
 
 
 def verbose_fn(env_timestep, player_index, current_player_index):
   if player_index != current_player_index:
     return
-  for obs in ['ADDED_INGREDIENT_TO_COOKING_POT',
-              'COLLECTED_SOUP_FROM_COOKING_POT']:
+  for obs in [
+      "ADDED_INGREDIENT_TO_COOKING_POT",
+      "COLLECTED_SOUP_FROM_COOKING_POT",
+  ]:
     lua_index = player_index + 1
-    if env_timestep.observation[f'{lua_index}.{obs}']:
-      print(obs, env_timestep.observation[f'{lua_index}.{obs}'])
+    if env_timestep.observation[f"{lua_index}.{obs}"]:
+      print(obs, env_timestep.observation[f"{lua_index}.{obs}"])
 
 
 def main():
   parser = argparse.ArgumentParser(description=__doc__)
   parser.add_argument(
-      '--level_name',
+      "--level_name",
       type=str,
-      default='collaborative_cooking__cramped',
+      default="collaborative_cooking__cramped",
       choices=environment_configs.keys(),
-      help='Level name to load')
+      help="Level name to load",
+  )
   parser.add_argument(
-      '--observation', type=str, default='RGB', help='Observation to render')
+      "--observation", type=str, default="RGB", help="Observation to render"
+  )
   parser.add_argument(
-      '--settings', type=json.loads, default={}, help='Settings as JSON string')
+      "--settings", type=json.loads, default={}, help="Settings as JSON string"
+  )
   # Activate verbose mode with --verbose=True.
   parser.add_argument(
-      '--verbose', type=bool, default=False, help='Print debug information')
+      "--verbose", type=bool, default=False, help="Print debug information"
+  )
   # Activate events printing mode with --print_events=True.
   parser.add_argument(
-      '--print_events', type=bool, default=False, help='Print events')
+      "--print_events", type=bool, default=False, help="Print events"
+  )
 
   args = parser.parse_args()
   env_module = environment_configs[args.level_name]
@@ -90,12 +97,18 @@ def main():
     roles = env_config.default_player_roles
     env_config.lab2d_settings = env_module.build(roles, env_config)
   level_playing_utils.run_episode(
-      args.observation, args.settings, _ACTION_MAP, env_config,
-      level_playing_utils.RenderType.PYGAME, MAX_SCREEN_WIDTH,
-      MAX_SCREEN_HEIGHT, FRAMES_PER_SECOND,
+      args.observation,
+      args.settings,
+      _ACTION_MAP,
+      env_config,
+      level_playing_utils.RenderType.PYGAME,
+      MAX_SCREEN_WIDTH,
+      MAX_SCREEN_HEIGHT,
+      FRAMES_PER_SECOND,
       verbose_fn if args.verbose else None,
-      print_events=args.print_events)
+      print_events=args.print_events,
+  )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
   main()

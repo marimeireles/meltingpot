@@ -36,16 +36,18 @@ class AlternatorTest(parameterized.TestCase):
     num_steps = steps_per_goal * 4 * 2
     observations = [{}] * num_steps
     expected = (
-        [_GOAL_A] * steps_per_goal +
-        [_GOAL_C] * steps_per_goal +
-        [_GOAL_A] * steps_per_goal +
-        [_GOAL_B] * steps_per_goal) * 2
+        [_GOAL_A] * steps_per_goal
+        + [_GOAL_C] * steps_per_goal
+        + [_GOAL_A] * steps_per_goal
+        + [_GOAL_B] * steps_per_goal
+    ) * 2
     actual, _ = puppeteers.goals_from_observations(puppeteer, observations)
     self.assertSequenceEqual(actual, expected)
 
   def test_resets_on_restart(self):
     puppeteer = alternator.Alternator(
-        goals=[_GOAL_A, _GOAL_B, _GOAL_C], steps_per_goal=1)
+        goals=[_GOAL_A, _GOAL_B, _GOAL_C], steps_per_goal=1
+    )
     observations = [{}] * 4
     episode_1, state = puppeteers.goals_from_observations(
         puppeteer, observations
@@ -57,5 +59,5 @@ class AlternatorTest(parameterized.TestCase):
     self.assertSequenceEqual([episode_1, episode_2], [expected, expected])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
   absltest.main()

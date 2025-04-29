@@ -49,7 +49,8 @@ class ScenarioConfigTest(parameterized.TestCase):
     self.assertIn(scenario.substrate, AVAILABLE_SUBSTRATES)
 
   @parameterized.named_parameters(
-      (name, name, scenario) for name, scenario in SCENARIO_CONFIGS.items())
+      (name, name, scenario) for name, scenario in SCENARIO_CONFIGS.items()
+  )
   def test_name_starts_with_substrate_name(self, name, scenario):
     self.assertStartsWith(name, scenario.substrate)
 
@@ -75,53 +76,64 @@ class ScenarioConfigTest(parameterized.TestCase):
   def test_bots_compatible(self, scenario):
     for role, bot_names in scenario.bots_by_role.items():
       incompatible = {
-          bot_name for bot_name in bot_names
+          bot_name
+          for bot_name in bot_names
           if not _is_compatible(bot_name, scenario.substrate, role)
       }
       with self.subTest(role):
         self.assertEmpty(
             incompatible,
-            f'Substrate {scenario.substrate!r}, role {role!r} not supported '
-            f'by: {incompatible!r}.')
+            f"Substrate {scenario.substrate!r}, role {role!r} not supported "
+            f"by: {incompatible!r}.",
+        )
 
   @parameterized.named_parameters(SCENARIO_CONFIGS.items())
   def test_no_missing_role_assigments(self, scenario):
-    background_roles = set(role for n, role in enumerate(scenario.roles)
-                           if not scenario.is_focal[n])
+    background_roles = set(
+        role
+        for n, role in enumerate(scenario.roles)
+        if not scenario.is_focal[n]
+    )
     supported_roles = {
-        role for role, bots in scenario.bots_by_role.items() if bots}
+        role for role, bots in scenario.bots_by_role.items() if bots
+    }
     unsupported_roles = background_roles - supported_roles
-    self.assertEmpty(unsupported_roles,
-                     f'Background roles {unsupported_roles!r} have not been '
-                     f'assigned bots.')
+    self.assertEmpty(
+        unsupported_roles,
+        f"Background roles {unsupported_roles!r} have not been assigned bots.",
+    )
 
   @parameterized.named_parameters(SCENARIO_CONFIGS.items())
   def test_no_unused_role_assignments(self, scenario):
-    background_roles = set(role for n, role in enumerate(scenario.roles)
-                           if not scenario.is_focal[n])
+    background_roles = set(
+        role
+        for n, role in enumerate(scenario.roles)
+        if not scenario.is_focal[n]
+    )
     redundant_roles = set(scenario.bots_by_role) - background_roles
-    self.assertEmpty(redundant_roles,
-                     f'Bots assigned to {redundant_roles!r} are unused.')
+    self.assertEmpty(
+        redundant_roles, f"Bots assigned to {redundant_roles!r} are unused."
+    )
 
   def test_no_duplicates(self):
     seen = collections.defaultdict(set)
     for name, config in SCENARIO_CONFIGS.items():
       seen[config].add(name)
     duplicates = tuple(names for _, names in seen.items() if len(names) > 1)
-    self.assertEmpty(duplicates, f'Duplicate configs found: {duplicates!r}.')
+    self.assertEmpty(duplicates, f"Duplicate configs found: {duplicates!r}.")
 
   def test_all_substrates_used_by_scenarios(self):
     used = {scenario.substrate for scenario in SCENARIO_CONFIGS.values()}
     unused = AVAILABLE_SUBSTRATES - used
-    self.assertEmpty(unused, f'Substrates not used by any scenario: {unused!r}')
+    self.assertEmpty(unused, f"Substrates not used by any scenario: {unused!r}")
 
   def test_all_bots_used_by_scenarios(self):
     used = set()
     for scenario in SCENARIO_CONFIGS.values():
       used.update(*scenario.bots_by_role.values())
     unused = AVAILABLE_BOTS - used
-    self.assertEmpty(unused, f'Bots not used by any scenario: {unused!r}')
+    self.assertEmpty(unused, f"Bots not used by any scenario: {unused!r}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
   absltest.main()

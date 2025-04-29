@@ -34,35 +34,42 @@ class SubstrateTestCase(parameterized.TestCase):
     try:
       timestep = env.step(action)
     except Exception:  # pylint: disable=broad-except
-      self.fail(f'Failure when passing action {action!r}.')
+      self.fail(f"Failure when passing action {action!r}.")
 
     try:
       env.discount_spec().validate(timestep.discount)
     except ValueError:
-      self.fail('Discount does not match spec.')
+      self.fail("Discount does not match spec.")
 
     reward_spec = env.reward_spec()
     if len(reward_spec) != len(timestep.reward):
-      self.fail(f'Spec is length {len(reward_spec)} but reward is length '
-                f'{len(timestep.reward)}.')
+      self.fail(
+          f"Spec is length {len(reward_spec)} but reward is length "
+          f"{len(timestep.reward)}."
+      )
     for n, spec in enumerate(reward_spec):
       try:
         spec.validate(timestep.reward[n])
       except ValueError:
-        self.fail(f'Reward {n} does not match spec.')
+        self.fail(f"Reward {n} does not match spec.")
 
     observations = timestep.observation
     observation_specs = env.observation_spec()
     if len(observation_specs) != len(observations):
-      self.fail(f'Spec is length {len(observation_specs)} but observations '
-                f'are length {len(observations)}')
+      self.fail(
+          f"Spec is length {len(observation_specs)} but observations "
+          f"are length {len(observations)}"
+      )
     for n, (observation, spec) in enumerate(
-        zip(observations, observation_specs)):
+        zip(observations, observation_specs)
+    ):
       if set(spec) != set(observation):
-        self.fail(f'Observation {n} keys {set(observation)!r} do not match '
-                  f'spec keys {set(observation)!r}.')
+        self.fail(
+            f"Observation {n} keys {set(observation)!r} do not match "
+            f"spec keys {set(observation)!r}."
+        )
       for key in spec:
         try:
           spec[key].validate(observation[key])
         except ValueError:
-          self.fail(f'Observation {n} key {key!r} does not match spec.')
+          self.fail(f"Observation {n} key {key!r} does not match spec.")

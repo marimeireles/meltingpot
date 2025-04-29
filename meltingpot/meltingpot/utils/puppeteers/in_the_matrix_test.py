@@ -84,7 +84,8 @@ class HelperFunctionTest(parameterized.TestCase):
   )
   def test_has_sufficient(self, inventory, target, margin, expected):
     actual = in_the_matrix.has_collected_sufficient(
-        np.array(inventory), target, margin)
+        np.array(inventory), target, margin
+    )
     self.assertEqual(actual, expected)
 
   @parameterized.parameters(
@@ -95,7 +96,7 @@ class HelperFunctionTest(parameterized.TestCase):
   )
   def test_partner_max_resource(self, inventory, expected):
     timestep = dm_env.restart({
-        'INTERACTION_INVENTORIES': (None, np.array(inventory)),
+        "INTERACTION_INVENTORIES": (None, np.array(inventory)),
     })
     actual = in_the_matrix.partner_max_resource(timestep)
     self.assertEqual(actual, expected)
@@ -108,13 +109,15 @@ class HelperFunctionTest(parameterized.TestCase):
       [(1, 2, 5), _RESOURCE_2, 1, _RESOURCE_2.interact_goal],
       [(1, 2, 5), _RESOURCE_2, 3, _RESOURCE_2.interact_goal],
   )
-  @mock.patch.object(immutabledict, 'immutabledict', dict)
+  @mock.patch.object(immutabledict, "immutabledict", dict)
   def test_collect_or_interact_puppet_timestep(
-      self, inventory, target, margin, goal):
-    timestep = dm_env.restart({'INVENTORY': np.array(inventory)})
+      self, inventory, target, margin, goal
+  ):
+    timestep = dm_env.restart({"INVENTORY": np.array(inventory)})
     actual = in_the_matrix.collect_or_interact_puppet_timestep(
-        timestep, target, margin)
-    expected = dm_env.restart({'INVENTORY': np.array(inventory), 'GOAL': goal})
+        timestep, target, margin
+    )
+    expected = dm_env.restart({"INVENTORY": np.array(inventory), "GOAL": goal})
     np.testing.assert_equal(actual, expected)
 
 
@@ -122,18 +125,18 @@ def _observation(inventory, interaction=None):
   if interaction is None:
     interaction = _NO_INTERACTION
   return {
-      'INVENTORY': np.array(inventory),
-      'INTERACTION_INVENTORIES': np.array(interaction),
+      "INVENTORY": np.array(inventory),
+      "INTERACTION_INVENTORIES": np.array(interaction),
   }
 
 
-def _goals_from_observations(puppeteer,
-                             inventories,
-                             interactions=(),
-                             state=None):
+def _goals_from_observations(
+    puppeteer, inventories, interactions=(), state=None
+):
   observations = []
-  for inventory, interaction in itertools.zip_longest(inventories,
-                                                      interactions):
+  for inventory, interaction in itertools.zip_longest(
+      inventories, interactions
+  ):
     observations.append(_observation(inventory, interaction))
   return puppeteers.goals_from_observations(puppeteer, observations, state)
 
@@ -168,7 +171,10 @@ class ScheduledFlipTest(parameterized.TestCase):
     )
     inventories = [(1, 1, 1), (1, 2, 1), (1, 2, 2), (1, 2, 4)]
     interactions = [
-        _NO_INTERACTION, _NO_INTERACTION, _INTERACTION, _INTERACTION
+        _NO_INTERACTION,
+        _NO_INTERACTION,
+        _INTERACTION,
+        _INTERACTION,
     ]
     expected = [
         _RESOURCE_1.collect_goal,
@@ -248,8 +254,9 @@ class GrimTriggerTest(parameterized.TestCase):
         _RESOURCE_0.interact_goal,  # defect
     ]
     _, state = _goals_from_observations(puppeteer, inventories, interactions)
-    actual, _ = _goals_from_observations(puppeteer, inventories, interactions,
-                                         state)
+    actual, _ = _goals_from_observations(
+        puppeteer, inventories, interactions, state
+    )
     self.assertEqual(actual, expected)
 
 
@@ -480,8 +487,7 @@ class AlternatingSpecialistTest(parameterized.TestCase):
         _RESOURCE_1.collect_goal,
         _RESOURCE_1.interact_goal,
     ]
-    actual, _ = _goals_from_observations(
-        puppeteer, inventories, interactions)
+    actual, _ = _goals_from_observations(puppeteer, inventories, interactions)
     self.assertEqual(actual, expected)
 
   def testTwoInteractionsPerOption(self):
@@ -538,10 +544,9 @@ class AlternatingSpecialistTest(parameterized.TestCase):
         _RESOURCE_1.interact_goal,
         _RESOURCE_1.interact_goal,
     ]
-    actual, _ = _goals_from_observations(
-        puppeteer, inventories, interactions)
+    actual, _ = _goals_from_observations(puppeteer, inventories, interactions)
     self.assertEqual(actual, expected)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
   absltest.main()

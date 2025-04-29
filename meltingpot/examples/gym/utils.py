@@ -20,8 +20,8 @@ from gymnasium import spaces
 import numpy as np
 import tree
 
-PLAYER_STR_FORMAT = 'player_{index}'
-_WORLD_PREFIX = 'WORLD.'
+PLAYER_STR_FORMAT = "player_{index}"
+_WORLD_PREFIX = "WORLD."
 
 
 def timestep_to_observations(timestep: dm_env.TimeStep) -> Mapping[str, Any]:
@@ -36,10 +36,11 @@ def timestep_to_observations(timestep: dm_env.TimeStep) -> Mapping[str, Any]:
 
 
 def remove_world_observations_from_space(
-    observation: spaces.Dict) -> spaces.Dict:
-  return spaces.Dict({
-      key: observation[key] for key in observation if _WORLD_PREFIX not in key
-  })
+    observation: spaces.Dict,
+) -> spaces.Dict:
+  return spaces.Dict(
+      {key: observation[key] for key in observation if _WORLD_PREFIX not in key}
+  )
 
 
 def spec_to_space(spec: tree.Structure[dm_env.specs.Array]) -> spaces.Space:
@@ -65,10 +66,10 @@ def spec_to_space(spec: tree.Structure[dm_env.specs.Array]) -> spaces.Space:
       info = np.iinfo(spec.dtype)
       return spaces.Box(info.min, info.max, spec.shape, spec.dtype)
     else:
-      raise NotImplementedError(f'Unsupported dtype {spec.dtype}')
+      raise NotImplementedError(f"Unsupported dtype {spec.dtype}")
   elif isinstance(spec, (list, tuple)):
     return spaces.Tuple([spec_to_space(s) for s in spec])
   elif isinstance(spec, dict):
     return spaces.Dict({key: spec_to_space(s) for key, s in spec.items()})
   else:
-    raise ValueError('Unexpected spec of type {}: {}'.format(type(spec), spec))
+    raise ValueError("Unexpected spec of type {}: {}".format(type(spec), spec))

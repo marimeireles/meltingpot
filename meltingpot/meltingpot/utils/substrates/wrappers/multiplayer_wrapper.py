@@ -23,8 +23,9 @@ import numpy as np
 T = TypeVar("T")
 
 
-def _player_observations(observations: Mapping[str, T], suffix: str,
-                         num_players: int) -> Iterator[T]:
+def _player_observations(
+    observations: Mapping[str, T], suffix: str, num_players: int
+) -> Iterator[T]:
   """Yields observations for each player.
 
   Args:
@@ -53,9 +54,12 @@ class Wrapper(observables.ObservableLab2dWrapper):
   -   discounts are never None
   """
 
-  def __init__(self, env,
-               individual_observation_names: Collection[str],
-               global_observation_names: Collection[str]):
+  def __init__(
+      self,
+      env,
+      individual_observation_names: Collection[str],
+      global_observation_names: Collection[str],
+  ):
     """Constructor.
 
     Args:
@@ -78,7 +82,8 @@ class Wrapper(observables.ObservableLab2dWrapper):
     return max(lua_player_indices)
 
   def _get_observations(
-      self, source: Mapping[str, T]) -> Sequence[Mapping[str, T]]:
+      self, source: Mapping[str, T]
+  ) -> Sequence[Mapping[str, T]]:
     """Returns multiplayer observations from dmlab2d observations.
 
     Args:
@@ -114,8 +119,9 @@ class Wrapper(observables.ObservableLab2dWrapper):
     return dm_env.TimeStep(
         step_type=source.step_type,
         reward=self._get_rewards(source.observation),
-        discount=0. if source.discount is None else source.discount,
-        observation=self._get_observations(source.observation))
+        discount=0.0 if source.discount is None else source.discount,
+        observation=self._get_observations(source.observation),
+    )
 
   def _get_action(self, source: Sequence[Mapping[str, T]]) -> Mapping[str, T]:
     """Returns dmlab2 action from multiplayer actions.
@@ -135,7 +141,8 @@ class Wrapper(observables.ObservableLab2dWrapper):
     return self._get_timestep(timestep)
 
   def step(
-      self, actions: Sequence[Mapping[str, np.ndarray]]) -> dm_env.TimeStep:
+      self, actions: Sequence[Mapping[str, np.ndarray]]
+  ) -> dm_env.TimeStep:
     """See base class."""
     action = self._get_action(actions)
     timestep = super().step(action)

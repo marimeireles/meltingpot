@@ -22,10 +22,9 @@ from meltingpot.utils.puppeteers import puppeteer
 class Alternator(puppeteer.Puppeteer[int]):
   """Puppeteer that cycles over a list of goals on a fixed schedule."""
 
-  def __init__(self,
-               *,
-               goals: Sequence[puppeteer.PuppetGoal],
-               steps_per_goal: int) -> None:
+  def __init__(
+      self, *, goals: Sequence[puppeteer.PuppetGoal], steps_per_goal: int
+  ) -> None:
     """Initializes the puppeteer.
 
     Args:
@@ -36,19 +35,20 @@ class Alternator(puppeteer.Puppeteer[int]):
     if steps_per_goal > 0:
       self._steps_per_goal = steps_per_goal
     else:
-      raise ValueError('steps_per_goal must be positive.')
+      raise ValueError("steps_per_goal must be positive.")
 
     if goals:
       self._goals = list(goals)
     else:
-      raise ValueError('goals must not be empty.')
+      raise ValueError("goals must not be empty.")
 
   def initial_state(self) -> int:
     """See base class."""
     return 0  # step count.
 
-  def step(self, timestep: dm_env.TimeStep,
-           prev_state: int) -> tuple[dm_env.TimeStep, int]:
+  def step(
+      self, timestep: dm_env.TimeStep, prev_state: int
+  ) -> tuple[dm_env.TimeStep, int]:
     """See base class."""
     if timestep.first():
       prev_state = self.initial_state()

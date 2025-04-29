@@ -48,25 +48,28 @@ class BotConfigTest(parameterized.TestCase):
   @parameterized.named_parameters(BOT_CONFIGS.items())
   def test_model_exists(self, bot):
     self.assertTrue(
-        os.path.isdir(bot.model_path), f'Missing model {bot.model_path!r}.')
+        os.path.isdir(bot.model_path), f"Missing model {bot.model_path!r}."
+    )
 
   @parameterized.named_parameters(BOT_CONFIGS.items())
   def test_substrate_matches_model(self, bot):
     substrate = os.path.basename(os.path.dirname(bot.model_path))
-    self.assertEqual(bot.substrate, substrate,
-                     f'{bot} substrate does not match model path.')
+    self.assertEqual(
+        bot.substrate, substrate, f"{bot} substrate does not match model path."
+    )
 
   def test_no_duplicates(self):
     seen = collections.defaultdict(set)
     for name, config in BOT_CONFIGS.items():
       seen[config].add(name)
     duplicates = {names for _, names in seen.items() if len(names) > 1}
-    self.assertEmpty(duplicates, f'Duplicate configs found: {duplicates!r}.')
+    self.assertEmpty(duplicates, f"Duplicate configs found: {duplicates!r}.")
 
   def test_models_used_by_bots(self):
     used = {bot.model_path for bot in BOT_CONFIGS.values()}
     unused = AVAILABLE_MODELS - used
-    self.assertEmpty(unused, f'Models not used by any bot: {unused!r}')
+    self.assertEmpty(unused, f"Models not used by any bot: {unused!r}")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
   absltest.main()

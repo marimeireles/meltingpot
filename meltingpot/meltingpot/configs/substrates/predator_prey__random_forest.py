@@ -54,8 +54,10 @@ L+XAXXXXXXXAXXXXXXXAX=J
 """
 
 prey_spawn_point = {"type": "all", "list": ["tiled_floor", "spawn_point_prey"]}
-predator_spawn_point = {"type": "all", "list": ["tiled_floor",
-                                                "spawn_point_predator"]}
+predator_spawn_point = {
+    "type": "all",
+    "list": ["tiled_floor", "spawn_point_predator"],
+}
 acorn = {"type": "all", "list": ["tiled_floor", "floor_acorn"]}
 
 # `prefab` determines which prefab game object to use for each `char` in the

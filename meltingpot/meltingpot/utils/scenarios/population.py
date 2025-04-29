@@ -25,8 +25,9 @@ import reactivex
 from reactivex import subject
 
 
-def _step_fn(policy: policy_lib.Policy,
-             lock: threading.Lock) -> Callable[[dm_env.TimeStep], int]:
+def _step_fn(
+    policy: policy_lib.Policy, lock: threading.Lock
+) -> Callable[[dm_env.TimeStep], int]:
   """Threadsafe stateful step function where the state is encapsulated.
 
   Args:
@@ -57,6 +58,7 @@ class PopulationObservables:
     action: emits actions sent to the substrate by the poulation.
     timestep: emits timesteps sent from the substrate to the population.
   """
+
   names: reactivex.Observable[Sequence[str]]
   action: reactivex.Observable[Sequence[int]]
   timestep: reactivex.Observable[dm_env.TimeStep]
@@ -70,7 +72,8 @@ class Population:
       *,
       policies: Mapping[str, policy_lib.Policy],
       names_by_role: Mapping[str, Collection[str]],
-      roles: Sequence[str]) -> None:
+      roles: Sequence[str]
+  ) -> None:
     """Initializes the population.
 
     Args:
@@ -81,22 +84,26 @@ class Population:
     """
     self._policies = dict(policies)
     self._names_by_role = {
-        role: tuple(set(names)) for role, names in names_by_role.items()}
+        role: tuple(set(names)) for role, names in names_by_role.items()
+    }
     self._roles = tuple(roles)
 
     self._locks = {name: threading.Lock() for name in self._policies}
     self._executor = concurrent.futures.ThreadPoolExecutor(
-        max_workers=len(roles))
+        max_workers=len(roles)
+    )
     self._step_fns: List[Callable[[dm_env.TimeStep], int]] = []
     self._action_futures: List[concurrent.futures.Future[int]] = []
 
     self._names_subject = subject.Subject()
     self._action_subject = subject.Subject()
     self._timestep_subject = subject.Subject()
-    self._observables = PopulationObservables(  # pylint: disable=unexpected-keyword-arg
-        names=self._names_subject,
-        action=self._action_subject,
-        timestep=self._timestep_subject,
+    self._observables = (
+        PopulationObservables(  # pylint: disable=unexpected-keyword-arg
+            names=self._names_subject,
+            action=self._action_subject,
+            timestep=self._timestep_subject,
+        )
     )
 
   def close(self):
@@ -136,11 +143,12 @@ class Population:
       RuntimeError: previous action has not been awaited.
     """
     if self._action_futures:
-      raise RuntimeError('Previous action not retrieved.')
+      raise RuntimeError("Previous action not retrieved.")
     self._timestep_subject.on_next(timestep)
     for n, step_fn in enumerate(self._step_fns):
       bot_timestep = timestep._replace(
-          observation=timestep.observation[n], reward=timestep.reward[n])
+          observation=timestep.observation[n], reward=timestep.reward[n]
+      )
       future = self._executor.submit(step_fn, bot_timestep)
       self._action_futures.append(future)
 
@@ -154,7 +162,7 @@ class Population:
       RuntimeError: no timestep has been sent.
     """
     if not self._action_futures:
-      raise RuntimeError('No timestep sent.')
+      raise RuntimeError("No timestep sent.")
     actions = tuple(future.result() for future in self._action_futures)
     self._action_futures.clear()
     self._action_subject.on_next(actions)

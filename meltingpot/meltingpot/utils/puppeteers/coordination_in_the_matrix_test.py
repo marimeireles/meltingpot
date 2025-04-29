@@ -42,15 +42,16 @@ _RESOURCE_C = in_the_matrix.Resource(
 
 def _observation(inventory, interaction):
   return {
-      'INVENTORY': np.array(inventory),
-      'INTERACTION_INVENTORIES': np.array(interaction),
+      "INVENTORY": np.array(inventory),
+      "INTERACTION_INVENTORIES": np.array(interaction),
   }
 
 
 def _goals_from_observations(puppeteer, inventories, interactions, state=None):
   observations = []
-  for inventory, interaction in itertools.zip_longest(inventories,
-                                                      interactions):
+  for inventory, interaction in itertools.zip_longest(
+      inventories, interactions
+  ):
     observations.append(_observation(inventory, interaction))
   return puppeteers.goals_from_observations(puppeteer, observations, state)
 
@@ -93,5 +94,5 @@ class CounterPrevious(parameterized.TestCase):
     self.assertEqual(actual, expected)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
   absltest.main()

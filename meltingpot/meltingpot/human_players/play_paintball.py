@@ -38,14 +38,14 @@ def get_zap() -> int:
 
 
 environment_configs = {
-    'paintball__capture_the_flag': paintball__capture_the_flag,
-    'paintball__king_of_the_hill': paintball__king_of_the_hill,
+    "paintball__capture_the_flag": paintball__capture_the_flag,
+    "paintball__king_of_the_hill": paintball__king_of_the_hill,
 }
 
 _ACTION_MAP = {
-    'move': level_playing_utils.get_direction_pressed,
-    'turn': level_playing_utils.get_turn_pressed,
-    'fireZap': get_zap,
+    "move": level_playing_utils.get_direction_pressed,
+    "turn": level_playing_utils.get_turn_pressed,
+    "fireZap": get_zap,
 }
 
 
@@ -56,19 +56,26 @@ def verbose_fn(unused_env, unused_player_index, unused_current_player_index):
 def main():
   parser = argparse.ArgumentParser(description=__doc__)
   parser.add_argument(
-      '--level_name', type=str, default='paintball__capture_the_flag',
+      "--level_name",
+      type=str,
+      default="paintball__capture_the_flag",
       choices=environment_configs.keys(),
-      help='Level name to load')
+      help="Level name to load",
+  )
   parser.add_argument(
-      '--observation', type=str, default='RGB', help='Observation to render')
+      "--observation", type=str, default="RGB", help="Observation to render"
+  )
   parser.add_argument(
-      '--settings', type=json.loads, default={}, help='Settings as JSON string')
+      "--settings", type=json.loads, default={}, help="Settings as JSON string"
+  )
   # Activate verbose mode with --verbose=True.
   parser.add_argument(
-      '--verbose', type=bool, default=False, help='Print debug information')
+      "--verbose", type=bool, default=False, help="Print debug information"
+  )
   # Activate events printing mode with --print_events=True.
   parser.add_argument(
-      '--print_events', type=bool, default=False, help='Print events')
+      "--print_events", type=bool, default=False, help="Print events"
+  )
 
   args = parser.parse_args()
   env_module = environment_configs[args.level_name]
@@ -77,11 +84,15 @@ def main():
     roles = env_config.default_player_roles
     env_config.lab2d_settings = env_module.build(roles, env_config)
   level_playing_utils.run_episode(
-      args.observation, args.settings, _ACTION_MAP,
-      env_config, level_playing_utils.RenderType.PYGAME,
+      args.observation,
+      args.settings,
+      _ACTION_MAP,
+      env_config,
+      level_playing_utils.RenderType.PYGAME,
       verbose_fn=verbose_fn if args.verbose else None,
-      print_events=args.print_events)
+      print_events=args.print_events,
+  )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
   main()

@@ -126,22 +126,33 @@ SCENE = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "partnerChoice",
-                "stateConfigs": [{
-                    "state": "ForceEmbark",
-                }, {
-                    "state": "partnerChoice",
-                }, {
-                    "state": "semaphore_yellow",
-                }, {
-                    "state": "semaphore_green",
-                }, {
-                    "state": "boatRace",
-                }, {
-                    "state": "semaphore_red",  # A temporary state at end game.
-                }],
-            }
+                "stateConfigs": [
+                    {
+                        "state": "ForceEmbark",
+                    },
+                    {
+                        "state": "partnerChoice",
+                    },
+                    {
+                        "state": "semaphore_yellow",
+                    },
+                    {
+                        "state": "semaphore_green",
+                    },
+                    {
+                        "state": "boatRace",
+                    },
+                    {
+                        "state": (
+                            "semaphore_red"
+                        ),  # A temporary state at end game.
+                    },
+                ],
+            },
         },
-        {"component": "Transform",},
+        {
+            "component": "Transform",
+        },
         {
             "component": "RaceManager",
             "kwargs": {
@@ -161,7 +172,7 @@ SCENE = {
                 "checkInterval": UNROLL_LENGTH,
             },
         },
-    ]
+    ],
 }
 if _ENABLE_DEBUG_OBSERVATIONS:
   SCENE["components"].append({
@@ -198,25 +209,27 @@ FLOOR = {
                     "layer": "background",
                     "sprite": "Floor",
                 }],
-            }
+            },
         },
         {
             "component": "Appearance",
             "kwargs": {
                 "renderMode": "ascii_shape",
-                "spriteNames": ["Floor",],
+                "spriteNames": [
+                    "Floor",
+                ],
                 "spriteShapes": [shapes.GRAINY_FLOOR],
                 "palettes": [{
                     "+": (157, 142, 120, 255),
                     "*": (154, 139, 115, 255),
                 }],
-                "noRotates": [True]
-            }
+                "noRotates": [True],
+            },
         },
         {
             "component": "Transform",
         },
-    ]
+    ],
 }
 
 WALL = {
@@ -231,35 +244,31 @@ WALL = {
                     "layer": "upperPhysical",
                     "sprite": "Wall",
                 }],
-            }
+            },
         },
-        {"component": "Transform",},
+        {
+            "component": "Transform",
+        },
         {
             "component": "Appearance",
             "kwargs": {
                 "renderMode": "ascii_shape",
-                "spriteNames": ["Wall",],
+                "spriteNames": [
+                    "Wall",
+                ],
                 "spriteShapes": [shapes.WALL],
-                "palettes": [{"*": (95, 95, 95, 255),
-                              "&": (100, 100, 100, 255),
-                              "@": (109, 109, 109, 255),
-                              "#": (152, 152, 152, 255)}],
-                "noRotates": [True]
-            }
+                "palettes": [{
+                    "*": (95, 95, 95, 255),
+                    "&": (100, 100, 100, 255),
+                    "@": (109, 109, 109, 255),
+                    "#": (152, 152, 152, 255),
+                }],
+                "noRotates": [True],
+            },
         },
-        {
-            "component": "BeamBlocker",
-            "kwargs": {
-                "beamType": "gift"
-            }
-        },
-        {
-            "component": "BeamBlocker",
-            "kwargs": {
-                "beamType": "zap"
-            }
-        },
-    ]
+        {"component": "BeamBlocker", "kwargs": {"beamType": "gift"}},
+        {"component": "BeamBlocker", "kwargs": {"beamType": "zap"}},
+    ],
 }
 
 SPAWN_POINT = {
@@ -272,12 +281,14 @@ SPAWN_POINT = {
                 "stateConfigs": [{
                     "state": "spawnPoint",
                     "layer": "logic",
-                    "groups": ["spawnPoints"]
+                    "groups": ["spawnPoints"],
                 }],
-            }
+            },
         },
-        {"component": "Transform",},
-    ]
+        {
+            "component": "Transform",
+        },
+    ],
 }
 
 
@@ -289,17 +300,21 @@ SINGLE_APPLE = {
             "kwargs": {
                 "initialState": "apple",
                 "stateConfigs": [
-                    {"state": "apple",
-                     "layer": "singleAppleLayer",
-                     "sprite": "apple",
+                    {
+                        "state": "apple",
+                        "layer": "singleAppleLayer",
+                        "sprite": "apple",
                     },
-                    {"state": "appleWait",
-                     "layer": "logic",
+                    {
+                        "state": "appleWait",
+                        "layer": "logic",
                     },
-                ]
-            }
+                ],
+            },
         },
-        {"component": "Transform",},
+        {
+            "component": "Transform",
+        },
         {
             "component": "Appearance",
             "kwargs": {
@@ -308,7 +323,7 @@ SINGLE_APPLE = {
                 "spriteShapes": [shapes.HD_APPLE],
                 "palettes": [shapes.get_palette((40, 180, 40, 255))],
                 "noRotates": [False],
-            }
+            },
         },
         {
             "component": "Edible",
@@ -316,9 +331,9 @@ SINGLE_APPLE = {
                 "liveState": "apple",
                 "waitState": "appleWait",
                 "rewardForEating": 1.0,
-            }
+            },
         },
-    ]
+    ],
 }
 
 
@@ -332,20 +347,25 @@ def get_respawning_apple(bank_side: str):
               "kwargs": {
                   "initialState": initial_state,
                   "stateConfigs": [
-                      {"state": "apple",
-                       "layer": "superOverlay",
-                       "sprite": "apple",
+                      {
+                          "state": "apple",
+                          "layer": "superOverlay",
+                          "sprite": "apple",
                       },
-                      {"state": "appleWait",
-                       "layer": "logic",
+                      {
+                          "state": "appleWait",
+                          "layer": "logic",
                       },
-                      {"state": "applePause",
-                       "layer": "logic",
+                      {
+                          "state": "applePause",
+                          "layer": "logic",
                       },
-                  ]
-              }
+                  ],
+              },
           },
-          {"component": "Transform",},
+          {
+              "component": "Transform",
+          },
           {
               "component": "Appearance",
               "kwargs": {
@@ -354,7 +374,7 @@ def get_respawning_apple(bank_side: str):
                   "spriteShapes": [shapes.HD_APPLE],
                   "palettes": [shapes.get_palette((40, 180, 40, 255))],
                   "noRotates": [False],
-              }
+              },
           },
           {
               "component": "Edible",
@@ -362,7 +382,7 @@ def get_respawning_apple(bank_side: str):
                   "liveState": "apple",
                   "waitState": "appleWait",
                   "rewardForEating": 1.0,
-              }
+              },
           },
           {
               "component": "FixedRateRegrow",
@@ -370,9 +390,9 @@ def get_respawning_apple(bank_side: str):
                   "liveState": "apple",
                   "waitState": "appleWait",
                   "regrowRate": 0.1,
-              }
+              },
           },
-      ]
+      ],
   }
 
 
@@ -384,34 +404,45 @@ SEMAPHORE = {
             "kwargs": {
                 "initialState": "red",
                 "stateConfigs": [
-                    {"state": "red",
-                     "layer": "upperPhysical",
-                     "sprite": "red",
-                     "groups": ["semaphore"]},
-                    {"state": "yellow",
-                     "layer": "upperPhysical",
-                     "sprite": "yellow",
-                     "groups": ["semaphore"]},
-                    {"state": "green",
-                     "layer": "upperPhysical",
-                     "sprite": "green",
-                     "groups": ["semaphore"]},
-                ]
-            }
+                    {
+                        "state": "red",
+                        "layer": "upperPhysical",
+                        "sprite": "red",
+                        "groups": ["semaphore"],
+                    },
+                    {
+                        "state": "yellow",
+                        "layer": "upperPhysical",
+                        "sprite": "yellow",
+                        "groups": ["semaphore"],
+                    },
+                    {
+                        "state": "green",
+                        "layer": "upperPhysical",
+                        "sprite": "green",
+                        "groups": ["semaphore"],
+                    },
+                ],
+            },
         },
-        {"component": "Transform",},
+        {
+            "component": "Transform",
+        },
         {
             "component": "Appearance",
             "kwargs": {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["red", "yellow", "green"],
                 "spriteShapes": [shapes.COIN] * 3,
-                "palettes": [shapes.RED_COIN_PALETTE, shapes.COIN_PALETTE,
-                             shapes.GREEN_COIN_PALETTE],
+                "palettes": [
+                    shapes.RED_COIN_PALETTE,
+                    shapes.COIN_PALETTE,
+                    shapes.GREEN_COIN_PALETTE,
+                ],
                 "noRotates": [False] * 3,
-            }
+            },
         },
-    ]
+    ],
 }
 
 
@@ -425,18 +456,24 @@ def get_barrier(bank_side: str = "N"):
               "kwargs": {
                   "initialState": initial_state,
                   "stateConfigs": [
-                      {"state": "on",
-                       "layer": "upperPhysical",
-                       "sprite": "barrierOn",
-                       "groups": ["barrier"]},
-                      {"state": "off",
-                       "layer": "superOverlay",
-                       "sprite": "barrierOff",
-                       "groups": ["barrier"]},
-                  ]
-              }
+                      {
+                          "state": "on",
+                          "layer": "upperPhysical",
+                          "sprite": "barrierOn",
+                          "groups": ["barrier"],
+                      },
+                      {
+                          "state": "off",
+                          "layer": "superOverlay",
+                          "sprite": "barrierOff",
+                          "groups": ["barrier"],
+                      },
+                  ],
+              },
           },
-          {"component": "Transform",},
+          {
+              "component": "Transform",
+          },
           {
               "component": "Appearance",
               "kwargs": {
@@ -445,9 +482,9 @@ def get_barrier(bank_side: str = "N"):
                   "spriteShapes": [shapes.BARRIER_ON, shapes.BARRIER_OFF],
                   "palettes": [shapes.GRAY_PALETTE] * 2,
                   "noRotates": [False] * 2,
-              }
+              },
           },
-      ]
+      ],
   }
 
 
@@ -461,35 +498,49 @@ def get_water(layer: str):
               "kwargs": {
                   "initialState": "water_1",
                   "stateConfigs": [
-                      {"state": "water_1",
-                       "layer": layer,
-                       "sprite": "water_1",
-                       "groups": ["water"]},
-                      {"state": "water_2",
-                       "layer": layer,
-                       "sprite": "water_2",
-                       "groups": ["water"]},
-                      {"state": "water_3",
-                       "layer": layer,
-                       "sprite": "water_3",
-                       "groups": ["water"]},
-                      {"state": "water_4",
-                       "layer": layer,
-                       "sprite": "water_4",
-                       "groups": ["water"]},
-                  ]
-              }
+                      {
+                          "state": "water_1",
+                          "layer": layer,
+                          "sprite": "water_1",
+                          "groups": ["water"],
+                      },
+                      {
+                          "state": "water_2",
+                          "layer": layer,
+                          "sprite": "water_2",
+                          "groups": ["water"],
+                      },
+                      {
+                          "state": "water_3",
+                          "layer": layer,
+                          "sprite": "water_3",
+                          "groups": ["water"],
+                      },
+                      {
+                          "state": "water_4",
+                          "layer": layer,
+                          "sprite": "water_4",
+                          "groups": ["water"],
+                      },
+                  ],
+              },
           },
-          {"component": "Transform",},
+          {
+              "component": "Transform",
+          },
           {
               "component": "Appearance",
               "kwargs": {
                   "renderMode": "ascii_shape",
                   "spriteNames": ["water_1", "water_2", "water_3", "water_4"],
-                  "spriteShapes": [shapes.WATER_1, shapes.WATER_2,
-                                   shapes.WATER_3, shapes.WATER_4],
+                  "spriteShapes": [
+                      shapes.WATER_1,
+                      shapes.WATER_2,
+                      shapes.WATER_3,
+                      shapes.WATER_4,
+                  ],
                   "palettes": [shapes.WATER_PALETTE] * 4,
-              }
+              },
           },
           {
               "component": "Animation",
@@ -499,9 +550,9 @@ def get_water(layer: str):
                   "loop": True,
                   "randomStartFrame": True,
                   "group": "water",
-              }
+              },
           },
-      ]
+      ],
   }
 
 
@@ -513,23 +564,26 @@ def get_goal(bank_side: str = "N"):
               "component": "StateManager",
               "kwargs": {
                   "initialState": "goalNonBlocking",
-                  "stateConfigs": [{
-                      "state": "goalNonBlocking",
-                      "layer": "logic",
-                  }, {
-                      "state": "goalBlocking",
-                      "layer": "upperPhysical",
-                  }],
-              }
+                  "stateConfigs": [
+                      {
+                          "state": "goalNonBlocking",
+                          "layer": "logic",
+                      },
+                      {
+                          "state": "goalBlocking",
+                          "layer": "upperPhysical",
+                      },
+                  ],
+              },
           },
-          {"component": "Transform",},
+          {
+              "component": "Transform",
+          },
           {
               "component": "WaterGoal",
-              "kwargs": {
-                  "bank_side": bank_side
-              },
-          }
-      ]
+              "kwargs": {"bank_side": bank_side},
+          },
+      ],
   }
 
 
@@ -549,18 +603,24 @@ def get_boat(front: bool, left: bool):
               "kwargs": {
                   "initialState": "boat",
                   "stateConfigs": [
-                      {"state": "boat",
-                       "layer": "lowerPhysical",
-                       "sprite": f"Boat{suffix}",
-                       "groups": ["boat"]},
-                      {"state": "boatFull",
-                       "layer": "overlay",
-                       "sprite": f"Boat{suffix}",
-                       "groups": ["boat"]},
-                  ]
-              }
+                      {
+                          "state": "boat",
+                          "layer": "lowerPhysical",
+                          "sprite": f"Boat{suffix}",
+                          "groups": ["boat"],
+                      },
+                      {
+                          "state": "boatFull",
+                          "layer": "overlay",
+                          "sprite": f"Boat{suffix}",
+                          "groups": ["boat"],
+                      },
+                  ],
+              },
           },
-          {"component": "Transform",},
+          {
+              "component": "Transform",
+          },
           {
               "component": "Appearance",
               "kwargs": {
@@ -568,10 +628,10 @@ def get_boat(front: bool, left: bool):
                   "spriteNames": [f"Boat{suffix}"],
                   "spriteShapes": [shape[suffix]],
                   "palettes": [shapes.BOAT_PALETTE],
-                  "noRotates": [False]
-              }
+                  "noRotates": [False],
+              },
           },
-      ]
+      ],
   }
 
 
@@ -590,21 +650,29 @@ def get_seat(left: bool):
               "kwargs": {
                   "initialState": "seat",
                   "stateConfigs": [
-                      {"state": "seat",
-                       "layer": "lowerPhysical",
-                       "sprite": f"Seat{suffix}",
-                       "groups": ["seat", "boat"]},
-                      {"state": "seatTaken",
-                       "layer": "overlay",
-                       "sprite": f"Seat{suffix}",
-                       "contact": "boat"},
-                      {"state": "seatUsed",
-                       "layer": "lowerPhysical",
-                       "sprite": f"Seat{suffix}"},
-                  ]
-              }
+                      {
+                          "state": "seat",
+                          "layer": "lowerPhysical",
+                          "sprite": f"Seat{suffix}",
+                          "groups": ["seat", "boat"],
+                      },
+                      {
+                          "state": "seatTaken",
+                          "layer": "overlay",
+                          "sprite": f"Seat{suffix}",
+                          "contact": "boat",
+                      },
+                      {
+                          "state": "seatUsed",
+                          "layer": "lowerPhysical",
+                          "sprite": f"Seat{suffix}",
+                      },
+                  ],
+              },
           },
-          {"component": "Transform",},
+          {
+              "component": "Transform",
+          },
           {
               "component": "Appearance",
               "kwargs": {
@@ -612,25 +680,22 @@ def get_seat(left: bool):
                   "spriteNames": [f"Seat{suffix}"],
                   "spriteShapes": [shape[suffix]],
                   "palettes": [shapes.BOAT_PALETTE],
-                  "noRotates": [False]
-              }
+                  "noRotates": [False],
+              },
           },
           {
               "component": "Seat",
-              "kwargs": {
-              },
+              "kwargs": {},
           },
-      ]
+      ],
   }
   if left:
-    seat["components"] += [
-        {
-            "component": "BoatManager",
-            "kwargs": {
-                "flailEffectiveness": 0.1,
-            }
-        }
-    ]
+    seat["components"] += [{
+        "component": "BoatManager",
+        "kwargs": {
+            "flailEffectiveness": 0.1,
+        },
+    }]
   return seat
 
 
@@ -648,24 +713,30 @@ def get_oar(left: bool):
               "kwargs": {
                   "initialState": "oarDown",
                   "stateConfigs": [
-                      {"state": "oarDown",
-                       "layer": "overlay",
-                       "sprite": f"OarDown{suffix}",
-                       "groups": ["oar", "boat"]},
-
-                      {"state": "oarUp_row",
-                       "layer": "overlay",
-                       "sprite": f"OarUp{suffix}Row",
-                       "groups": ["oar", "boat"]},
-
-                      {"state": "oarUp_flail",
-                       "layer": "overlay",
-                       "sprite": f"OarUp{suffix}Flail",
-                       "groups": ["oar", "boat"]},
-                  ]
-              }
+                      {
+                          "state": "oarDown",
+                          "layer": "overlay",
+                          "sprite": f"OarDown{suffix}",
+                          "groups": ["oar", "boat"],
+                      },
+                      {
+                          "state": "oarUp_row",
+                          "layer": "overlay",
+                          "sprite": f"OarUp{suffix}Row",
+                          "groups": ["oar", "boat"],
+                      },
+                      {
+                          "state": "oarUp_flail",
+                          "layer": "overlay",
+                          "sprite": f"OarUp{suffix}Flail",
+                          "groups": ["oar", "boat"],
+                      },
+                  ],
+              },
           },
-          {"component": "Transform",},
+          {
+              "component": "Transform",
+          },
           {
               "component": "Appearance",
               "kwargs": {
@@ -677,10 +748,10 @@ def get_oar(left: bool):
                   ],
                   "spriteShapes": shape[suffix],
                   "palettes": [shapes.GRAY_PALETTE] * 3,
-                  "noRotates": [False] * 3
-              }
+                  "noRotates": [False] * 3,
+              },
           },
-      ]
+      ],
   }
 
 
@@ -692,30 +763,34 @@ AVATAR = {
             "kwargs": {
                 "initialState": "player",
                 "stateConfigs": [
-                    {"state": "player",
-                     "layer": "upperPhysical",
-                     "sprite": "Avatar",
-                     "contact": "avatar",
-                     "groups": ["players"]},
-
-                    {"state": "playerWait",
-                     "groups": ["playerWaits"]},
-
-                    {"state": "rowing",
-                     "layer": "superOverlay",
-                     "sprite": "Avatar",
-                     "contact": "avatar",
-                     "groups": ["players"]},
-
-                    {"state": "landed",
-                     "layer": "upperPhysical",
-                     "sprite": "Avatar",
-                     "contact": "avatar",
-                     "groups": ["players"]},
-                ]
-            }
+                    {
+                        "state": "player",
+                        "layer": "upperPhysical",
+                        "sprite": "Avatar",
+                        "contact": "avatar",
+                        "groups": ["players"],
+                    },
+                    {"state": "playerWait", "groups": ["playerWaits"]},
+                    {
+                        "state": "rowing",
+                        "layer": "superOverlay",
+                        "sprite": "Avatar",
+                        "contact": "avatar",
+                        "groups": ["players"],
+                    },
+                    {
+                        "state": "landed",
+                        "layer": "upperPhysical",
+                        "sprite": "Avatar",
+                        "contact": "avatar",
+                        "groups": ["players"],
+                    },
+                ],
+            },
         },
-        {"component": "Transform",},
+        {
+            "component": "Transform",
+        },
         {
             "component": "Appearance",
             "kwargs": {
@@ -723,8 +798,8 @@ AVATAR = {
                 "spriteNames": ["Avatar"],
                 "spriteShapes": [shapes.CUTE_AVATAR],
                 "palettes": [shapes.get_palette(colors.human_readable[0])],
-                "noRotates": [True]
-            }
+                "noRotates": [True],
+            },
         },
         {
             "component": "Avatar",
@@ -733,8 +808,7 @@ AVATAR = {
                 "aliveState": "player",
                 "waitState": "playerWait",
                 "spawnGroup": "spawnPoints",
-                "actionOrder": [
-                    "move", "turn", "row", "flail"],
+                "actionOrder": ["move", "turn", "row", "flail"],
                 "actionSpec": {
                     "move": {"default": 0, "min": 0, "max": len(_COMPASS)},
                     "turn": {"default": 0, "min": -1, "max": 1},
@@ -746,9 +820,9 @@ AVATAR = {
                     "right": 5,
                     "forward": 9,
                     "backward": 1,
-                    "centered": False
-                }
-            }
+                    "centered": False,
+                },
+            },
         },
         {
             "component": "Rowing",
@@ -757,11 +831,8 @@ AVATAR = {
                 "playerRole": "none",
             },
         },
-        {
-            "component": "StrokesTracker",
-            "kwargs": {}
-        },
-    ]
+        {"component": "StrokesTracker", "kwargs": {}},
+    ],
 }
 if _ENABLE_DEBUG_OBSERVATIONS:
   AVATAR["components"].append({
@@ -813,15 +884,15 @@ PLAYER_COLOR_PALETTES = [
 # Primitive action components.
 # pylint: disable=bad-whitespace
 # pyformat: disable
-NOOP       = {"move": 0, "turn":  0, "row": 0, "flail": 0}
-FORWARD    = {"move": 1, "turn":  0, "row": 0, "flail": 0}
-STEP_RIGHT = {"move": 2, "turn":  0, "row": 0, "flail": 0}
-BACKWARD   = {"move": 3, "turn":  0, "row": 0, "flail": 0}
-STEP_LEFT  = {"move": 4, "turn":  0, "row": 0, "flail": 0}
-TURN_LEFT  = {"move": 0, "turn": -1, "row": 0, "flail": 0}
-TURN_RIGHT = {"move": 0, "turn":  1, "row": 0, "flail": 0}
-ROW        = {"move": 0, "turn":  0, "row": 1, "flail": 0}
-FLAIL      = {"move": 0, "turn":  0, "row": 0, "flail": 1}
+NOOP = {"move": 0, "turn": 0, "row": 0, "flail": 0}
+FORWARD = {"move": 1, "turn": 0, "row": 0, "flail": 0}
+STEP_RIGHT = {"move": 2, "turn": 0, "row": 0, "flail": 0}
+BACKWARD = {"move": 3, "turn": 0, "row": 0, "flail": 0}
+STEP_LEFT = {"move": 4, "turn": 0, "row": 0, "flail": 0}
+TURN_LEFT = {"move": 0, "turn": -1, "row": 0, "flail": 0}
+TURN_RIGHT = {"move": 0, "turn": 1, "row": 0, "flail": 0}
+ROW = {"move": 0, "turn": 0, "row": 1, "flail": 0}
+FLAIL = {"move": 0, "turn": 0, "row": 0, "flail": 1}
 # pyformat: enable
 # pylint: enable=bad-whitespace
 
@@ -877,15 +948,16 @@ def build(
   assert len(roles) == MANDATED_NUM_PLAYERS, "Wrong number of players"
   assert "num_races" in config, (
       "Cannot build substrate without specifying the number of races. Try "
-      "using the specific config (e.g. `boat_race__eight_races`) instead.")
+      "using the specific config (e.g. `boat_race__eight_races`) instead."
+  )
 
   # Build the rest of the substrate definition.
   substrate_definition = dict(
       levelName="boat_race",
       levelDirectory="meltingpot/lua/levels",
       numPlayers=MANDATED_NUM_PLAYERS,
-      maxEpisodeLengthFrames=config.num_races * (PARTNER_DURATION +
-                                                 RACE_DURATION),
+      maxEpisodeLengthFrames=config.num_races
+      * (PARTNER_DURATION + RACE_DURATION),
       spriteSize=8,
       topology="BOUNDED",  # Choose from ["BOUNDED", "TORUS"],
       simulation={

@@ -29,8 +29,8 @@ class VideoSubject(subject.Subject):
       self,
       root: str,
       *,
-      extension: str = 'webm',
-      codec: str = 'vp90',
+      extension: str = "webm",
+      codec: str = "vp90",
       fps: int = 30,
   ) -> None:
     """Initializes the instance.
@@ -47,7 +47,7 @@ class VideoSubject(subject.Subject):
     super().__init__()
     self._root = root
     if not os.path.exists(root):
-      raise FileNotFoundError(f'Video root {root!r} does not exist.')
+      raise FileNotFoundError(f"Video root {root!r} does not exist.")
     self._extension = extension
     self._codec = codec
     self._fps = fps
@@ -60,26 +60,28 @@ class VideoSubject(subject.Subject):
     Args:
       timestep: the most recent timestep.
     """
-    rgb_frame = timestep.observation[0]['WORLD.RGB']
+    rgb_frame = timestep.observation[0]["WORLD.RGB"]
     height, width, colors = rgb_frame.shape
     if colors != 3:
-      raise ValueError('WORLD.RGB is not RGB.')
+      raise ValueError("WORLD.RGB is not RGB.")
     if rgb_frame.dtype != np.uint8:
-      raise ValueError('WORLD.RGB is not uint8.')
+      raise ValueError("WORLD.RGB is not uint8.")
     if rgb_frame.min() < 0 or rgb_frame.max() > 255:
-      raise ValueError('WORLD.RGB is not in [0, 255].')
+      raise ValueError("WORLD.RGB is not in [0, 255].")
 
     if timestep.step_type.first():
       self._path = os.path.join(
-          self._root, f'{uuid.uuid4().hex}.{self._extension}')
+          self._root, f"{uuid.uuid4().hex}.{self._extension}"
+      )
       self._writer = cv2.VideoWriter(
           filename=self._path,
           fourcc=cv2.VideoWriter_fourcc(*self._codec),
           fps=self._fps,
           frameSize=(width, height),
-          isColor=True)
+          isColor=True,
+      )
     elif self._writer is None:
-      raise ValueError('First timestep must be StepType.FIRST.')
+      raise ValueError("First timestep must be StepType.FIRST.")
     bgr_frame = cv2.cvtColor(rgb_frame, cv2.COLOR_RGB2BGR)
     assert self._writer.isOpened()  # Catches any cv2 usage errors.
     self._writer.write(bgr_frame)

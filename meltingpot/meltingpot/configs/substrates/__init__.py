@@ -41,8 +41,10 @@ def _validated(build):
     """
     invalid_roles = set(roles) - config.valid_roles
     if invalid_roles:
-      raise ValueError(f'Invalid roles: {invalid_roles!r}. Must be one of '
-                       f'{config.valid_roles!r}')
+      raise ValueError(
+          f"Invalid roles: {invalid_roles!r}. Must be one of "
+          f"{config.valid_roles!r}"
+      )
     return build(config=config, roles=roles)
 
   return lab2d_settings_builder
@@ -58,8 +60,8 @@ def get_config(substrate: str) -> config_dict.ConfigDict:
     ModuleNotFoundError: the config does not exist.
   """
   if substrate not in SUBSTRATES:
-    raise ValueError(f'{substrate} not in {SUBSTRATES}.')
-  path = f'{__name__}.{substrate}'
+    raise ValueError(f"{substrate} not in {SUBSTRATES}.")
+  path = f"{__name__}.{substrate}"
   module = importlib.import_module(path)
   config = module.get_config()
   with config.unlocked():
@@ -69,54 +71,54 @@ def get_config(substrate: str) -> config_dict.ConfigDict:
 
 SUBSTRATES: Set[str] = frozenset({
     # keep-sorted start
-    'allelopathic_harvest__open',
-    'bach_or_stravinsky_in_the_matrix__arena',
-    'bach_or_stravinsky_in_the_matrix__repeated',
-    'boat_race__eight_races',
-    'chemistry__three_metabolic_cycles',
-    'chemistry__three_metabolic_cycles_with_plentiful_distractors',
-    'chemistry__two_metabolic_cycles',
-    'chemistry__two_metabolic_cycles_with_distractors',
-    'chicken_in_the_matrix__arena',
-    'chicken_in_the_matrix__repeated',
-    'clean_up',
-    'coins',
-    'collaborative_cooking__asymmetric',
-    'collaborative_cooking__circuit',
-    'collaborative_cooking__cramped',
-    'collaborative_cooking__crowded',
-    'collaborative_cooking__figure_eight',
-    'collaborative_cooking__forced',
-    'collaborative_cooking__ring',
-    'commons_harvest__closed',
-    'commons_harvest__open',
-    'commons_harvest__partnership',
-    'coop_mining',
-    'daycare',
-    'externality_mushrooms__dense',
-    'factory_commons__either_or',
-    'fruit_market__concentric_rivers',
-    'gift_refinements',
-    'hidden_agenda',
-    'paintball__capture_the_flag',
-    'paintball__king_of_the_hill',
-    'predator_prey__alley_hunt',
-    'predator_prey__open',
-    'predator_prey__orchard',
-    'predator_prey__random_forest',
-    'prisoners_dilemma_in_the_matrix__arena',
-    'prisoners_dilemma_in_the_matrix__repeated',
-    'pure_coordination_in_the_matrix__arena',
-    'pure_coordination_in_the_matrix__repeated',
-    'rationalizable_coordination_in_the_matrix__arena',
-    'rationalizable_coordination_in_the_matrix__repeated',
-    'running_with_scissors_in_the_matrix__arena',
-    'running_with_scissors_in_the_matrix__one_shot',
-    'running_with_scissors_in_the_matrix__repeated',
-    'stag_hunt_in_the_matrix__arena',
-    'stag_hunt_in_the_matrix__repeated',
-    'territory__inside_out',
-    'territory__open',
-    'territory__rooms',
+    "allelopathic_harvest__open",
+    "bach_or_stravinsky_in_the_matrix__arena",
+    "bach_or_stravinsky_in_the_matrix__repeated",
+    "boat_race__eight_races",
+    "chemistry__three_metabolic_cycles",
+    "chemistry__three_metabolic_cycles_with_plentiful_distractors",
+    "chemistry__two_metabolic_cycles",
+    "chemistry__two_metabolic_cycles_with_distractors",
+    "chicken_in_the_matrix__arena",
+    "chicken_in_the_matrix__repeated",
+    "clean_up",
+    "coins",
+    "collaborative_cooking__asymmetric",
+    "collaborative_cooking__circuit",
+    "collaborative_cooking__cramped",
+    "collaborative_cooking__crowded",
+    "collaborative_cooking__figure_eight",
+    "collaborative_cooking__forced",
+    "collaborative_cooking__ring",
+    "commons_harvest__closed",
+    "commons_harvest__open",
+    "commons_harvest__partnership",
+    "coop_mining",
+    "daycare",
+    "externality_mushrooms__dense",
+    "factory_commons__either_or",
+    "fruit_market__concentric_rivers",
+    "gift_refinements",
+    "hidden_agenda",
+    "paintball__capture_the_flag",
+    "paintball__king_of_the_hill",
+    "predator_prey__alley_hunt",
+    "predator_prey__open",
+    "predator_prey__orchard",
+    "predator_prey__random_forest",
+    "prisoners_dilemma_in_the_matrix__arena",
+    "prisoners_dilemma_in_the_matrix__repeated",
+    "pure_coordination_in_the_matrix__arena",
+    "pure_coordination_in_the_matrix__repeated",
+    "rationalizable_coordination_in_the_matrix__arena",
+    "rationalizable_coordination_in_the_matrix__repeated",
+    "running_with_scissors_in_the_matrix__arena",
+    "running_with_scissors_in_the_matrix__one_shot",
+    "running_with_scissors_in_the_matrix__repeated",
+    "stag_hunt_in_the_matrix__arena",
+    "stag_hunt_in_the_matrix__repeated",
+    "territory__inside_out",
+    "territory__open",
+    "territory__rooms",
     # keep-sorted end
 })

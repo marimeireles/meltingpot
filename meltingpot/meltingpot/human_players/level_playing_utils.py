@@ -34,11 +34,11 @@ import pygame
 WHITE = (255, 255, 255)
 
 MOVEMENT_MAP = {
-    'NONE': 0,
-    'FORWARD': 1,
-    'RIGHT': 2,
-    'BACKWARD': 3,
-    'LEFT': 4,
+    "NONE": 0,
+    "FORWARD": 1,
+    "RIGHT": 2,
+    "BACKWARD": 3,
+    "LEFT": 4,
 }
 
 
@@ -71,14 +71,14 @@ def get_direction_pressed() -> int:
   """Gets direction pressed."""
   key_pressed = pygame.key.get_pressed()
   if key_pressed[pygame.K_UP] or key_pressed[pygame.K_w]:
-    return MOVEMENT_MAP['FORWARD']
+    return MOVEMENT_MAP["FORWARD"]
   if key_pressed[pygame.K_RIGHT] or key_pressed[pygame.K_d]:
-    return MOVEMENT_MAP['RIGHT']
+    return MOVEMENT_MAP["RIGHT"]
   if key_pressed[pygame.K_DOWN] or key_pressed[pygame.K_s]:
-    return MOVEMENT_MAP['BACKWARD']
+    return MOVEMENT_MAP["BACKWARD"]
   if key_pressed[pygame.K_LEFT] or key_pressed[pygame.K_a]:
-    return MOVEMENT_MAP['LEFT']
-  return MOVEMENT_MAP['NONE']
+    return MOVEMENT_MAP["LEFT"]
+  return MOVEMENT_MAP["NONE"]
 
 
 def get_turn_pressed() -> int:
@@ -94,12 +94,24 @@ def get_turn_pressed() -> int:
 def get_space_key_pressed() -> int:
   return 1 if pygame.key.get_pressed()[pygame.K_SPACE] else 0
 
+
 def get_enter_key_pressed() -> int:
   return 1 if pygame.key.get_pressed()[pygame.K_RETURN] else 0
 
+
 def get_key_number_pressed() -> int:
-  number_keys = [pygame.K_0, pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4,
-                 pygame.K_5, pygame.K_6, pygame.K_7, pygame.K_8, pygame.K_9]
+  number_keys = [
+      pygame.K_0,
+      pygame.K_1,
+      pygame.K_2,
+      pygame.K_3,
+      pygame.K_4,
+      pygame.K_5,
+      pygame.K_6,
+      pygame.K_7,
+      pygame.K_8,
+      pygame.K_9,
+  ]
   for num in range(len(number_keys)):
     if pygame.key.get_pressed()[number_keys[num]]:
       return num
@@ -152,16 +164,16 @@ def get_key_x_pressed() -> int:
 
 def _split_key(key: str) -> Tuple[str, str]:
   """Splits the key into player index and name."""
-  return tuple(key.split('.', maxsplit=1))
+  return tuple(key.split(".", maxsplit=1))
 
 
 def _get_rewards(timestep: dm_env.TimeStep) -> Mapping[str, float]:
   """Gets the list of rewards, one for each player."""
   rewards = {}
   for key in timestep.observation.keys():
-    if key.endswith('.REWARD'):
+    if key.endswith(".REWARD"):
       player_prefix, name = _split_key(key)
-      if name == 'REWARD':
+      if name == "REWARD":
         rewards[player_prefix] = timestep.observation[key]
   return rewards
 
@@ -183,8 +195,9 @@ class ActionReader(object):
     """Update the actions of player `player_prefix`."""
     actions = {action_key: 0 for action_key in self._action_spec.keys()}
     for action_name in self._action_names:
-      actions[f'{player_prefix}.{action_name}'] = self._action_map[
-          action_name]()
+      actions[f"{player_prefix}.{action_name}"] = self._action_map[
+          action_name
+      ]()
     return actions
 
 
@@ -206,7 +219,7 @@ def run_episode(
     env_builder: EnvBuilder = builder.builder,
     print_events: Optional[bool] = False,
     player_prefixes: Optional[Sequence[str]] = None,
-    default_observation: str = 'WORLD.RGB',
+    default_observation: str = "WORLD.RGB",
     reset_env_when_done: bool = False,
     initial_player_index: int = 0,
 ) -> None:
@@ -268,17 +281,19 @@ def run_episode(
   """
   full_config.lab2d_settings.update(config_overrides)
   if player_prefixes is None:
-    player_count = full_config.lab2d_settings.get('numPlayers', 1)
+    player_count = full_config.lab2d_settings.get("numPlayers", 1)
     # By default, we use lua indices (which start at 1) as player prefixes.
-    player_prefixes = [f'{i+1}' for i in range(player_count)]
+    player_prefixes = [f"{i+1}" for i in range(player_count)]
   else:
     player_count = len(player_prefixes)
-  print(f'Running an episode with {player_count} players: {player_prefixes}.')
+  print(f"Running an episode with {player_count} players: {player_prefixes}.")
   with env_builder(**full_config) as env:
 
     if len(player_prefixes) != player_count:
-      raise ValueError('Player prefixes, when specified, must be of the same '
-                       'length as the number of players.')
+      raise ValueError(
+          "Player prefixes, when specified, must be of the same "
+          "length as the number of players."
+      )
     player_index = initial_player_index
     timestep = env.reset()
 
@@ -287,18 +302,19 @@ def run_episode(
 
     if interactive == RenderType.PYGAME:
       pygame.init()
-      pygame.display.set_caption('Melting Pot: {}'.format(
-          full_config.lab2d_settings.levelName))
+      pygame.display.set_caption(
+          "Melting Pot: {}".format(full_config.lab2d_settings.levelName)
+      )
       font = pygame.font.SysFont(None, text_font_size)
 
     scale = 1
     observation_spec = env.observation_spec()
     if render_observation in observation_spec:
       obs_spec = observation_spec[render_observation]
-    elif f'1.{render_observation}' in observation_spec:
+    elif f"1.{render_observation}" in observation_spec:
       # This assumes all players have the same observation, which is true for
       # MeltingPot environments.
-      obs_spec = observation_spec[f'1.{render_observation}']
+      obs_spec = observation_spec[f"1.{render_observation}"]
     else:
       # Falls back to 'default_observation.'
       obs_spec = observation_spec[default_observation]
@@ -306,11 +322,13 @@ def run_episode(
     observation_shape = obs_spec.shape
     observation_height = observation_shape[0]
     observation_width = observation_shape[1]
-    scale = min(screen_height // observation_height,
-                screen_width // observation_width)
+    scale = min(
+        screen_height // observation_height, screen_width // observation_width
+    )
     if interactive == RenderType.PYGAME:
       game_display = pygame.display.set_mode(
-          (observation_width * scale, observation_height * scale))
+          (observation_width * scale, observation_height * scale)
+      )
       clock = pygame.time.Clock()
     stop = False
 
@@ -327,7 +345,7 @@ def run_episode(
             if event.key == pygame.K_TAB:
               player_index = (player_index + 1) % player_count
             break
-      player_prefix = player_prefixes[player_index] if player_prefixes else ''
+      player_prefix = player_prefixes[player_index] if player_prefixes else ""
 
       if stop:
         break
@@ -347,10 +365,10 @@ def run_episode(
           verbose_fn(timestep, i, player_index)
         score[prefix] += rewards[prefix]
         if i == player_index and rewards[prefix] != 0:
-          print(f'Player {prefix} Score: {score[prefix]}')
+          print(f"Player {prefix} Score: {score[prefix]}")
 
       # Print events if applicable
-      if print_events and hasattr(env, 'events'):
+      if print_events and hasattr(env, "events"):
         events = env.events()
         # Only print events on timesteps when there are events to print.
         if events:
@@ -361,8 +379,8 @@ def run_episode(
         # show visual observation
         if render_observation in timestep.observation:
           obs = timestep.observation[render_observation]
-        elif f'{player_prefix}.{render_observation}' in timestep.observation:
-          obs = timestep.observation[f'{player_prefix}.{render_observation}']
+        elif f"{player_prefix}.{render_observation}" in timestep.observation:
+          obs = timestep.observation[f"{player_prefix}.{render_observation}"]
         else:
           # Fall back to default_observation.
           obs = timestep.observation[default_observation]
@@ -372,7 +390,8 @@ def run_episode(
         rect = surface.get_rect()
 
         surf = pygame.transform.scale(
-            surface, (rect[2] * scale, rect[3] * scale))
+            surface, (rect[2] * scale, rect[3] * scale)
+        )
         game_display.blit(surf, dest=(0, 0))
 
         # show text
@@ -391,4 +410,4 @@ def run_episode(
     if interactive == RenderType.PYGAME:
       pygame.quit()
     for prefix in player_prefixes:
-      print('Player %s: score is %g' % (prefix, score[prefix]))
+      print("Player %s: score is %g" % (prefix, score[prefix]))
