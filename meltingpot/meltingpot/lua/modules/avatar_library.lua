@@ -428,6 +428,7 @@ function Avatar:getAllConnectedObjectsWithNamedComponent(componentName)
 end
 
 function Avatar:onStateChange(oldState)
+  print('Avatar:onStateChange(oldState)', oldState, newState)
   local newState = self.gameObject:getState()
   local waitState = self:getWaitState()
   local behavior
@@ -577,6 +578,7 @@ function Zapper:__init__(kwargs)
       {'beamRadius', args.numberType},
       -- The default beam color is yellow.
       {'beamColor', args.default({252, 252, 106}), args.tableType},
+      {'deathBeamColor', args.default({252, 0, 0}), args.tableType},
       {'framesTillRespawn', args.numberType},
       {'penaltyForBeingZapped', args.numberType},
       {'rewardForZapping', args.numberType},
@@ -588,6 +590,7 @@ function Zapper:__init__(kwargs)
   self._config.beamLength = kwargs.beamLength
   self._config.beamRadius = kwargs.beamRadius
   self._config.beamColor = kwargs.beamColor
+  self._config.deathBeamColor = kwargs.deathBeamColor
   self._config.framesTillRespawn = kwargs.framesTillRespawn
   self._config.penaltyForBeingZapped = kwargs.penaltyForBeingZapped
   self._config.rewardForZapping = kwargs.rewardForZapping
@@ -601,127 +604,127 @@ function Zapper:addHits(worldConfig)
   }
   worldConfig.hits['deathHit'] = {
       layer = 'beamZap',
-      sprite = 'BeamZap',
+      sprite = 'DeathBeamZap',
   }
   component.insertIfNotPresent(worldConfig.renderOrder, 'beamZap')
 end
 
 function Zapper:addSprites(tileSet)
   tileSet:addColor('BeamZap', self._config.beamColor)
+  tileSet:addColor('DeathBeamZap', self._config.deathBeamColor)
 end
 
 function Zapper:registerUpdaters(updaterRegistry)
   local aliveState = self:getAliveState()
-  local waitState  = self:getWaitState()
+  local waitState = self:getWaitState()
 
-  -- Beam-firing updater -------------------------------------------------------
-  local function zap()
-    local avatar   = self.gameObject:getComponent('Avatar')
-    local actions  = avatar:getVolatileData().actions
-
-    if avatar:isAlive() and self._config.cooldownTime >= 0 then
-      if self._coolingTimer > 0 then
-        self._coolingTimer = self._coolingTimer - 1
-      else
-        if actions['fireZap'] == 1 then
-          self._coolingTimer = self._config.cooldownTime
-          self.gameObject:hitBeam('zapHit',
-                                  self._config.beamLength,
-                                  self._config.beamRadius)
-        elseif actions['deathZap'] == 1 then
-          print("💀💀💀💀💀")
-          self._coolingTimer = self._config.cooldownTime
-          self.gameObject:hitBeam('deathHit',
-                                  self._config.beamLength,
-                                  self._config.beamRadius)
+  local zap = function()
+    local playerVolatileVariables = (
+        self.gameObject:getComponent('Avatar'):getVolatileData())
+    local actions = playerVolatileVariables.actions
+    -- Execute the beam if applicable.
+    if self.gameObject:getComponent('Avatar'):isAlive() then
+      if self._config.cooldownTime >= 0 then
+        if self._coolingTimer > 0 then
+          self._coolingTimer = self._coolingTimer - 1
+        else
+          if actions['fireZap'] == 1 then
+            self._coolingTimer = self._config.cooldownTime
+            self.gameObject:hitBeam(
+                'zapHit', self._config.beamLength, self._config.beamRadius)
+          elseif actions['deathZap'] == 1 then
+            self._coolingTimer = self._config.cooldownTime
+            self.gameObject:hitBeam(
+                'deathHit', self._config.beamLength, self._config.beamRadius)
+          end
         end
       end
     end
   end
 
   updaterRegistry:registerUpdater{
-    updateFn = zap,
-    priority = 140,
+      updateFn = zap,
+      priority = 140,
   }
 
-  -- Respawn updater -----------------------------------------------------------
-  local function respawn()
-    local avatar      = self.gameObject:getComponent('Avatar')
-    local spawnGroup  = avatar:getSpawnGroup()
+  local respawn = function()
+    local spawnGroup = self.gameObject:getComponent('Avatar'):getSpawnGroup()
     self.gameObject:teleportToGroup(spawnGroup, aliveState)
     self.playerRespawnedThisStep = true
   end
 
   updaterRegistry:registerUpdater{
-    updateFn    = respawn,
-    priority    = 135,
-    state       = waitState,
-    startFrame  = self._config.framesTillRespawn,
+      updateFn = respawn,
+      priority = 135,
+      state = waitState,
+      startFrame = self._config.framesTillRespawn
   }
 end
 
-function Zapper:registerUpdaters(updaterRegistry)
-  local aliveState = self:getAliveState()
-  local waitState  = self:getWaitState()
-
-  ---------------------------------------------------------------------------
-  -- Beam-firing updater
-  ---------------------------------------------------------------------------
-  local function zap()
-    local avatar  = self.gameObject:getComponent('Avatar')
-    local actions = avatar:getVolatileData().actions
-
-    if avatar:isAlive() and self._config.cooldownTime >= 0 then
-      if self._coolingTimer > 0 then
-        self._coolingTimer = self._coolingTimer - 1
-      else
-        if actions['fireZap'] == 1 then                    -- primary zap
-          self._coolingTimer = self._config.cooldownTime
-          self.gameObject:hitBeam('zapHit',
-                                  self._config.beamLength,
-                                  self._config.beamRadius)
-
-        elseif actions['deathZap'] == 1 then               -- death zap
-          print("💀💀💀💀💀")
-          self._coolingTimer = self._config.cooldownTime
-          self.gameObject:hitBeam('deathHit',
-                                  self._config.beamLength,
-                                  self._config.beamRadius)
-        end
-      end
+function Zapper:onHit(hittingGameObject, hitName)
+  self._hitName = hitName
+  if hitName == 'zapHit' then
+    local zappedAvatar = self.gameObject:getComponent('Avatar')
+    local zappedIndex = zappedAvatar:getIndex()
+    local zapperAvatar = hittingGameObject:getComponent('Avatar')
+    local zapperIndex = zapperAvatar:getIndex()
+    if self.playerZapMatrix then
+      self.playerZapMatrix(zappedIndex, zapperIndex):add(1)
     end
+    events:add('zap', 'dict',
+               'source', zapperAvatar:getIndex(),  -- int
+               'target', zappedAvatar:getIndex())  -- int
+    zappedAvatar:addReward(self._config.penaltyForBeingZapped)
+    zapperAvatar:addReward(self._config.rewardForZapping)
+    if self._config.removeHitPlayer then
+      self.gameObject:setState(self:getWaitState())
+    end
+    -- Temporarily store the index of the zapper avatar in state so it can
+    -- be observed elsewhere.
+    self.zapperIndex = zapperIndex
+    -- Temporarily record that the zapper hit another player on this frame.
+    if hittingGameObject:hasComponent('Zapper') then
+      local hittingZapper = hittingGameObject:getComponent('Zapper')
+      hittingZapper.num_others_player_zapped_this_step = (
+          hittingZapper.num_others_player_zapped_this_step + 1)
+    end
+    -- return `true` to prevent the beam from passing through a hit player.
+    return true
   end
-
-  updaterRegistry:registerUpdater{
-    updateFn = zap,
-    priority = 140,
-  }
-
-  ---------------------------------------------------------------------------
-  -- Respawn updater
-  ---------------------------------------------------------------------------
-  local function respawn()
-    local avatar     = self.gameObject:getComponent('Avatar')
-    local spawnGroup = avatar:getSpawnGroup()
-    self.gameObject:teleportToGroup(spawnGroup, aliveState)
-    self.playerRespawnedThisStep = true
+  if hitName == 'deathHit' then
+    print("⚡️ Zapper:onHit is triggered")
+    local zappedAvatar = self.gameObject:getComponent('Avatar')
+    local zappedIndex = zappedAvatar:getIndex()
+    local zapperAvatar = hittingGameObject:getComponent('Avatar')
+    local zapperIndex = zapperAvatar:getIndex()
+    if self.playerZapMatrix then
+      self.playerZapMatrix(zappedIndex, zapperIndex):add(1)
+    end
+    events:add('zap', 'dict',
+               'source', zapperAvatar:getIndex(),  -- int
+               'target', zappedAvatar:getIndex())  -- int
+    zappedAvatar:addReward(self._config.penaltyForBeingZapped)
+    zapperAvatar:addReward(self._config.rewardForZapping)
+    if self._config.removeHitPlayer then
+      self.gameObject:setState(self:getWaitState())
+    end
+    -- Temporarily store the index of the zapper avatar in state so it can
+    -- be observed elsewhere.
+    self.zapperIndex = zapperIndex
+    -- Temporarily record that the zapper hit another player on this frame.
+    if hittingGameObject:hasComponent('Zapper') then
+      local hittingZapper = hittingGameObject:getComponent('Zapper')
+      hittingZapper.num_others_player_zapped_this_step = (
+          hittingZapper.num_others_player_zapped_this_step + 1)
+    end
+    -- return `true` to prevent the beam from passing through a hit player.
+    return true
   end
-
-  updaterRegistry:registerUpdater{
-    updateFn   = respawn,
-    priority   = 135,
-    state      = waitState,
-    startFrame = self._config.framesTillRespawn,
-  }
 end
 
 function Zapper:onStateChange()
-  if self._lastHitName == 'deathHit' then
-    self._respawnTimer = math.huge
-  end
   self._respawnTimer = self._config.framesTillRespawn
-  -- clear _lastHitName
-  self._lastHitName = nil
+  print('Zapper:onStateChange() was triggered')
 end
 
 function Zapper:reset()
