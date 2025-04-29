@@ -35,7 +35,7 @@ KL_THRESHOLD        = 0.005
 KL_PATIENCE         = 10
 # ----------------------------------------------------------------------------
 
-# 1) Create environment
+# 1) Create environment and define metrics variables
 env = MeltingPotCompatibilityV0(
     substrate_name="commons_harvest__open",
     render_mode="rgb_array"
@@ -46,6 +46,11 @@ action_dim    = env.action_space(primary_agent).n
 rgb_space     = env.observation_space(primary_agent)["RGB"]
 H, W, C       = rgb_space.shape
 obs_shape     = (C, H, W)
+
+beam_fired_hist     = {a: [] for a in agents}
+death_fired_hist    = {a: [] for a in agents}
+beam_received_hist  = {a: [] for a in agents}
+death_received_hist = {a: [] for a in agents}
 
 # 2) Define convolutional actor-critic network
 class ActorCritic(nn.Module):
@@ -128,6 +133,18 @@ def collect_batch(n_steps=STEPS_PER_UPDATE):
             buffer[a]["vals"].append(v[0])
 
         nxt, rewards, term, trunc, info = env.step(actions)
+
+        for a in agents:
+            # each of these will typically be a 0-D array or scalar
+            bf = int(nxt[a]["BEAM_ZAPS_FIRED"])
+            df = int(nxt[a]["DEATH_ZAPS_FIRED"])
+            br = int(nxt[a]["BEAM_ZAPS_RECEIVED"])
+            dr = int(nxt[a]["DEATH_ZAPS_RECEIVED"])
+            beam_fired_hist[a].append(bf)
+            death_fired_hist[a].append(df)
+            beam_received_hist[a].append(br)
+            death_received_hist[a].append(dr)
+
         for a in agents:
             r = float(rewards.get(a, 0.0))
             buffer[a]["rews"].append(r)
