@@ -32,6 +32,7 @@ local component = require(meltingpot .. 'component')
 local component_registry = require(meltingpot .. 'component_registry')
 
 local _COMPASS = {'N', 'E', 'S', 'W'}
+local INFINITE_RESPAWN = math.huge
 
 
 --[[ The `Avatar` component sets up a GameObject to be controlled by an agent.
@@ -595,6 +596,8 @@ function Zapper:__init__(kwargs)
   self._config.penaltyForBeingZapped = kwargs.penaltyForBeingZapped
   self._config.rewardForZapping = kwargs.rewardForZapping
   self._config.removeHitPlayer = kwargs.removeHitPlayer
+
+  self._lastHitWasDeath = false
 end
 
 function Zapper:addHits(worldConfig)
@@ -633,6 +636,7 @@ function Zapper:registerUpdaters(updaterRegistry)
             self.gameObject:hitBeam(
                 'zapHit', self._config.beamLength, self._config.beamRadius)
           elseif actions['deathZap'] == 1 then
+            print('☀️ deathZap in registerUpdaters')
             self._coolingTimer = self._config.cooldownTime
             self.gameObject:hitBeam(
                 'deathHit', self._config.beamLength, self._config.beamRadius)
@@ -648,9 +652,16 @@ function Zapper:registerUpdaters(updaterRegistry)
   }
 
   local respawn = function()
+    print('respawn 😇')
+    print('self._lastHitWasDeath inside respawn', self._lastHitWasDeath)
+    if self._lastHitWasDeath then
+      print('last hit was death 🪦')
+      return
+    end
     local spawnGroup = self.gameObject:getComponent('Avatar'):getSpawnGroup()
     self.gameObject:teleportToGroup(spawnGroup, aliveState)
     self.playerRespawnedThisStep = true
+    self._lastHitWasDeath = false
   end
 
   updaterRegistry:registerUpdater{
@@ -662,7 +673,8 @@ function Zapper:registerUpdaters(updaterRegistry)
 end
 
 function Zapper:onHit(hittingGameObject, hitName)
-  self._hitName = hitName
+  self._lastHitWasDeath = (hitName == 'deathHit')
+  print('🌸 self._lastHitWasDeath was updated', self._lastHitWasDeath)
   if hitName == 'zapHit' then
     local zappedAvatar = self.gameObject:getComponent('Avatar')
     local zappedIndex = zappedAvatar:getIndex()
@@ -723,9 +735,17 @@ function Zapper:onHit(hittingGameObject, hitName)
 end
 
 function Zapper:onStateChange()
+  -- reset the countdown to the configured base
   self._respawnTimer = self._config.framesTillRespawn
-  print('Zapper:onStateChange() was triggered')
+
+  -- if the last hit was a deathHit, push timer to 'infinite'
+  if self._lastHitWasDeath then
+    self._respawnTimer = INFINITE_RESPAWN
+  end
+
+  print('Zapper:onStateChange() was triggered, respawnTimer=', self._respawnTimer)
 end
+
 
 function Zapper:reset()
   self.playerRespawnedThisStep = false
