@@ -119,6 +119,8 @@ function Avatar:__init__(kwargs)
   self._config.skipWaitStateRewards = kwargs.skipWaitStateRewards
   self._config.randomizeInitialOrientation = kwargs.randomizeInitialOrientation
 
+  self._cumulativeReward = 0
+
   if kwargs.postInitialSpawnGroup ~= '_DEFAULT' then
     self._config.postInitialSpawnGroup = kwargs.postInitialSpawnGroup
   end
@@ -363,23 +365,27 @@ function Avatar:getSpawnGroup()
 end
 
 function Avatar:addReward(amount)
-  local function _addReward(amount)
-    self._playerVolatileVariables.reward = (
-          self._playerVolatileVariables.reward + amount)
+  local function _add(amount)
+    local pv = self._playerVolatileVariables
+    pv.reward = pv.reward + amount
+    -- **accumulate into the running total**
+    self._cumulativeReward = self._cumulativeReward + amount
   end
   if self._config.skipWaitStateRewards then
-    -- Only add rewards if avatar is not in a wait state.
     if self.gameObject:getState() ~= self._config.waitState then
-      _addReward(amount)
+      _add(amount)
     end
   else
-    -- Add rewards regardless of whether avatar is in wait state.
-    _addReward(amount)
+    _add(amount)
   end
 end
 
 function Avatar:getReward()
   return self._playerVolatileVariables.reward
+end
+
+function Avatar:getCumulativeReward()
+  return self._cumulativeReward
 end
 
 -- Return a table with avatar's actions and rewards on the current frame.
@@ -583,6 +589,7 @@ function Zapper:__init__(kwargs)
       {'penaltyForBeingZapped', args.numberType},
       {'rewardForZapping', args.numberType},
       {'removeHitPlayer', args.default(true), args.booleanType},
+      {'deathRayThreshold', args.numberType}
   })
   Zapper.Base.__init__(self, kwargs)
 
@@ -595,7 +602,9 @@ function Zapper:__init__(kwargs)
   self._config.penaltyForBeingZapped = kwargs.penaltyForBeingZapped
   self._config.rewardForZapping = kwargs.rewardForZapping
   self._config.removeHitPlayer = kwargs.removeHitPlayer
+  self._config.deathRayThreshold = kwargs.deathRayThreshold
 
+  -- flag for differentiating paralyzing zap from death zap
   self._lastHitWasDeath = false
 end
 
@@ -698,32 +707,37 @@ function Zapper:onHit(hittingGameObject, hitName)
     return true
   end
   if hitName == 'deathHit' then
-    local zappedAvatar = self.gameObject:getComponent('Avatar')
-    local zappedIndex = zappedAvatar:getIndex()
-    local zapperAvatar = hittingGameObject:getComponent('Avatar')
-    local zapperIndex = zapperAvatar:getIndex()
-    if self.playerZapMatrix then
-      self.playerZapMatrix(zappedIndex, zapperIndex):add(1)
+    local zappedAvatarRewards = self.gameObject:getComponent('Avatar'):getCumulativeReward()
+    local zapperAvatarRewards = hittingGameObject:getComponent('Avatar'):getCumulativeReward()
+    print('zappedAvatarRewards ' .. zappedAvatarRewards + self._config.deathRayThreshold .. ' and zapperAvatarRewards ' .. zapperAvatarRewards)
+    if zappedAvatarRewards + self._config.deathRayThreshold < zapperAvatarRewards then
+      local zappedAvatar = self.gameObject:getComponent('Avatar')
+      local zappedIndex = zappedAvatar:getIndex()
+      local zapperAvatar = hittingGameObject:getComponent('Avatar')
+      local zapperIndex = zapperAvatar:getIndex()
+      if self.playerZapMatrix then
+        self.playerZapMatrix(zappedIndex, zapperIndex):add(1)
+      end
+      events:add('zap', 'dict',
+                'source', zapperAvatar:getIndex(),  -- int
+                'target', zappedAvatar:getIndex())  -- int
+      zappedAvatar:addReward(self._config.penaltyForBeingZapped)
+      zapperAvatar:addReward(self._config.rewardForZapping)
+      if self._config.removeHitPlayer then
+        self.gameObject:setState(self:getWaitState())
+      end
+      -- Temporarily store the index of the zapper avatar in state so it can
+      -- be observed elsewhere.
+      self.zapperIndex = zapperIndex
+      -- Temporarily record that the zapper hit another player on this frame.
+      if hittingGameObject:hasComponent('Zapper') then
+        local hittingZapper = hittingGameObject:getComponent('Zapper')
+        hittingZapper.num_others_player_zapped_this_step = (
+            hittingZapper.num_others_player_zapped_this_step + 1)
+      end
+      -- return `true` to prevent the beam from passing through a hit player.
+      return true
     end
-    events:add('zap', 'dict',
-               'source', zapperAvatar:getIndex(),  -- int
-               'target', zappedAvatar:getIndex())  -- int
-    zappedAvatar:addReward(self._config.penaltyForBeingZapped)
-    zapperAvatar:addReward(self._config.rewardForZapping)
-    if self._config.removeHitPlayer then
-      self.gameObject:setState(self:getWaitState())
-    end
-    -- Temporarily store the index of the zapper avatar in state so it can
-    -- be observed elsewhere.
-    self.zapperIndex = zapperIndex
-    -- Temporarily record that the zapper hit another player on this frame.
-    if hittingGameObject:hasComponent('Zapper') then
-      local hittingZapper = hittingGameObject:getComponent('Zapper')
-      hittingZapper.num_others_player_zapped_this_step = (
-          hittingZapper.num_others_player_zapped_this_step + 1)
-    end
-    -- return `true` to prevent the beam from passing through a hit player.
-    return true
   end
 end
 
