@@ -509,6 +509,9 @@ def create_avatar_object(
                   "framesTillRespawn": 4,
                   "penaltyForBeingZapped": 0,
                   "rewardForZapping": 0,
+                  "deathRayThreshold": (
+                      1
+                  ),  # number of reward zapper agent must have gathered in order to death zap another agent
               },
           },
           {
