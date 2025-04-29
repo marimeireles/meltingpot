@@ -510,12 +510,15 @@ def create_avatar_object(
                   "penaltyForBeingZapped": 0,
                   "rewardForZapping": 0,
                   "deathRayThreshold": (
-                      1
+                      5
                   ),  # number of reward zapper agent must have gathered in order to death zap another agent
               },
           },
           {
               "component": "ReadyToShootObservation",
+          },
+          {
+              "component": "ZapMetricsReporter",
           },
       ],
   }
@@ -553,9 +556,14 @@ def get_config():
   config.action_set = ACTION_SET
   # Observation format configuration.
   config.individual_observation_names = [
-      "RGB",
-      "READY_TO_SHOOT",
+    "RGB",
+    "READY_TO_SHOOT",
+    "BEAM_ZAPS_FIRED",
+    "DEATH_ZAPS_FIRED",
+    "BEAM_ZAPS_RECEIVED",
+    "DEATH_ZAPS_RECEIVED",
   ]
+
   config.global_observation_names = [
       "WORLD.RGB",
   ]
