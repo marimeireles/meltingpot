@@ -17,6 +17,7 @@ Use `WASD` keys to move the character around.
 Use `Q and E` to turn the character.
 Use `SPACE` to fire the zapper.
 Use `TAB` to switch between players.
+Use `ENTER` to fire the death zapper.
 """
 
 import argparse
