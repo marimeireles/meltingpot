@@ -306,12 +306,9 @@ def create_scene():
                   "probabilityTerminationPerInterval": 0.15,
               },
           },
-          {
-            "component": "GlobalMetricHolder",
-            "kwargs": {}
-          },
       ],
   }
+
   return scene
 
 
@@ -513,15 +510,12 @@ def create_avatar_object(
                   "penaltyForBeingZapped": 0,
                   "rewardForZapping": 0,
                   "deathRayThreshold": (
-                      5
+                      1
                   ),  # number of reward zapper agent must have gathered in order to death zap another agent
               },
           },
           {
               "component": "ReadyToShootObservation",
-          },
-          {
-              "component": "ZapMetricsReporter",
           },
       ],
   }
@@ -559,14 +553,9 @@ def get_config():
   config.action_set = ACTION_SET
   # Observation format configuration.
   config.individual_observation_names = [
-    "RGB",
-    "READY_TO_SHOOT",
-    "BEAM_ZAPS_FIRED",
-    "DEATH_ZAPS_FIRED",
-    "BEAM_ZAPS_RECEIVED",
-    "DEATH_ZAPS_RECEIVED",
+      "RGB",
+      "READY_TO_SHOOT",
   ]
-
   config.global_observation_names = [
       "WORLD.RGB",
   ]
@@ -594,6 +583,7 @@ def build(
   """Build substrate definition given player roles."""
   del config
   num_players = len(roles)
+  # Build the rest of the substrate definition.
   substrate_definition = dict(
       levelName="commons_harvest",
       levelDirectory="meltingpot/lua/levels",

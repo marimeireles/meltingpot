@@ -677,67 +677,69 @@ function Zapper:registerUpdaters(updaterRegistry)
 end
 
 function Zapper:onHit(hittingGameObject, hitName)
-  -- 1) Ignore anything that isn’t fired by a live avatar.
-  if not hittingGameObject or
-     not hittingGameObject:hasComponent('Avatar') then
-    return false
-  end
-
-  -- 2) Shortcut to the two components we need.
-  local zappedAvatarComp = self.gameObject:getComponent('Avatar')
-  local zapperAvatarComp = hittingGameObject:getComponent('Avatar')
-  local zappedIndex      = zappedAvatarComp:getIndex()
-  local zapperIndex      = zapperAvatarComp:getIndex()
-
-  -- 3) Record death-zap flag for respawn logic.
   self._lastHitWasDeath = (hitName == 'deathHit')
-
-  -- 4) If you have a GlobalMetricHolder, update its matrices.
-  local scene = self.gameObject.simulation:getSceneObject()
-  if scene and scene:hasComponent('GlobalMetricHolder') then
-    local gm = scene:getComponent('GlobalMetricHolder')
-    if hitName == 'zapHit' then
-      gm.beamZapMatrix(zappedIndex, zapperIndex):add(1)
-    elseif hitName == 'deathHit' then
-      gm.deathZapMatrix(zappedIndex, zapperIndex):add(1)
+  if hitName == 'zapHit' then
+    local zappedAvatar = self.gameObject:getComponent('Avatar')
+    local zappedIndex = zappedAvatar:getIndex()
+    local zapperAvatar = hittingGameObject:getComponent('Avatar')
+    local zapperIndex = zapperAvatar:getIndex()
+    if self.playerZapMatrix then
+      self.playerZapMatrix(zappedIndex, zapperIndex):add(1)
     end
-  end
-
-  -- 5) Common reward + removal logic for both zap types.
-  local function applyHit()
-    events:add('zap', 'dict', 'source', zapperIndex, 'target', zappedIndex)
-    zappedAvatarComp:addReward(self._config.penaltyForBeingZapped)
-    zapperAvatarComp:addReward(self._config.rewardForZapping)
+    events:add('zap', 'dict',
+               'source', zapperAvatar:getIndex(),  -- int
+               'target', zappedAvatar:getIndex())  -- int
+    zappedAvatar:addReward(self._config.penaltyForBeingZapped)
+    zapperAvatar:addReward(self._config.rewardForZapping)
     if self._config.removeHitPlayer then
       self.gameObject:setState(self:getWaitState())
     end
-    -- Correctly increment *this* Zapper component’s per-step counter.
-    local zapperComp = hittingGameObject:getComponent('Zapper')
-    if zapperComp and zapperComp.num_others_player_zapped_this_step ~= nil then
-      zapperComp.num_others_player_zapped_this_step =
-          zapperComp.num_others_player_zapped_this_step + 1
+    -- Temporarily store the index of the zapper avatar in state so it can
+    -- be observed elsewhere.
+    self.zapperIndex = zapperIndex
+    -- Temporarily record that the zapper hit another player on this frame.
+    if hittingGameObject:hasComponent('Zapper') then
+      local hittingZapper = hittingGameObject:getComponent('Zapper')
+      hittingZapper.num_others_player_zapped_this_step = (
+          hittingZapper.num_others_player_zapped_this_step + 1)
     end
-  end
-
-  -- 6) Dispatch by hitName.
-  if hitName == 'zapHit' then
-    applyHit()
+    -- return `true` to prevent the beam from passing through a hit player.
     return true
-
-  elseif hitName == 'deathHit' then
-    -- Only count a death-zap if the reward lead exceeds threshold.
-    local zappedRewards = zappedAvatarComp:getCumulativeReward()
-    local zapperRewards = zapperAvatarComp:getCumulativeReward()
-    if zappedRewards + self._config.deathRayThreshold < zapperRewards then
-      applyHit()
+  end
+  if hitName == 'deathHit' then
+    local zappedAvatarRewards = self.gameObject:getComponent('Avatar'):getCumulativeReward()
+    local zapperAvatarRewards = hittingGameObject:getComponent('Avatar'):getCumulativeReward()
+    print('zappedAvatarRewards ' .. zappedAvatarRewards + self._config.deathRayThreshold .. ' and zapperAvatarRewards ' .. zapperAvatarRewards)
+    if zappedAvatarRewards + self._config.deathRayThreshold < zapperAvatarRewards then
+      local zappedAvatar = self.gameObject:getComponent('Avatar')
+      local zappedIndex = zappedAvatar:getIndex()
+      local zapperAvatar = hittingGameObject:getComponent('Avatar')
+      local zapperIndex = zapperAvatar:getIndex()
+      if self.playerZapMatrix then
+        self.playerZapMatrix(zappedIndex, zapperIndex):add(1)
+      end
+      events:add('zap', 'dict',
+                'source', zapperAvatar:getIndex(),  -- int
+                'target', zappedAvatar:getIndex())  -- int
+      zappedAvatar:addReward(self._config.penaltyForBeingZapped)
+      zapperAvatar:addReward(self._config.rewardForZapping)
+      if self._config.removeHitPlayer then
+        self.gameObject:setState(self:getWaitState())
+      end
+      -- Temporarily store the index of the zapper avatar in state so it can
+      -- be observed elsewhere.
+      self.zapperIndex = zapperIndex
+      -- Temporarily record that the zapper hit another player on this frame.
+      if hittingGameObject:hasComponent('Zapper') then
+        local hittingZapper = hittingGameObject:getComponent('Zapper')
+        hittingZapper.num_others_player_zapped_this_step = (
+            hittingZapper.num_others_player_zapped_this_step + 1)
+      end
+      -- return `true` to prevent the beam from passing through a hit player.
       return true
     end
   end
-
-  -- 7) Otherwise let the beam pass through.
-  return false
 end
-
 
 function Zapper:onStateChange()
   self._respawnTimer = self._config.framesTillRespawn
@@ -914,51 +916,6 @@ function Zapper:getZappablePlayerIndices(layer)
   return zappablePlayerIndices
 end
 
-local ZapMetricsReporter = class.Class(component.Component)
-
-function ZapMetricsReporter:addObservations(tileSet, world, observations)
-  -- Grab the scene object, which holds the GlobalMetricHolder.
-  local scene = self.gameObject.simulation:getSceneObject()
-  if not scene or not scene:hasComponent("GlobalMetricHolder") then
-    return
-  end
-  local gm = scene:getComponent("GlobalMetricHolder")
-
-  -- Get this avatar’s index and the total number of players.
-  local avatar = self.gameObject:getComponent("Avatar")
-  if not avatar then
-    return
-  end
-  local idx = avatar:getIndex()
-  local n   = self.gameObject.simulation:getNumPlayers()
-
-  -- Sum up beamZap vs. deathZap, fired vs. received.
-  local firedBeam, firedDeath, gotBeam, gotDeath = 0, 0, 0, 0
-  for i = 1, n do
-    firedBeam  = firedBeam  + gm.beamZapMatrix(i,    idx)
-    firedDeath = firedDeath + gm.deathZapMatrix(i,   idx)
-    gotBeam    = gotBeam    + gm.beamZapMatrix(idx,  i)
-    gotDeath   = gotDeath   + gm.deathZapMatrix(idx, i)
-  end
-
-  -- Helper to append a scalar observation.
-  local function add(name, value)
-    table.insert(observations, {
-      name  = tostring(idx) .. "." .. name,
-      type  = "Doubles",
-      shape = {},
-      func  = function() return value end,
-    })
-  end
-
-  add("BEAM_ZAPS_FIRED",     firedBeam)
-  add("DEATH_ZAPS_FIRED",    firedDeath)
-  add("BEAM_ZAPS_RECEIVED",  gotBeam)
-  add("DEATH_ZAPS_RECEIVED", gotDeath)
-end
-
--- don’t forget to register it in your allComponents table:
---   ZapMetricsReporter = ZapMetricsReporter,
 
 --[[ The `ReadyToShootObservation` component adds an observation that is 1 when
 the avatar can fire (from the Zapper component) and <1 if in cooldown time.
@@ -1435,7 +1392,7 @@ local allComponents = {
     Role = Role,
     AvatarIdsInViewObservation = AvatarIdsInViewObservation,
     AvatarIdsInRangeToZapObservation = AvatarIdsInRangeToZapObservation,
-    ZapMetricsReporter = ZapMetricsReporter,
+
     -- Components that are typically part of other game objects that are
     -- connected to the avatar.
     AvatarConnector = AvatarConnector,
