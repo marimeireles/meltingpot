@@ -17,8 +17,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-# ── Added for TensorBoard logging and progress bar ─────────────────────────────
-from torch.utils.tensorboard import SummaryWriter
 from tqdm import trange
 # ───────────────────────────────────────────────────────────────────────────────
 
@@ -35,7 +33,7 @@ KL_THRESHOLD        = 0.005
 KL_PATIENCE         = 10
 # ----------------------------------------------------------------------------
 
-# 1) Create environment and define metrics variables
+# 1) Create environment
 env = MeltingPotCompatibilityV0(
     substrate_name="commons_harvest__open",
     render_mode="rgb_array"
@@ -46,11 +44,6 @@ action_dim    = env.action_space(primary_agent).n
 rgb_space     = env.observation_space(primary_agent)["RGB"]
 H, W, C       = rgb_space.shape
 obs_shape     = (C, H, W)
-
-beam_fired_hist     = {a: [] for a in agents}
-death_fired_hist    = {a: [] for a in agents}
-beam_received_hist  = {a: [] for a in agents}
-death_received_hist = {a: [] for a in agents}
 
 # 2) Define convolutional actor-critic network
 class ActorCritic(nn.Module):
@@ -133,18 +126,6 @@ def collect_batch(n_steps=STEPS_PER_UPDATE):
             buffer[a]["vals"].append(v[0])
 
         nxt, rewards, term, trunc, info = env.step(actions)
-
-        for a in agents:
-            # each of these will typically be a 0-D array or scalar
-            bf = int(nxt[a]["BEAM_ZAPS_FIRED"])
-            df = int(nxt[a]["DEATH_ZAPS_FIRED"])
-            br = int(nxt[a]["BEAM_ZAPS_RECEIVED"])
-            dr = int(nxt[a]["DEATH_ZAPS_RECEIVED"])
-            beam_fired_hist[a].append(bf)
-            death_fired_hist[a].append(df)
-            beam_received_hist[a].append(br)
-            death_received_hist[a].append(dr)
-
         for a in agents:
             r = float(rewards.get(a, 0.0))
             buffer[a]["rews"].append(r)
@@ -193,9 +174,6 @@ run_id        = datetime.now().strftime("%Y%m%d_%H%M%S")
 checkpoint_dir = pathlib.Path("checkpoints")
 checkpoint_dir.mkdir(parents=True, exist_ok=True)
 
-# Initialize TensorBoard writer
-writer = SummaryWriter(log_dir=f"runs/{run_id}")
-
 # Wrap updates loop with tqdm progress bar
 for update in trange(TOTAL_UPDATES, desc="PPO updates"):
     batch, stock_hist, harvests, positions = collect_batch()
@@ -209,12 +187,6 @@ for update in trange(TOTAL_UPDATES, desc="PPO updates"):
     cum_returns = [sum(harvest_rate_hist[a]) for a in agents]
     cumulative_rewards.append(cum_returns)
     gini_history.append(compute_gini(cum_returns))
-
-    # Log overall metrics to TensorBoard
-    writer.add_scalar('metrics/gini', gini_history[-1], update)
-    for idx, a in enumerate(agents):
-        writer.add_scalar(f'metrics/{a}_cum_return', cum_returns[idx], update)
-        writer.add_scalar(f'metrics/{a}_mean_harvest', np.mean(harvests[a]), update)
 
     for a in agents:
         o       = jnp.stack(batch[a]["obs"])
@@ -232,9 +204,6 @@ for update in trange(TOTAL_UPDATES, desc="PPO updates"):
             losses.append(float(loss))
         params[a], optim_states[a] = p, s
 
-        # log average loss for this agent/update
-        writer.add_scalar(f'loss/{a}', np.mean(losses), update)
-
         # KL divergence and logging
         old_logits, _ = ActorCritic(action_dim).apply(old_params, o)
         new_logits, _ = ActorCritic(action_dim).apply(p, o)
@@ -242,16 +211,12 @@ for update in trange(TOTAL_UPDATES, desc="PPO updates"):
         dist_new = distrax.Categorical(logits=new_logits)
         kl = jnp.mean(dist_old.kl_divergence(dist_new))
         kl_counter[a] = kl_counter[a] + 1 if kl < KL_THRESHOLD else 0
-        writer.add_scalar(f'metrics/{a}_kl', float(kl), update)
 
         print(f"Agent {a} update {update}: mean KL={kl:.6f}, patience={kl_counter[a]}")
 
     if all(count >= KL_PATIENCE for count in kl_counter.values()):
         print(f"Early stopping at update {update}: KL < {KL_THRESHOLD} for {KL_PATIENCE} updates.")
         break
-
-# Close TensorBoard writer
-writer.close()
 
 # 7) Save model and raw data
 for a, p in params.items():
