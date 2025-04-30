@@ -683,8 +683,8 @@ function Zapper:onHit(hittingGameObject, hitName)
     local zappedIndex = zappedAvatar:getIndex()
     local zapperAvatar = hittingGameObject:getComponent('Avatar')
     local zapperIndex = zapperAvatar:getIndex()
-    if self.playerZapMatrix then
-      self.playerZapMatrix(zappedIndex, zapperIndex):add(1)
+    if self.playerFireZapMatrix then
+      self.playerFireZapMatrix(zappedIndex, zapperIndex):add(1)
     end
     events:add('zap', 'dict',
                'source', zapperAvatar:getIndex(),  -- int
@@ -715,8 +715,8 @@ function Zapper:onHit(hittingGameObject, hitName)
       local zappedIndex = zappedAvatar:getIndex()
       local zapperAvatar = hittingGameObject:getComponent('Avatar')
       local zapperIndex = zapperAvatar:getIndex()
-      if self.playerZapMatrix then
-        self.playerZapMatrix(zappedIndex, zapperIndex):add(1)
+      if self.playerDeathZapMatrix then
+        self.playerDeathZapMatrix(zappedIndex, zapperIndex):add(1)
       end
       events:add('zap', 'dict',
                 'source', zapperAvatar:getIndex(),  -- int
@@ -760,10 +760,13 @@ end
 
 function Zapper:start()
   local scene = self.gameObject.simulation:getSceneObject()
-  self.playerZapMatrix = nil
+  self.playerFireZapMatrix = nil
+  self.playerDeathZapMatrix = nil
   if scene:hasComponent("GlobalMetricHolder") then
-    self.playerZapMatrix = scene:getComponent(
-        "GlobalMetricHolder").playerZapMatrix
+    self.playerFireZapMatrix = scene:getComponent(
+        "GlobalMetricHolder").playerFireZapMatrix
+    self.playerDeathZapMatrix = scene:getComponent(
+        "GlobalMetricHolder").playerDeathZapMatrix
   end
   -- Set the beam cooldown timer to its `ready` state (i.e. coolingTimer = 0).
   self._coolingTimer = 0
