@@ -306,9 +306,12 @@ def create_scene():
                   "probabilityTerminationPerInterval": 0.15,
               },
           },
+          {
+            "component": "GlobalMetricHolder",
+            "kwargs": {}
+          },
       ],
   }
-
   return scene
 
 
@@ -591,7 +594,6 @@ def build(
   """Build substrate definition given player roles."""
   del config
   num_players = len(roles)
-  # Build the rest of the substrate definition.
   substrate_definition = dict(
       levelName="commons_harvest",
       levelDirectory="meltingpot/lua/levels",

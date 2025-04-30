@@ -1,4 +1,3 @@
-import gymnasium as gym
 from shimmy import MeltingPotCompatibilityV0
 
 import jax
@@ -13,6 +12,7 @@ import distrax
 import pathlib
 from flax import serialization
 from datetime import datetime
+import csv
 import pandas as pd
 import numpy as np
 
@@ -125,6 +125,7 @@ def collect_batch(n_steps=STEPS_PER_UPDATE):
             buffer[a]["vals"].append(v[0])
 
         nxt, rewards, term, trunc, info = env.step(actions)
+
         for a in agents:
             r = float(rewards.get(a, 0.0))
             buffer[a]["rews"].append(r)
@@ -135,6 +136,22 @@ def collect_batch(n_steps=STEPS_PER_UPDATE):
         if all(term.values()) or all(trunc.values()):
             nxt, _ = env.reset()
         obs_dict = nxt
+
+        rows = []
+        for agent, info in info.items():
+            m = info.get("metrics", {})
+            rows.append({
+            "agent": agent,
+            "times_zapped":   m.get("zap_source",    0),
+            "times_zapped_by":m.get("zap_target",    0),
+            })
+            print(m)
+
+        # TODO: make this pretty in the right way if it works
+        with open("experiments/episode_metrics.csv", "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=rows[0].keys())
+            writer.writeheader()
+            writer.writerows(rows)
 
     # compute returns
     for a in agents:
