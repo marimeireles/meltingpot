@@ -137,22 +137,6 @@ def collect_batch(n_steps=STEPS_PER_UPDATE):
             nxt, _ = env.reset()
         obs_dict = nxt
 
-        rows = []
-        for agent, info in info.items():
-            m = info.get("metrics", {})
-            rows.append({
-            "agent": agent,
-            "times_zapped":   m.get("zap_source",    0),
-            "times_zapped_by":m.get("zap_target",    0),
-            })
-            print(m)
-
-        # TODO: make this pretty in the right way if it works
-        with open("experiments/episode_metrics.csv", "w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=rows[0].keys())
-            writer.writeheader()
-            writer.writerows(rows)
-
     # compute returns
     for a in agents:
         G = 0.0; returns = []

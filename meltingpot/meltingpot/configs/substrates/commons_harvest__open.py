@@ -280,7 +280,7 @@ TARGET_SPRITE_SELF = {
 }
 
 
-def create_scene():
+def create_scene(num_players):
   """Creates the scene with the provided args controlling apple regrowth."""
   scene = {
       "name": "scene",
@@ -292,21 +292,37 @@ def create_scene():
                   "stateConfigs": [{
                       "state": "scene",
                   }],
-              },
+              }
           },
           {
               "component": "Transform",
           },
-          {"component": "Neighborhoods", "kwargs": {}},
+          {
+              "component": "Neighborhoods",
+              "kwargs": {}
+          },
           {
               "component": "StochasticIntervalEpisodeEnding",
               "kwargs": {
                   "minimumFramesPerEpisode": 1000,
                   "intervalLength": 100,  # Set equal to unroll length.
-                  "probabilityTerminationPerInterval": 0.15,
-              },
+                  "probabilityTerminationPerInterval": 0.15
+              }
           },
-      ],
+          {
+              "component": "GlobalMetricHolder",
+              "kwargs": {
+                  "metrics": [
+                      {"type": "tensor.Int32Tensor",
+                       "shape": (num_players, num_players),
+                       "variable": "playerFireZapMatrix"},
+                      {"type": "tensor.Int32Tensor",
+                       "shape": (num_players, num_players),
+                       "variable": "playerDeathZapMatrix"},
+                  ]
+              }
+          },
+      ]
   }
 
   return scene
@@ -511,7 +527,7 @@ def create_avatar_object(
                   "rewardForZapping": 0,
                   "deathRayThreshold": (
                       1
-                  ),  # number of reward zapper agent must have gathered in order to death zap another agent
+                  ),  # threshold reward zapper agent must have gathered in order to death zap another agent
               },
           },
           {
@@ -583,6 +599,7 @@ def build(
   """Build substrate definition given player roles."""
   del config
   num_players = len(roles)
+  print("🍀 num_players", num_players)
   # Build the rest of the substrate definition.
   substrate_definition = dict(
       levelName="commons_harvest",
@@ -599,7 +616,7 @@ def build(
               APPLE_RESPAWN_RADIUS, REGROWTH_PROBABILITIES
           ),
           "charPrefabMap": CHAR_PREFAB_MAP,
-          "scene": create_scene(),
+          "scene": create_scene(num_players),
       },
   )
   return substrate_definition

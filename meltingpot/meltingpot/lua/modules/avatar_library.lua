@@ -744,7 +744,7 @@ end
 function Zapper:onStateChange()
   self._respawnTimer = self._config.framesTillRespawn
 
-  -- if the last hit was a deathHit, push timer to 'infinite'
+  -- if the last hit was a deathHit, push timer to 'infinity'
   if self._lastHitWasDeath then
     self._respawnTimer = INFINITE_RESPAWN
   end
@@ -759,6 +759,8 @@ function Zapper:reset()
 end
 
 function Zapper:start()
+  -- Loads and update the object that keeps track of metrics
+  -- in the Lua side and communicates it to the Python side.
   local scene = self.gameObject.simulation:getSceneObject()
   self.playerFireZapMatrix = nil
   self.playerDeathZapMatrix = nil

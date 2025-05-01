@@ -707,12 +707,6 @@ function GlobalMetricHolder:__init__(kwargs)
 end
 
 function GlobalMetricHolder:reset()
-  local n = self.simulation:getNumPlayers()
-
-  -- Information on zapped agents
-  self.beamZapMatrix  = tensor.Int32Tensor(n, n):fill(0)
-  self.deathZapMatrix = tensor.Int32Tensor(n, n):fill(0)
-
   -- Create and initialise the metrics to zero
   for _, metric in pairs(self._config.metrics) do
     self[metric.variable] = tensor[
