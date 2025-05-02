@@ -279,6 +279,7 @@ TARGET_SPRITE_SELF = {
     "noRotate": True,
 }
 
+_ENABLE_DEBUG_OBSERVATIONS = True
 
 def create_scene(num_players):
   """Creates the scene with the provided args controlling apple regrowth."""
@@ -292,40 +293,65 @@ def create_scene(num_players):
                   "stateConfigs": [{
                       "state": "scene",
                   }],
-              }
+              },
           },
           {
               "component": "Transform",
           },
           {
               "component": "Neighborhoods",
-              "kwargs": {}
+              "kwargs": {},
           },
           {
               "component": "StochasticIntervalEpisodeEnding",
               "kwargs": {
                   "minimumFramesPerEpisode": 1000,
                   "intervalLength": 100,  # Set equal to unroll length.
-                  "probabilityTerminationPerInterval": 0.15
-              }
+                  "probabilityTerminationPerInterval": 0.15,
+              },
           },
           {
               "component": "GlobalMetricHolder",
               "kwargs": {
                   "metrics": [
-                      {"type": "tensor.Int32Tensor",
-                       "shape": (num_players, num_players),
-                       "variable": "playerFireZapMatrix"},
-                      {"type": "tensor.Int32Tensor",
-                       "shape": (num_players, num_players),
-                       "variable": "playerDeathZapMatrix"},
-                  ]
-              }
+                      {
+                          "type": "tensor.Int32Tensor",
+                          "shape": (num_players, num_players),
+                          "variable": "playerFireZapMatrix",
+                      },
+                      {
+                          "type": "tensor.Int32Tensor",
+                          "shape": (num_players, num_players),
+                          "variable": "playerDeathZapMatrix",
+                      },
+                  ],
+              },
           },
-      ]
+      ],
   }
-
+  scene["components"].append({
+      "component": "GlobalMetricReporter",
+      "kwargs": {
+          "metrics": [
+              {
+                  "name": "WHO_ZAPPED_WHO",
+                  "type": "tensor.Int32Tensor",
+                  "shape": (num_players, num_players),
+                  "component": "GlobalMetricHolder",
+                  "variable": "playerFireZapMatrix",
+              },
+              {
+                  "name": "WHO_DEATH_ZAPPED_WHO",
+                  "type": "tensor.Int32Tensor",
+                  "shape": (num_players, num_players),
+                  "component": "GlobalMetricHolder",
+                  "variable": "playerDeathZapMatrix",
+              },
+          ],
+      },
+  })
   return scene
+
 
 
 def create_apple_prefab(
@@ -574,6 +600,8 @@ def get_config():
   ]
   config.global_observation_names = [
       "WORLD.RGB",
+      "WORLD.WHO_ZAPPED_WHO",
+      "WORLD.WHO_DEATH_ZAPPED_WHO",
   ]
 
   # The specs of the environment (from a single-agent perspective).
