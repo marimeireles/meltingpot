@@ -38,11 +38,14 @@ env = MeltingPotCompatibilityV0(
     render_mode="rgb_array"
 )
 agents        = env.possible_agents
+num_agents = len(agents)
 primary_agent = agents[0]
 action_dim    = env.action_space(primary_agent).n
 rgb_space     = env.observation_space(primary_agent)["RGB"]
 H, W, C       = rgb_space.shape
 obs_shape     = (C, H, W)
+fire_zap_counts  = np.zeros((num_agents, num_agents), dtype=int)
+death_zap_counts = np.zeros((num_agents, num_agents), dtype=int)
 
 # 2) Define convolutional actor-critic network
 class ActorCritic(nn.Module):
@@ -94,7 +97,9 @@ def compute_gini(array):
 
 # 4) Trajectory collection with metrics
 def collect_batch(n_steps=STEPS_PER_UPDATE):
+    global fire_zap_counts, death_zap_counts
     buffer = {a: {"obs": [], "acts": [], "logps": [], "vals": [], "rews": []} for a in agents}
+    # TODO: not sure about this stock var, look it up when I'm doing plots
     stock_hist = []
     harvests   = {a: [] for a in agents}
     positions  = {a: [] for a in agents}
@@ -102,14 +107,9 @@ def collect_batch(n_steps=STEPS_PER_UPDATE):
     obs_dict, _ = env.reset()
     steps = 0
     while steps < n_steps:
+        # TODO: also not sure about this info stuff, check when plotting
         # get global resource stock if available
         info = {}
-        try:
-            _, _, _, _, info = env.step({})  # dummy to fetch info
-            stock = info.get('resources', None)
-        except:
-            stock = None
-        stock_hist.append(stock)
 
         actions = {}
         for a, obs in obs_dict.items():
@@ -119,6 +119,8 @@ def collect_batch(n_steps=STEPS_PER_UPDATE):
             rngs[a], sk = random.split(rngs[a])
             act         = dist.sample(seed=sk)
             actions[a]  = int(act)
+
+            # stash policy rollout data
             buffer[a]["obs"].append(img[0])
             buffer[a]["acts"].append(act)
             buffer[a]["logps"].append(dist.log_prob(act))
@@ -126,13 +128,39 @@ def collect_batch(n_steps=STEPS_PER_UPDATE):
 
         nxt, rewards, term, trunc, info = env.step(actions)
 
+        # extract global info (e.g. resource stock)
+        stock = info.get("resources")
+        stock_hist.append(stock)
+
         for a in agents:
             r = float(rewards.get(a, 0.0))
             buffer[a]["rews"].append(r)
             harvests[a].append(r)
             pos = obs_dict[a].get('position') if 'position' in obs_dict[a] else None
             positions[a].append(pos)
+
+        # pull out the zap matrices from the *next* observation
+        # they come back as part of each agent’s obs under the same keys,
+        # so we can pick any agent (here, primary_agent) to grab them.
+        world_obs    = nxt[primary_agent]
+        # fetch, but default to zeros if missing
+        fire_mat  = world_obs.get("WORLD.WHO_ZAPPED_WHO")
+        death_mat = world_obs.get("WORLD.WHO_DEATH_ZAPPED_WHO")
+
+        # convert to int-arrays, defaulting to zeros of shape [num_agents, num_agents]
+        zeros = np.zeros((num_agents, num_agents), dtype=int)
+
+        fire_arr  = np.array(fire_mat,  dtype=int) if fire_mat  is not None else zeros
+        death_arr = np.array(death_mat, dtype=int) if death_mat is not None else zeros
+
+        # mutate the outer arrays in place
+        fire_zap_counts[:]  += fire_arr
+        death_zap_counts[:] += death_arr
+
+
         steps += 1
+
+        # handles episode termination
         if all(term.values()) or all(trunc.values()):
             nxt, _ = env.reset()
         obs_dict = nxt
@@ -234,3 +262,12 @@ df_harvest.to_csv(checkpoint_dir / f"{run_id}_harvest_events.csv", index_label='
 for a in agents:
     df_pos = pd.DataFrame(spatial_pos_hist[a], columns=['x','y'])
     df_pos.to_csv(checkpoint_dir / f"{run_id}_positions_agent_{a}.csv", index_label='step')
+
+# DataFrames with agent-on-agent rows/cols
+df_fire  = pd.DataFrame(fire_zap_counts,  index=agents, columns=agents)
+df_death = pd.DataFrame(death_zap_counts, index=agents, columns=agents)
+
+df_fire.to_csv(checkpoint_dir / f"{run_id}_fire_zap_matrix.csv",
+               index_label="zapped→zapper")
+df_death.to_csv(checkpoint_dir / f"{run_id}_death_zap_matrix.csv",
+                index_label="zapped→zapper")
