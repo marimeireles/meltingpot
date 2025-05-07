@@ -23,16 +23,13 @@ Use `ENTER` to fire the death zapper.
 import argparse
 import json
 
-from meltingpot.configs.substrates import commons_harvest__closed
 from meltingpot.configs.substrates import commons_harvest__open
-from meltingpot.configs.substrates import commons_harvest__partnership
 from meltingpot.human_players import level_playing_utils
+
 from ml_collections import config_dict
 
 environment_configs = {
-    "commons_harvest__closed": commons_harvest__closed,
     "commons_harvest__open": commons_harvest__open,
-    "commons_harvest__partnership": commons_harvest__partnership,
 }
 
 _ACTION_MAP = {
@@ -43,9 +40,12 @@ _ACTION_MAP = {
 }
 
 
-def verbose_fn(unused_env, unused_player_index, unused_current_player_index):
-  pass
-
+def verbose_fn(timestep, step, player_index):
+    obs = timestep.observation
+    fire_matrix  = obs["WORLD.WHO_ZAPPED_WHO"]
+    death_matrix = obs["WORLD.WHO_DEATH_ZAPPED_WHO"]
+    print(f"[Frame {step}] FIRE zap matrix:\n{fire_matrix}")
+    print(f"[Frame {step}] DEATH zap matrix:\n{death_matrix}")
 
 def main():
   parser = argparse.ArgumentParser(description=__doc__)
@@ -64,7 +64,7 @@ def main():
   )
   # Activate verbose mode with --verbose=True.
   parser.add_argument(
-      "--verbose", type=bool, default=False, help="Print debug information"
+      "--verbose", type=bool, default=False, help="Print   information"
   )
   # Activate events printing mode with --print_events=True.
   parser.add_argument(

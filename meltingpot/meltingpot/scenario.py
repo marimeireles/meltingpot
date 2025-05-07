@@ -56,6 +56,8 @@ PERMITTED_OBSERVATIONS = frozenset({
     "READY_TO_SHOOT",
     "STAMINA",
     "VOTING",
+    "WHO_ZAPPED_WHO",
+    "WHO_DEATH_ZAPPED_WHO",
     # An extra observation that is never necessary but could perhaps help.
     "COLLECTIVE_REWARD",
 })

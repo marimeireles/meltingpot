@@ -349,7 +349,8 @@ def create_scene(num_players):
               },
           ],
       },
-  })
+  }
+  )
   return scene
 
 
@@ -597,22 +598,31 @@ def get_config():
   config.individual_observation_names = [
       "RGB",
       "READY_TO_SHOOT",
+      "WHO_ZAPPED_WHO",
+      "WHO_DEATH_ZAPPED_WHO",
   ]
   config.global_observation_names = [
       "WORLD.RGB",
       "WORLD.WHO_ZAPPED_WHO",
       "WORLD.WHO_DEATH_ZAPPED_WHO",
   ]
+  
 
   # The specs of the environment (from a single-agent perspective).
   config.action_spec = specs.action(len(ACTION_SET))
+  n = 7
   config.timestep_spec = specs.timestep({
       "RGB": specs.OBSERVATION["RGB"],
       "READY_TO_SHOOT": specs.OBSERVATION["READY_TO_SHOOT"],
       # Debug only (do not use the following observations in policies).
       "WORLD.RGB": specs.rgb(144, 192),
+      "WORLD.WHO_ZAPPED_WHO": specs.int32(
+          n, n, name="WORLD.WHO_ZAPPED_WHO"
+      ),
+      "WORLD.WHO_DEATH_ZAPPED_WHO": specs.int32(
+          n, n, name="WORLD.WHO_DEATH_ZAPPED_WHO"
+      ),
   })
-
   # The roles assigned to each player.
   config.valid_roles = frozenset({"default"})
   config.default_player_roles = ("default",) * 7
