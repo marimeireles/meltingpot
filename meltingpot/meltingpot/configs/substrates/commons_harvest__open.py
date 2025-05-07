@@ -637,7 +637,6 @@ def build(
   """Build substrate definition given player roles."""
   del config
   num_players = len(roles)
-  print("🍀 num_players", num_players)
   # Build the rest of the substrate definition.
   substrate_definition = dict(
       levelName="commons_harvest",
