@@ -359,7 +359,7 @@ def main():
             R  = jnp.stack(traj[agent]["returns"])
 
             params, opt_state = network_parameters[agent], optimizer_states[agent]
-            for _ in range(PPO_EPOCHS):
+            for epoch_idx in range(PPO_EPOCHS):
                 new_params, new_opt_state, loss = ppo_update_step(
                     params, opt_state, o, a, lp, v, R
                 )
@@ -372,9 +372,10 @@ def main():
                 avg_kl = jnp.mean(dist_old.kl_divergence(dist_new))
 
                 if avg_kl > KL_THRESHOLD:
+                    avg_kl_value = avg_kl.item()
                     logger.info(
-                        "Stopping PPO epochs for agent %s at epoch %d due to KL=%.4f > %.4f",
-                        agent, _, float(avg_kl), KL_THRESHOLD
+                        f"Stopping PPO epochs for agent {agent} at epoch {epoch_idx} "
+                        f"due to KL={avg_kl_value:.4f} > {KL_THRESHOLD:.4f}"
                     )
                     break
 
