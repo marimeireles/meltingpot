@@ -709,7 +709,6 @@ function Zapper:onHit(hittingGameObject, hitName)
   if hitName == 'deathHit' then
     local zappedAvatarRewards = self.gameObject:getComponent('Avatar'):getCumulativeReward()
     local zapperAvatarRewards = hittingGameObject:getComponent('Avatar'):getCumulativeReward()
-    print('zappedAvatarRewards ' .. zappedAvatarRewards + self._config.deathRayThreshold .. ' and zapperAvatarRewards ' .. zapperAvatarRewards)
     if zappedAvatarRewards + self._config.deathRayThreshold < zapperAvatarRewards then
       local zappedAvatar = self.gameObject:getComponent('Avatar')
       local zappedIndex = zappedAvatar:getIndex()

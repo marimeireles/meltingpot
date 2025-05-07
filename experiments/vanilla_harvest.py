@@ -45,6 +45,7 @@ def parse_args():
         default="train",
         help="train: run PPO self‐play; human: launch interactive player",
     )
+    # TODO: make the code generic for both commons harvest and clean up
     p.add_argument(
         "--level-name",
         type=str,
@@ -57,11 +58,6 @@ def parse_args():
         type=json.loads,
         default="{}",
         help="JSON dict of overrides for the substrate",
-    )
-    p.add_argument(
-        "--render",
-        action="store_true",
-        help="display a PyGame window during training or human play",
     )
     p.add_argument(
         "--fps",
@@ -82,16 +78,11 @@ def parse_args():
         help="number of PPO outer updates",
     )
     p.add_argument(
-        "--verbose",
-        action="store_true",
-        help="in human mode, print zap matrices each frame",
+        "--log-level",
+        default="INFO",
+        choices=("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"),
+        help="Root logger verbosity",
     )
-    p.add_argument(
-        "--print-events",
-        action="store_true",
-        help="in human mode, print dmlab2d events each frame",
-    )
-
     return p.parse_args()
 
 def get_multi_rewards(timestep):
@@ -104,10 +95,29 @@ def get_multi_rewards(timestep):
                 rewards[prefix] = float(val)
     return rewards
 
+import logging
+import sys
+
+def configure_logging(level: str) -> None:
+    """Configure root and library loggers for reproducible output."""
+    logging.basicConfig(
+        stream=sys.stdout,
+        level=getattr(logging, level),
+        format="%(asctime)s | %(name)s | %(levelname)s | %(message)s",
+        datefmt="%H:%M:%S",
+    )
+    # Silence extremely chatty third‑party libraries unless debug is requested
+    if level != "DEBUG":
+        for noisy in ("absl", "jaxlib", "jax"):
+            logging.getLogger(noisy).setLevel(logging.WARNING)
+
 # 1) Build the MeltingPot environment directly via DM Lab2D
 # -------------------------------------------------------------------
 def main():
     args = parse_args()
+    configure_logging(args.log_level)
+    logger = logging.getLogger(__name__)
+    logger.info("Launching in %s mode", args.mode)
 
     # Load the substrate config
     env_config = commons_harvest__open.get_config()
@@ -200,7 +210,8 @@ def main():
         buffer = {
             agent: {
                 "observations": [], "actions": [], "logp": [],
-                "values": [],       "rewards": [], "metrics": []
+                "values": [],       "rewards": [], "zap": [],
+                "death_zap": []
             }
             for agent in agent_list
         }
@@ -244,10 +255,10 @@ def main():
                 buffer[agent]["rewards"].append(jnp.asarray(r, dtype=jnp.float32))
 
             # 4) extract global metrics
-            buffer[primary_agent_id]["zapped"].append(
+            buffer[primary_agent_id]["zap"].append(
                 np.array(timestep.observation["WORLD.WHO_ZAPPED_WHO"])
             )
-            buffer[primary_agent_id][""].append(
+            buffer[primary_agent_id]["death_zap"].append(
                 np.array(timestep.observation["WORLD.WHO_DEATH_ZAPPED_WHO"])
             )
 
@@ -298,18 +309,26 @@ def main():
 
     # 6) Main training loop
     # -------------------------------------------------------------------
+    logger = logging.getLogger("train")
+
     reward_history = {agent: [] for agent in agent_list}
     best_reward    = {agent: -jnp.inf for agent in agent_list}
     no_improve_cnt = {agent: 0 for agent in agent_list}
 
     for update_idx in range(TOTAL_TRAINING_UPDATES):
         traj = collect_trajectory_batch_per_agent()
+        logger.debug(
+            "Collected %d environment steps for primary agent",
+            len(traj[primary_agent_id]["observations"]),
+        )
 
-        # Example: print primary agent’s zap‐history
-        hist = traj[primary_agent_id]["metrics"]
-        print(f"[Update {update_idx}] {len(hist)} zap‐metric steps collected")
-        for t, m in enumerate(hist):
-            print(f" Step {t} zap‐matrix:\n{m}")
+        if logger.isEnabledFor(logging.DEBUG):
+            for t, m in enumerate(traj[primary_agent_id]["zapped"]):
+                logger.debug("Update %d | step %d | zap matrix:\n%s",
+                            update_idx, t, m)
+            for t, m in enumerate(traj[primary_agent_id]["death_zapped"]):
+                logger.debug("Update %d | step %d | death_zap matrix:\n%s",
+                            update_idx, t, m)
 
         # PPO updates
         for agent in agent_list:
