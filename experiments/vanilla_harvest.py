@@ -81,6 +81,17 @@ def parse_args():
         default=5,
         help="number of PPO outer updates",
     )
+    p.add_argument(
+        "--verbose",
+        action="store_true",
+        help="in human mode, print zap matrices each frame",
+    )
+    p.add_argument(
+        "--print-events",
+        action="store_true",
+        help="in human mode, print dmlab2d events each frame",
+    )
+
     return p.parse_args()
 
 def build_env(args):
@@ -133,6 +144,31 @@ def main():
     rgb = dummy_timestep.observation[f"{primary_agent_id}.RGB"]
     obs_height, obs_width, obs_channels = rgb.shape
     observation_shape = (obs_channels, obs_height, obs_width)
+
+    if args.mode == "human":
+        _ACTION_MAP = {
+            "move": level_playing_utils.get_direction_pressed,
+            "turn": level_playing_utils.get_turn_pressed,
+            "fireZap": level_playing_utils.get_space_key_pressed,
+            "deathZap": level_playing_utils.get_enter_key_pressed,
+        }
+
+        environment_configs = {
+            "commons_harvest__open": commons_harvest__open,
+        }
+        env_module = environment_configs["commons_harvest__open"]
+        env_config = env_module.get_config()
+        with config_dict.ConfigDict(env_config).unlocked() as env_config:
+            roles = env_config.default_player_roles
+            env_config.lab2d_settings = env_module.build(roles, env_config)
+        level_playing_utils.run_episode(
+            "RGB",
+            {},
+            _ACTION_MAP,
+            env_config,
+            level_playing_utils.RenderType.PYGAME,
+        )
+        return
 
 
     # 2) Define convolutional actor-critic network (Flax)
