@@ -156,8 +156,7 @@ def main():
         )
         return
 
-
-    # 2) Define convolutional actor-critic network (Flax)
+    # 2) Define convolutional actor-critic network
     # -------------------------------------------------------------------
     class ActorCriticNetwork(nn.Module):
         action_dimension: int
@@ -239,14 +238,17 @@ def main():
             timestep = env.step(action_dict)
 
             # 3) extract all agents’ rewards once, then distribute
-            reward_dict = get_multi_rewards(timestep)  # or _get_rewards(timestep)
+            reward_dict = get_multi_rewards(timestep)
             for agent in agent_list:
                 r = reward_dict.get(agent, 0.0)
                 buffer[agent]["rewards"].append(jnp.asarray(r, dtype=jnp.float32))
 
-            # 4) any global metrics you care about
-            buffer[primary_agent_id]["metrics"].append(
+            # 4) extract global metrics
+            buffer[primary_agent_id]["zapped"].append(
                 np.array(timestep.observation["WORLD.WHO_ZAPPED_WHO"])
+            )
+            buffer[primary_agent_id][""].append(
+                np.array(timestep.observation["WORLD.WHO_DEATH_ZAPPED_WHO"])
             )
 
             # 5) if episode ended, reset
