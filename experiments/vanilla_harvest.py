@@ -94,15 +94,6 @@ def parse_args():
 
     return p.parse_args()
 
-def build_env(args):
-    # 1) load config and attach lab2d_settings
-    cfg = commons_harvest__open.get_config()
-    with cfg.unlocked():
-        roles = cfg.default_player_roles
-        cfg.lab2d_settings = commons_harvest__open.build(roles, cfg)
-    # 2) instantiate
-    return builder.builder(**cfg), roles
-
 def get_multi_rewards(timestep):
     """Returns a dict mapping each 'prefix' → float reward."""
     rewards = {}
@@ -153,14 +144,9 @@ def main():
             "deathZap": level_playing_utils.get_enter_key_pressed,
         }
 
-        environment_configs = {
-            "commons_harvest__open": commons_harvest__open,
-        }
-        env_module = environment_configs["commons_harvest__open"]
-        env_config = env_module.get_config()
         with config_dict.ConfigDict(env_config).unlocked() as env_config:
             roles = env_config.default_player_roles
-            env_config.lab2d_settings = env_module.build(roles, env_config)
+            env_config.lab2d_settings = commons_harvest__open.build(roles, env_config)
         level_playing_utils.run_episode(
             "RGB",
             {},
