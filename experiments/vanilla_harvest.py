@@ -209,14 +209,15 @@ def main():
         buffer = {
             agent: {
                 "observations": [], "actions": [], "logp": [],
-                "values": [],       "rewards": [], "zapped": [],
-                "death_zapped": []
+                "values": [], "rewards": [], "zapped": [],
+                "death_zapped": [], "episode_lenghts": []
             }
             for agent in agent_list
         }
 
         # start in a fresh episode
         timestep = env.reset()
+        current_ep_steps = 0
 
         while len(buffer[primary_agent_id]["observations"]) < steps_per_agent:
             action_dict = {}
@@ -246,6 +247,7 @@ def main():
 
             # 2) step the environment
             timestep = env.step(action_dict)
+            current_ep_steps += 1
 
             # 3) extract all agents’ rewards once, then distribute
             reward_dict = get_multi_rewards(timestep)
@@ -263,7 +265,10 @@ def main():
 
             # 5) if episode ended, reset
             if timestep.last():
-                timestep = env.reset()
+                for agent in agent_list:
+                    buffer[agent]["episode_lengths"].append(current_ep_steps)
+                current_ep_steps = 0
+                timestep = env.reset
 
         # 6) compute discounted returns
         for agent in agent_list:
