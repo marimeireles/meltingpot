@@ -211,7 +211,7 @@ def main():
             agent: {
                 "observations": [], "actions": [], "logp": [],
                 "values": [], "rewards": [], "zapped": [],
-                "death_zapped": [], "episode_lenghts": []
+                "death_zapped": [], "episode_lengths": []
             }
             for agent in agent_list
         }
