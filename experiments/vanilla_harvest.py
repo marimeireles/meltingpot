@@ -23,14 +23,13 @@ from meltingpot.human_players.level_playing_utils import _get_rewards
 import meltingpot.human_players.level_playing_utils as level_playing_utils
 
 # ── Hyperparameters ─────────────────────────────────────────────────────────────
-DISCOUNT_FACTOR            = 0.99
-LEARNING_RATE              = 3e-4
-PPO_CLIP_EPSILON           = 0.2
-STEPS_PER_UPDATE           = 128
-PPO_EPOCHS                 = 4
-TOTAL_TRAINING_UPDATES     = 5
-EARLY_STOP_DELTA_THRESHOLD = 1e-2
-EARLY_STOP_PATIENCE        = 10
+DISCOUNT_FACTOR        = 0.99
+LEARNING_RATE          = 3e-4
+PPO_CLIP_EPSILON       = 0.2
+STEPS_PER_UPDATE       = 128
+PPO_EPOCHS             = 4
+TOTAL_TRAINING_UPDATES = 5
+KL_THRESHOLD           = 1e-2
 # ────────────────────────────────────────────────────────────────────────────────
 
 # 0) Utils
@@ -80,7 +79,7 @@ def parse_args():
     p.add_argument(
         "--log-level",
         default="INFO",
-        choices=("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"),
+        choices=("DEBUG", "INFO", "WARNING", "ERROR", "COMPLETE"),
         help="Root logger verbosity",
     )
     return p.parse_args()
@@ -107,7 +106,7 @@ def configure_logging(level: str) -> None:
         datefmt="%H:%M:%S",
     )
     # Silence extremely chatty third‑party libraries unless debug is requested
-    if level != "DEBUG":
+    if level != "COMPLETE":
         for noisy in ("absl", "jaxlib", "jax"):
             logging.getLogger(noisy).setLevel(logging.WARNING)
 
@@ -210,8 +209,8 @@ def main():
         buffer = {
             agent: {
                 "observations": [], "actions": [], "logp": [],
-                "values": [],       "rewards": [], "zap": [],
-                "death_zap": []
+                "values": [],       "rewards": [], "zapped": [],
+                "death_zapped": []
             }
             for agent in agent_list
         }
@@ -255,10 +254,10 @@ def main():
                 buffer[agent]["rewards"].append(jnp.asarray(r, dtype=jnp.float32))
 
             # 4) extract global metrics
-            buffer[primary_agent_id]["zap"].append(
+            buffer[primary_agent_id]["zapped"].append(
                 np.array(timestep.observation["WORLD.WHO_ZAPPED_WHO"])
             )
-            buffer[primary_agent_id]["death_zap"].append(
+            buffer[primary_agent_id]["death_zapped"].append(
                 np.array(timestep.observation["WORLD.WHO_DEATH_ZAPPED_WHO"])
             )
 
@@ -340,26 +339,29 @@ def main():
 
             params, opt_state = network_parameters[agent], optimizer_states[agent]
             for _ in range(PPO_EPOCHS):
-                params, opt_state, loss = ppo_update_step(
+                new_params, new_opt_state, loss = ppo_update_step(
                     params, opt_state, o, a, lp, v, R
                 )
+
+                # --- compute avg KL divergence between old and new policies ---
+                logits_old, _ = ActorCriticNetwork(action_dimension).apply(params, o)
+                logits_new, _ = ActorCriticNetwork(action_dimension).apply(new_params, o)
+                dist_old = distrax.Categorical(logits=logits_old)
+                dist_new = distrax.Categorical(logits=logits_new)
+                avg_kl = jnp.mean(dist_old.kl_divergence(dist_new))
+
+                if avg_kl > KL_THRESHOLD:
+                    logger.info(
+                        "Stopping PPO epochs for agent %s at epoch %d due to KL=%.4f > %.4f",
+                        agent, _, float(avg_kl), KL_THRESHOLD
+                    )
+                    break
+
+                # otherwise accept the update and continue
+                params, opt_state = new_params, new_opt_state
+
             network_parameters[agent] = params
             optimizer_states[agent]   = opt_state
-
-            # logging and early stopping bookkeeping
-            avg_r = jnp.mean(jnp.stack(traj[agent]["rewards"]))
-            reward_history[agent].append(avg_r)
-
-            if avg_r > best_reward[agent] + EARLY_STOP_DELTA_THRESHOLD:
-                best_reward[agent]    = avg_r
-                no_improve_cnt[agent] = 0
-            else:
-                no_improve_cnt[agent] += 1
-
-        if all(no_improve_cnt[a] >= EARLY_STOP_PATIENCE for a in agent_list):
-            print(f"Early stopping at update {update_idx}")
-            break
-
 
     # 7) Save checkpoints
     # -------------------------------------------------------------------
