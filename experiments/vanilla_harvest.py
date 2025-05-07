@@ -12,6 +12,7 @@ import jax.numpy as jnp
 from jax import random, jit, value_and_grad
 
 import flax.linen as nn
+from flax import serialization
 import optax
 import distrax
 
@@ -28,8 +29,8 @@ DISCOUNT_FACTOR        = 0.99
 LEARNING_RATE          = 3e-4
 PPO_CLIP_EPSILON       = 0.2
 STEPS_PER_UPDATE       = 128
-PPO_EPOCHS             = 4
-TOTAL_TRAINING_UPDATES = 5
+PPO_EPOCHS             = 100
+TOTAL_TRAINING_UPDATES = 100
 KL_THRESHOLD           = 1e-2
 # ────────────────────────────────────────────────────────────────────────────────
 
@@ -396,7 +397,6 @@ def main():
     run_dir.mkdir()
 
     # 7a) Save model parameters
-    from flax import serialization
     for agent, params in network_parameters.items():
         path = run_dir / f"agent_{agent}_params.msgpack"
         with path.open("wb") as fp:
