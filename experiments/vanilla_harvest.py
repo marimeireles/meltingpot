@@ -1,4 +1,5 @@
 import argparse
+import datetime
 import json
 import pathlib
 from ml_collections import config_dict
@@ -316,8 +317,9 @@ def main():
     logger = logging.getLogger("train")
 
     reward_history = {agent: [] for agent in agent_list}
-    best_reward    = {agent: -jnp.inf for agent in agent_list}
-    no_improve_cnt = {agent: 0 for agent in agent_list}
+    episode_length_history = []
+    zap_count_history     = []
+    death_zap_history     = []
 
     for update_idx in range(TOTAL_TRAINING_UPDATES):
         traj = collect_trajectory_batch_per_agent()
@@ -325,6 +327,20 @@ def main():
             "Collected %d environment steps for primary agent",
             len(traj[primary_agent_id]["observations"]),
         )
+
+        #  per-agent cumulative reward
+        for agent in agent_list:
+            cum_r = float(jnp.sum(jnp.stack(traj[agent]["rewards"])))
+            reward_history[agent].append(cum_r)
+
+        # episode lengths within this batch
+        episode_length_history.append(traj[primary_agent_id]["episode_lengths"])
+
+        # aggregate zap counts this update
+        zaps = jnp.stack(traj[primary_agent_id]["zapped"])          # shape [T, N, N]
+        deaths = jnp.stack(traj[primary_agent_id]["death_zapped"])  # shape [T, N, N]
+        zap_count_history.append(int(zaps.sum()))
+        death_zap_history.append(int(deaths.sum()))
 
         if logger.isEnabledFor(logging.DEBUG):
             for t, m in enumerate(traj[primary_agent_id]["zapped"]):
@@ -370,14 +386,32 @@ def main():
 
     # 7) Save checkpoints
     # -------------------------------------------------------------------
-    ckpt_dir = pathlib.Path("checkpoints")
-    ckpt_dir.mkdir(exist_ok=True)
-    from flax import serialization
+    ckpt_root = pathlib.Path("checkpoints")
+    ckpt_root.mkdir(exist_ok=True)
 
+    # Create a run-specific subdirectory using the current date/time
+    run_id = datetime.datetime.now().strftime("run_%Y%m%d_%H%M%S")
+    run_dir = ckpt_root / run_id
+    run_dir.mkdir()
+
+    # 7a) Save model parameters
+    from flax import serialization
     for agent, params in network_parameters.items():
-        path = ckpt_dir / f"agent_{agent}_params.msgpack"
+        path = run_dir / f"agent_{agent}_params.msgpack"
         with path.open("wb") as fp:
             fp.write(serialization.to_bytes(params))
+
+    # 7b) Save all of your recorded training statistics
+    data = {
+        "reward_history":          reward_history,           # dict[str, list[float]]
+        "episode_length_history":  episode_length_history,   # list[list[int]]
+        "zap_count_history":       zap_count_history,        # list[int]
+        "death_zap_history":       death_zap_history,        # list[int]
+    }
+    with (run_dir / "training_stats.json").open("w") as f:
+        json.dump(data, f, indent=2)
+
+    logger.info("Saved run data and checkpoints to %s", run_dir)
 
 if __name__ == "__main__":
     main()
