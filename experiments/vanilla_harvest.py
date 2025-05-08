@@ -29,7 +29,7 @@ DISCOUNT_FACTOR        = 0.99
 LEARNING_RATE          = 3e-4
 PPO_CLIP_EPSILON       = 0.2
 STEPS_PER_UPDATE       = 128
-PPO_EPOCHS             = 100
+PPO_EPOCHS             = 1
 TOTAL_TRAINING_UPDATES = 100
 KL_THRESHOLD           = 1e-2
 # ────────────────────────────────────────────────────────────────────────────────
@@ -127,11 +127,12 @@ def main():
         roles = cfg.default_player_roles
         cfg.lab2d_settings = commons_harvest__open.build(roles, cfg)
 
-    # Instantiate the environment
+    # instantiate the environment
     env = builder.builder(**env_config)  # returns a `dmlab2d.Environment`
 
-    # Determine agent identifiers (string prefixes "1", "2", …)
+    # determine agents
     agent_list       = [str(i+1) for i in range(len(roles))]
+    n_players = len(agent_list)
     primary_agent_id = agent_list[0]
 
     # All agents share the same discrete action set
@@ -141,11 +142,15 @@ def main():
     # Observation shape for the RGB channel
     # We will extract per-agent obs via timestep.observation[f"{agent_id}.RGB"]
     # and reshape into [C,H,W].
-    # We assume all agents get the same RGB shape
+    # all agents get the same RGB shape
     dummy_timestep = env.reset()
     rgb = dummy_timestep.observation[f"{primary_agent_id}.RGB"]
     obs_height, obs_width, obs_channels = rgb.shape
     observation_shape = (obs_channels, obs_height, obs_width)
+
+    # instantiate global variables
+    zap_matrix       = jnp.zeros((n_players, n_players), dtype=jnp.int32)
+    death_zap_matrix = jnp.zeros((n_players, n_players), dtype=jnp.int32)
 
     if args.mode == "human":
         _ACTION_MAP = {
@@ -224,7 +229,7 @@ def main():
         while len(buffer[primary_agent_id]["observations"]) < steps_per_agent:
             action_dict = {}
 
-            # 1) for each agent: compute policy, sample, and store obs/action/logp/value
+            # for each agent: compute policy, sample, and store obs/action/logp/value
             for agent in agent_list:
                 img = timestep.observation[f"{agent}.RGB"]
                 x   = jnp.asarray(img, jnp.float32).transpose(2,0,1)[None,...]
@@ -247,17 +252,17 @@ def main():
                 buf["logp"].append(logp)
                 buf["values"].append(value[0])
 
-            # 2) step the environment
+            # step the environment
             timestep = env.step(action_dict)
             current_ep_steps += 1
 
-            # 3) extract all agents’ rewards once, then distribute
+            # extract all agents’ rewards once, then distribute
             reward_dict = get_multi_rewards(timestep)
             for agent in agent_list:
                 r = reward_dict.get(agent, 0.0)
                 buffer[agent]["rewards"].append(jnp.asarray(r, dtype=jnp.float32))
 
-            # 4) extract global metrics
+            # extract global metrics
             buffer[primary_agent_id]["zapped"].append(
                 np.array(timestep.observation["WORLD.WHO_ZAPPED_WHO"])
             )
@@ -265,14 +270,14 @@ def main():
                 np.array(timestep.observation["WORLD.WHO_DEATH_ZAPPED_WHO"])
             )
 
-            # 5) if episode ended, reset
+            # if episode ended, reset
             if timestep.last():
                 for agent in agent_list:
                     buffer[agent]["episode_lengths"].append(current_ep_steps)
                 current_ep_steps = 0
                 timestep = env.reset
 
-        # 6) compute discounted returns
+        # compute discounted returns
         for agent in agent_list:
             G, rets = 0.0, []
             for r in reversed(buffer[agent]["rewards"]):
@@ -283,7 +288,7 @@ def main():
         return buffer
 
 
-    # 5) PPO loss and update
+    # 5) Define PPO loss and update functions that will be used in training
     # -------------------------------------------------------------------
     def compute_ppo_loss(params, obs, acts, old_logp, old_val, rets):
         logits, vals = ActorCriticNetwork(action_dimension).apply(params, obs)
@@ -319,8 +324,6 @@ def main():
 
     reward_history = {agent: [] for agent in agent_list}
     episode_length_history = []
-    zap_count_history     = []
-    death_zap_history     = []
 
     for update_idx in range(TOTAL_TRAINING_UPDATES):
         traj = collect_trajectory_batch_per_agent()
@@ -338,10 +341,13 @@ def main():
         episode_length_history.append(traj[primary_agent_id]["episode_lengths"])
 
         # aggregate zap counts this update
-        zaps = jnp.stack(traj[primary_agent_id]["zapped"])          # shape [T, N, N]
-        deaths = jnp.stack(traj[primary_agent_id]["death_zapped"])  # shape [T, N, N]
-        zap_count_history.append(int(zaps.sum()))
-        death_zap_history.append(int(deaths.sum()))
+        zaps = jnp.stack(traj[primary_agent_id]["zapped"])          # shape [steps, n_players, n_players]
+        zap_increment = jnp.sum(zaps, axis=0)                           # shape [n_players, n_players]
+        zap_matrix = zap_matrix + zap_increment
+        breakpoint()
+        deaths = jnp.stack(traj[primary_agent_id]["death_zapped"])  # shape [steps, n_players, n_players]
+        increment += jnp.sum(deaths, axis=0)
+        death_zap_matrix = increment + death_zap_matrix
 
         if logger.isEnabledFor(logging.DEBUG):
             for t, m in enumerate(traj[primary_agent_id]["zapped"]):
@@ -365,7 +371,7 @@ def main():
                     params, opt_state, o, a, lp, v, R
                 )
 
-                # --- compute avg KL divergence between old and new policies ---
+                # compute avg KL divergence between old and new policies
                 logits_old, _ = ActorCriticNetwork(action_dimension).apply(params, o)
                 logits_new, _ = ActorCriticNetwork(action_dimension).apply(new_params, o)
                 dist_old = distrax.Categorical(logits=logits_old)
@@ -406,8 +412,8 @@ def main():
     data = {
         "reward_history":          reward_history,           # dict[str, list[float]]
         "episode_length_history":  episode_length_history,   # list[list[int]]
-        "zap_count_history":       zap_count_history,        # list[int]
-        "death_zap_history":       death_zap_history,        # list[int]
+        "zap_matrix":              zap_matrix,               # list[list[int]]
+        "death_zap_matrix":        death_zap_matrix,         # list[list[int]]
     }
     with (run_dir / "training_stats.json").open("w") as f:
         json.dump(data, f, indent=2)
