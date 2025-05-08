@@ -358,7 +358,7 @@ def main():
         traj = collect_trajectory_batch_per_agent()
         logger.debug(
             "Collected %d environment steps",
-            len(traj[primary_agent_id]["observations"] * (TOTAL_TRAINING_UPDATES + 1)),
+            len(traj[primary_agent_id]["observations"] * (update_idx + 1)),
         )
 
         #  per-agent cumulative reward
@@ -378,10 +378,11 @@ def main():
         death_zap_matrix = death_increment + death_zap_matrix
 
         # aggregate the total zap matrixes through time in a per step basis
-        zap_through_time = shifted_cumsum(zap_through_time, (update_idx + 1) * BATCH_SIZE      )
-        death_zap_through_time = shifted_cumsum(death_zap_through_time, (update_idx + 1) * BATCH_SIZE      )
+        zap_through_time = shifted_cumsum(zap_through_time, (update_idx + 1) * BATCH_SIZE)
+        death_zap_through_time = shifted_cumsum(death_zap_through_time, (update_idx + 1) * BATCH_SIZE)
 
         if logger.isEnabledFor(logging.DEBUG):
+            logger.debug("Training iteration:", update_idx)
             logger.debug("zap matrix:\n%s", zap_matrix)
             logger.debug("death_zap matrix:\n%s", death_zap_matrix)
 
