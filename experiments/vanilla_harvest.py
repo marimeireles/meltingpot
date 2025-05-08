@@ -112,6 +112,31 @@ def configure_logging(level: str) -> None:
         for noisy in ("absl", "jaxlib", "jax"):
             logging.getLogger(noisy).setLevel(logging.WARNING)
 
+def shifted_cumsum(tensor: jnp.ndarray, start: int) -> jnp.ndarray:
+    """
+    Compute an inclusive cumsum along axis 0, but so that the first
+    non-zero prefix appears at index `start` instead of index 0.
+
+    Parameters
+    ----------
+    tensor : jnp.ndarray
+      shape == (m, …)
+    start : int
+      number of zero‐rows to insert before `tensor`
+
+    Returns
+    -------
+    jnp.ndarray
+      shape == (start + m, …); its `start + i` slice is
+      sum(tensor[0:i+1], axis=0).
+    """
+    # Build `start` zero-rows of the same shape as tensor[0]
+    zeros = jnp.zeros((start,) + tensor.shape[1:], tensor.dtype)
+    # Concatenate: now padded.shape[0] == start + m
+    padded = jnp.concatenate([zeros, tensor], axis=0)
+    # Standard cumsum along axis 0
+    return jnp.cumsum(padded, axis=0)
+
 # 1) Build the MeltingPot environment directly via DM Lab2D
 # -------------------------------------------------------------------
 def main():
@@ -151,6 +176,8 @@ def main():
     # instantiate global variables
     zap_matrix       = jnp.zeros((n_players, n_players), dtype=jnp.int32)
     death_zap_matrix = jnp.zeros((n_players, n_players), dtype=jnp.int32)
+    zap_through_time = [{'step': 0, 'matrix': jnp.zeros((n_players, n_players), dtype=jnp.int32)}]
+    death_zap_through_time = [{'step': 0, 'matrix': jnp.zeros((n_players, n_players), dtype=jnp.int32)}]
 
     if args.mode == "human":
         _ACTION_MAP = {
@@ -340,14 +367,17 @@ def main():
         # episode lengths within this batch
         episode_length_history.append(traj[primary_agent_id]["episode_lengths"])
 
-        # aggregate zap counts this update
+        # aggregate zap counts this update to the total zap_matrixes
         zaps = jnp.stack(traj[primary_agent_id]["zapped"])          # shape [steps, n_players, n_players]
-        zap_increment = jnp.sum(zaps, axis=0)                           # shape [n_players, n_players]
+        zap_increment = jnp.sum(zaps, axis=0)                       # shape [n_players, n_players]
         zap_matrix = zap_matrix + zap_increment
-        breakpoint()
         deaths = jnp.stack(traj[primary_agent_id]["death_zapped"])  # shape [steps, n_players, n_players]
-        increment += jnp.sum(deaths, axis=0)
-        death_zap_matrix = increment + death_zap_matrix
+        death_increment += jnp.sum(deaths, axis=0)                        # shape [n_players, n_players]
+        death_zap_matrix = death_increment + death_zap_matrix
+
+        # aggregate the total zap matrixes through time in a per step basis
+        zap_through_time = shifted_cumsum(zap_through_time, (update_idx + 1) * STEPS_PER_UPDATE)
+        death_zap_through_time = shifted_cumsum(death_zap_through_time, (update_idx + 1) * STEPS_PER_UPDATE)
 
         if logger.isEnabledFor(logging.DEBUG):
             for t, m in enumerate(traj[primary_agent_id]["zapped"]):
@@ -412,8 +442,10 @@ def main():
     data = {
         "reward_history":          reward_history,           # dict[str, list[float]]
         "episode_length_history":  episode_length_history,   # list[list[int]]
-        "zap_matrix":              zap_matrix,               # list[list[int]]
-        "death_zap_matrix":        death_zap_matrix,         # list[list[int]]
+        "zap_matrix":              zap_matrix,               # jnp[jnp[int]]
+        "death_zap_matrix":        death_zap_matrix,         # jnp[jnp[int]]
+        "zap_through_time":        zap_through_time,         # jnp[jnp[int]]
+        "death_zap_through_time":  death_zap_through_time,   # jnp[jnp[int]]
     }
     with (run_dir / "training_stats.json").open("w") as f:
         json.dump(data, f, indent=2)
