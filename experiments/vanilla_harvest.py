@@ -28,9 +28,9 @@ import meltingpot.human_players.level_playing_utils as level_playing_utils
 DISCOUNT_FACTOR        = 0.99
 LEARNING_RATE          = 3e-4
 PPO_CLIP_EPSILON       = 0.2
-STEPS_PER_UPDATE       = 128
-PPO_EPOCHS             = 1
-TOTAL_TRAINING_UPDATES = 100
+BATCH_SIZE             = 128
+PPO_EPOCHS             = 3
+TOTAL_TRAINING_UPDATES = 2
 KL_THRESHOLD           = 1e-2
 # ────────────────────────────────────────────────────────────────────────────────
 
@@ -176,8 +176,10 @@ def main():
     # instantiate global variables
     zap_matrix       = jnp.zeros((n_players, n_players), dtype=jnp.int32)
     death_zap_matrix = jnp.zeros((n_players, n_players), dtype=jnp.int32)
-    zap_through_time = [{'step': 0, 'matrix': jnp.zeros((n_players, n_players), dtype=jnp.int32)}]
-    death_zap_through_time = [{'step': 0, 'matrix': jnp.zeros((n_players, n_players), dtype=jnp.int32)}]
+    zap_increment = jnp.zeros((n_players, n_players), dtype=jnp.int32)
+    death_increment = jnp.zeros((n_players, n_players), dtype=jnp.int32)
+    zap_through_time = jnp.zeros((1, n_players, n_players), dtype=jnp.int32)
+    death_zap_through_time = jnp.zeros((1, n_players, n_players), dtype=jnp.int32)
 
     if args.mode == "human":
         _ACTION_MAP = {
@@ -239,7 +241,7 @@ def main():
 
     # 4) Data-collection using raw dm_env API
     # -------------------------------------------------------------------
-    def collect_trajectory_batch_per_agent(steps_per_agent=STEPS_PER_UPDATE):
+    def collect_trajectory_batch_per_agent(steps_per_agent=BATCH_SIZE      ):
         buffer = {
             agent: {
                 "observations": [], "actions": [], "logp": [],
@@ -355,8 +357,8 @@ def main():
     for update_idx in range(TOTAL_TRAINING_UPDATES):
         traj = collect_trajectory_batch_per_agent()
         logger.debug(
-            "Collected %d environment steps for primary agent",
-            len(traj[primary_agent_id]["observations"]),
+            "Collected %d environment steps",
+            len(traj[primary_agent_id]["observations"] * (TOTAL_TRAINING_UPDATES + 1)),
         )
 
         #  per-agent cumulative reward
@@ -372,20 +374,16 @@ def main():
         zap_increment = jnp.sum(zaps, axis=0)                       # shape [n_players, n_players]
         zap_matrix = zap_matrix + zap_increment
         deaths = jnp.stack(traj[primary_agent_id]["death_zapped"])  # shape [steps, n_players, n_players]
-        death_increment += jnp.sum(deaths, axis=0)                        # shape [n_players, n_players]
+        death_increment += jnp.sum(deaths, axis=0)                  # shape [n_players, n_players]
         death_zap_matrix = death_increment + death_zap_matrix
 
         # aggregate the total zap matrixes through time in a per step basis
-        zap_through_time = shifted_cumsum(zap_through_time, (update_idx + 1) * STEPS_PER_UPDATE)
-        death_zap_through_time = shifted_cumsum(death_zap_through_time, (update_idx + 1) * STEPS_PER_UPDATE)
+        zap_through_time = shifted_cumsum(zap_through_time, (update_idx + 1) * BATCH_SIZE      )
+        death_zap_through_time = shifted_cumsum(death_zap_through_time, (update_idx + 1) * BATCH_SIZE      )
 
         if logger.isEnabledFor(logging.DEBUG):
-            for t, m in enumerate(traj[primary_agent_id]["zapped"]):
-                logger.debug("Update %d | step %d | zap matrix:\n%s",
-                            update_idx, t, m)
-            for t, m in enumerate(traj[primary_agent_id]["death_zapped"]):
-                logger.debug("Update %d | step %d | death_zap matrix:\n%s",
-                            update_idx, t, m)
+            logger.debug("zap matrix:\n%s", zap_matrix)
+            logger.debug("death_zap matrix:\n%s", death_zap_matrix)
 
         # PPO updates
         for agent in agent_list:
@@ -442,13 +440,24 @@ def main():
     data = {
         "reward_history":          reward_history,           # dict[str, list[float]]
         "episode_length_history":  episode_length_history,   # list[list[int]]
-        "zap_matrix":              zap_matrix,               # jnp[jnp[int]]
-        "death_zap_matrix":        death_zap_matrix,         # jnp[jnp[int]]
-        "zap_through_time":        zap_through_time,         # jnp[jnp[int]]
-        "death_zap_through_time":  death_zap_through_time,   # jnp[jnp[int]]
+        "zap_matrix":              zap_matrix,               # jnp.ndarray
+        "death_zap_matrix":        death_zap_matrix,         # jnp.ndarray
+        "zap_through_time":        zap_through_time,         # jnp.ndarray or list thereof
+        "death_zap_through_time":  death_zap_through_time,   # jnp.ndarray or list thereof
     }
-    with (run_dir / "training_stats.json").open("w") as f:
-        json.dump(data, f, indent=2)
+
+    # Convert all JAX arrays into Python-native lists for JSON serialization
+    from jax.tree_util import tree_map
+
+    serializable_data = tree_map(
+        lambda x: x.tolist() if hasattr(x, "tolist") else x,
+        data
+    )
+
+    # Write out JSON
+    stats_path = run_dir / "training_stats.json"
+    with stats_path.open("w") as f:
+        json.dump(serializable_data, f, indent=2)
 
     logger.info("Saved run data and checkpoints to %s", run_dir)
 
