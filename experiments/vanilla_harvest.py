@@ -17,6 +17,7 @@ import optax
 import distrax
 
 import numpy as np
+import pandas as pd
 
 from meltingpot.configs.substrates import commons_harvest__open
 from meltingpot.utils.substrates import builder
@@ -29,8 +30,8 @@ DISCOUNT_FACTOR        = 0.99
 LEARNING_RATE          = 3e-4
 PPO_CLIP_EPSILON       = 0.2
 BATCH_SIZE             = 128
-PPO_EPOCHS             = 3
-TOTAL_TRAINING_UPDATES = 2
+PPO_EPOCHS             = 30
+TOTAL_TRAINING_UPDATES = 50
 KL_THRESHOLD           = 1e-2
 # ────────────────────────────────────────────────────────────────────────────────
 
@@ -112,30 +113,100 @@ def configure_logging(level: str) -> None:
         for noisy in ("absl", "jaxlib", "jax"):
             logging.getLogger(noisy).setLevel(logging.WARNING)
 
-def shifted_cumsum(tensor: jnp.ndarray, start: int) -> jnp.ndarray:
-    """
-    Compute an inclusive cumsum along axis 0, but so that the first
-    non-zero prefix appears at index `start` instead of index 0.
+# 2) Define convolutional actor-critic network
+# -------------------------------------------------------------------
+class ActorCriticNetwork(nn.Module):
+    action_dimension: int
 
-    Parameters
-    ----------
-    tensor : jnp.ndarray
-      shape == (m, …)
-    start : int
-      number of zero‐rows to insert before `tensor`
+    @nn.compact
+    def __call__(self, observations):
+        x = observations / 255.0
+        x = nn.Conv(32, (8, 8), (4, 4))(x); x = nn.relu(x)
+        x = nn.Conv(64, (4, 4), (2, 2))(x); x = nn.relu(x)
+        x = nn.Conv(64, (3, 3), (1, 1))(x); x = nn.relu(x)
+        x = x.reshape((x.shape[0], -1))
+        x = nn.Dense(512)(x); x = nn.relu(x)
 
-    Returns
-    -------
-    jnp.ndarray
-      shape == (start + m, …); its `start + i` slice is
-      sum(tensor[0:i+1], axis=0).
-    """
-    # Build `start` zero-rows of the same shape as tensor[0]
-    zeros = jnp.zeros((start,) + tensor.shape[1:], tensor.dtype)
-    # Concatenate: now padded.shape[0] == start + m
-    padded = jnp.concatenate([zeros, tensor], axis=0)
-    # Standard cumsum along axis 0
-    return jnp.cumsum(padded, axis=0)
+        logits       = nn.Dense(self.action_dimension)(x)
+        state_value  = nn.Dense(1)(x)
+        return logits, jnp.squeeze(state_value, axis=-1)
+
+# 4) Data-collection using raw dm_env API
+# -------------------------------------------------------------------
+# TODO: ACTION_SET should be properly global and be a default arg like steps_per_agent
+def collect_trajectory_batch_per_agent(agent_list, env, primary_agent_id, action_dimension, network_parameters, rng_key_per_agent, ACTION_SET, steps_per_agent=BATCH_SIZE):
+    buffer = {
+        agent: {
+            "observations": [], "actions": [], "logp": [],
+            "values": [], "rewards": [], "zapped": [],
+            "death_zapped": [],
+        }
+        for agent in agent_list
+    }
+
+    # start in a fresh episode
+    timestep = env.reset()
+    current_ep_steps = 0
+
+    while len(buffer[primary_agent_id]["observations"]) < steps_per_agent:
+        action_dict = {}
+
+        # for each agent: compute policy, sample, and store obs/action/logp/value
+        for agent in agent_list:
+            img = timestep.observation[f"{agent}.RGB"]
+            x   = jnp.asarray(img, jnp.float32).transpose(2,0,1)[None,...]
+
+            logits, value = ActorCriticNetwork(action_dimension).apply(
+                network_parameters[agent], x
+            )
+            dist = distrax.Categorical(logits=logits[0])
+            rng_key_per_agent[agent], sub = random.split(rng_key_per_agent[agent])
+            a    = dist.sample(seed=sub)
+            logp = dist.log_prob(a)
+
+            # map to primitive actions
+            for name, val in ACTION_SET[int(a)].items():
+                action_dict[f"{agent}.{name}"] = val
+
+            buf = buffer[agent]
+            buf["observations"].append(x[0])
+            buf["actions"].append(a)
+            buf["logp"].append(logp)
+            buf["values"].append(value[0])
+
+        # step the environment
+        timestep = env.step(action_dict)
+        current_ep_steps += 1
+
+        # extract all agents’ rewards once, then distribute
+        reward_dict = get_multi_rewards(timestep)
+        for agent in agent_list:
+            r = reward_dict.get(agent, 0.0)
+            buffer[agent]["rewards"].append(jnp.asarray(r, dtype=jnp.float32))
+
+        # extract global metrics
+        buffer[primary_agent_id]["zapped"].append(
+            np.array(timestep.observation["WORLD.WHO_ZAPPED_WHO"])
+        )
+        buffer[primary_agent_id]["death_zapped"].append(
+            np.array(timestep.observation["WORLD.WHO_DEATH_ZAPPED_WHO"])
+        )
+
+        # if episode ended, reset
+        if timestep.last():
+            current_ep_steps = 0
+            timestep = env.reset
+
+    # compute discounted returns
+    for agent in agent_list:
+        G, rets = 0.0, []
+        for r in reversed(buffer[agent]["rewards"]):
+            G = r + DISCOUNT_FACTOR * G
+            rets.insert(0, G)
+        buffer[agent]["returns"] = rets
+
+    return buffer
+
 
 # 1) Build the MeltingPot environment directly via DM Lab2D
 # -------------------------------------------------------------------
@@ -161,6 +232,7 @@ def main():
     primary_agent_id = agent_list[0]
 
     # All agents share the same discrete action set
+    # TODO: Should make these properly global
     ACTION_SET       = commons_harvest__open.ACTION_SET
     action_dimension = len(ACTION_SET)
 
@@ -173,7 +245,7 @@ def main():
     obs_height, obs_width, obs_channels = rgb.shape
     observation_shape = (obs_channels, obs_height, obs_width)
 
-    # instantiate global variables
+    # instantiate global variables within the main
     zap_matrix       = jnp.zeros((n_players, n_players), dtype=jnp.int32)
     death_zap_matrix = jnp.zeros((n_players, n_players), dtype=jnp.int32)
     zap_increment = jnp.zeros((n_players, n_players), dtype=jnp.int32)
@@ -181,6 +253,7 @@ def main():
     zap_through_time = jnp.zeros((1, n_players, n_players), dtype=jnp.int32)
     death_zap_through_time = jnp.zeros((1, n_players, n_players), dtype=jnp.int32)
 
+    # Defines human mode for debugging
     if args.mode == "human":
         _ACTION_MAP = {
             "move": level_playing_utils.get_direction_pressed,
@@ -201,25 +274,6 @@ def main():
         )
         return
 
-    # 2) Define convolutional actor-critic network
-    # -------------------------------------------------------------------
-    class ActorCriticNetwork(nn.Module):
-        action_dimension: int
-
-        @nn.compact
-        def __call__(self, observations):
-            x = observations / 255.0
-            x = nn.Conv(32, (8, 8), (4, 4))(x); x = nn.relu(x)
-            x = nn.Conv(64, (4, 4), (2, 2))(x); x = nn.relu(x)
-            x = nn.Conv(64, (3, 3), (1, 1))(x); x = nn.relu(x)
-            x = x.reshape((x.shape[0], -1))
-            x = nn.Dense(512)(x); x = nn.relu(x)
-
-            logits       = nn.Dense(self.action_dimension)(x)
-            state_value  = nn.Dense(1)(x)
-            return logits, jnp.squeeze(state_value, axis=-1)
-
-
     # 3) Initialise parameters, optimisers, RNGs
     # -------------------------------------------------------------------
     global_rng_key    = random.PRNGKey(0)
@@ -238,85 +292,7 @@ def main():
         optimizer_states[agent_id]   = opt_state
         rng_key_per_agent[agent_id]  = init_rng
 
-
-    # 4) Data-collection using raw dm_env API
-    # -------------------------------------------------------------------
-    def collect_trajectory_batch_per_agent(steps_per_agent=BATCH_SIZE      ):
-        buffer = {
-            agent: {
-                "observations": [], "actions": [], "logp": [],
-                "values": [], "rewards": [], "zapped": [],
-                "death_zapped": [], "episode_lengths": []
-            }
-            for agent in agent_list
-        }
-
-        # start in a fresh episode
-        timestep = env.reset()
-        current_ep_steps = 0
-
-        while len(buffer[primary_agent_id]["observations"]) < steps_per_agent:
-            action_dict = {}
-
-            # for each agent: compute policy, sample, and store obs/action/logp/value
-            for agent in agent_list:
-                img = timestep.observation[f"{agent}.RGB"]
-                x   = jnp.asarray(img, jnp.float32).transpose(2,0,1)[None,...]
-
-                logits, value = ActorCriticNetwork(action_dimension).apply(
-                    network_parameters[agent], x
-                )
-                dist = distrax.Categorical(logits=logits[0])
-                rng_key_per_agent[agent], sub = random.split(rng_key_per_agent[agent])
-                a    = dist.sample(seed=sub)
-                logp = dist.log_prob(a)
-
-                # map to primitive actions
-                for name, val in ACTION_SET[int(a)].items():
-                    action_dict[f"{agent}.{name}"] = val
-
-                buf = buffer[agent]
-                buf["observations"].append(x[0])
-                buf["actions"].append(a)
-                buf["logp"].append(logp)
-                buf["values"].append(value[0])
-
-            # step the environment
-            timestep = env.step(action_dict)
-            current_ep_steps += 1
-
-            # extract all agents’ rewards once, then distribute
-            reward_dict = get_multi_rewards(timestep)
-            for agent in agent_list:
-                r = reward_dict.get(agent, 0.0)
-                buffer[agent]["rewards"].append(jnp.asarray(r, dtype=jnp.float32))
-
-            # extract global metrics
-            buffer[primary_agent_id]["zapped"].append(
-                np.array(timestep.observation["WORLD.WHO_ZAPPED_WHO"])
-            )
-            buffer[primary_agent_id]["death_zapped"].append(
-                np.array(timestep.observation["WORLD.WHO_DEATH_ZAPPED_WHO"])
-            )
-
-            # if episode ended, reset
-            if timestep.last():
-                for agent in agent_list:
-                    buffer[agent]["episode_lengths"].append(current_ep_steps)
-                current_ep_steps = 0
-                timestep = env.reset
-
-        # compute discounted returns
-        for agent in agent_list:
-            G, rets = 0.0, []
-            for r in reversed(buffer[agent]["rewards"]):
-                G = r + DISCOUNT_FACTOR * G
-                rets.insert(0, G)
-            buffer[agent]["returns"] = rets
-
-        return buffer
-
-
+    # TODO: see todo below (ppo_update_step)
     # 5) Define PPO loss and update functions that will be used in training
     # -------------------------------------------------------------------
     def compute_ppo_loss(params, obs, acts, old_logp, old_val, rets):
@@ -335,6 +311,7 @@ def main():
         value_loss  = jnp.mean((rets - vals)**2)
         return policy_loss + 0.5 * value_loss
 
+    # TODO: not sure why this function is not being recognized when it's defined outside of my main
     @jit
     def ppo_update_step(params, opt_state, obs, acts, old_logp, old_val, rets):
         loss, grads = value_and_grad(compute_ppo_loss)(
@@ -346,16 +323,14 @@ def main():
         new_params = optax.apply_updates(params, updates)
         return new_params, new_opt_state, loss
 
-
     # 6) Main training loop
     # -------------------------------------------------------------------
     logger = logging.getLogger("train")
 
     reward_history = {agent: [] for agent in agent_list}
-    episode_length_history = []
 
     for update_idx in range(TOTAL_TRAINING_UPDATES):
-        traj = collect_trajectory_batch_per_agent()
+        traj = collect_trajectory_batch_per_agent(agent_list, env, primary_agent_id, action_dimension, network_parameters, rng_key_per_agent, ACTION_SET)
         logger.debug(
             "Collected %d environment steps",
             len(traj[primary_agent_id]["observations"] * (update_idx + 1)),
@@ -366,23 +341,15 @@ def main():
             cum_r = float(jnp.sum(jnp.stack(traj[agent]["rewards"])))
             reward_history[agent].append(cum_r)
 
-        # episode lengths within this batch
-        episode_length_history.append(traj[primary_agent_id]["episode_lengths"])
-
-        # aggregate zap counts this update to the total zap_matrixes
         zaps = jnp.stack(traj[primary_agent_id]["zapped"])          # shape [steps, n_players, n_players]
-        zap_increment = jnp.sum(zaps, axis=0)                       # shape [n_players, n_players]
-        zap_matrix = zap_matrix + zap_increment
+        zap_through_time = jnp.cumsum(zaps, axis=0)
+        zap_matrix = zap_through_time[-1]
         deaths = jnp.stack(traj[primary_agent_id]["death_zapped"])  # shape [steps, n_players, n_players]
-        death_increment += jnp.sum(deaths, axis=0)                  # shape [n_players, n_players]
-        death_zap_matrix = death_increment + death_zap_matrix
-
-        # aggregate the total zap matrixes through time in a per step basis
-        zap_through_time = shifted_cumsum(zap_through_time, (update_idx + 1) * BATCH_SIZE)
-        death_zap_through_time = shifted_cumsum(death_zap_through_time, (update_idx + 1) * BATCH_SIZE)
+        death_zap_through_time = jnp.cumsum(deaths, axis=0)
+        death_zap_matrix = death_zap_through_time[-1]
 
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug("Training iteration:", update_idx)
+            logger.debug("Training iteration: %d", update_idx)
             logger.debug("zap matrix:\n%s", zap_matrix)
             logger.debug("death_zap matrix:\n%s", death_zap_matrix)
 
@@ -437,30 +404,55 @@ def main():
         with path.open("wb") as fp:
             fp.write(serialization.to_bytes(params))
 
-    # 7b) Save all of your recorded training statistics
-    data = {
-        "reward_history":          reward_history,           # dict[str, list[float]]
-        "episode_length_history":  episode_length_history,   # list[list[int]]
-        "zap_matrix":              zap_matrix,               # jnp.ndarray
-        "death_zap_matrix":        death_zap_matrix,         # jnp.ndarray
-        "zap_through_time":        zap_through_time,         # jnp.ndarray or list thereof
-        "death_zap_through_time":  death_zap_through_time,   # jnp.ndarray or list thereof
-    }
+    # reward_history: dict[str, list[float]] → DataFrame with one column per agent
+    df_rewards = pd.DataFrame(reward_history)
+    rewards_path = run_dir / "reward_history.csv"
+    df_rewards.to_csv(rewards_path, index=False)
+    logger.info("Saved reward history to %s", rewards_path)
 
-    # Convert all JAX arrays into Python-native lists for JSON serialization
-    from jax.tree_util import tree_map
+    # zap_matrix and death_zap_matrix: both are 2D arrays of shape [n_players, n_players]
+    df_zap = pd.DataFrame(np.array(zap_matrix))
+    zap_path = run_dir / "zap_matrix.csv"
+    df_zap.to_csv(zap_path, index=False, header=False)
+    logger.info("Saved zap matrix to %s", zap_path)
 
-    serializable_data = tree_map(
-        lambda x: x.tolist() if hasattr(x, "tolist") else x,
-        data
+    df_death_zap = pd.DataFrame(np.array(death_zap_matrix))
+    death_zap_path = run_dir / "death_zap_matrix.csv"
+    df_death_zap.to_csv(death_zap_path, index=False, header=False)
+    logger.info("Saved death-zap matrix to %s", death_zap_path)
+
+    # zap_through_time and death_zap_through_time: 3D arrays of shape [steps, n_players, n_players]
+    zap_arr  = np.array(zap_through_time)         # shape [T, N, N]
+    death_arr = np.array(death_zap_through_time)  # shape [T, N, N]
+    np.savez_compressed(
+        run_dir / "zap_data_through_time.npz",
+        zap=zap_arr,
+        death=death_arr
+    )
+    logger.info(
+        "Saved zap and death‐zap through time to %s (arrays shapes %s, %s)",
+        run_dir / "zap_data_through_time.npz",
+        zap_arr.shape,
+        death_arr.shape,
     )
 
-    # Write out JSON
-    stats_path = run_dir / "training_stats.json"
-    with stats_path.open("w") as f:
-        json.dump(serializable_data, f, indent=2)
+    # Collect hyperparameters into a dict
+    hyperparams = {
+        "DISCOUNT_FACTOR":         DISCOUNT_FACTOR,
+        "LEARNING_RATE":           LEARNING_RATE,
+        "PPO_CLIP_EPSILON":        PPO_CLIP_EPSILON,
+        "BATCH_SIZE":              BATCH_SIZE,
+        "PPO_EPOCHS":              PPO_EPOCHS,
+        "TOTAL_TRAINING_UPDATES":  TOTAL_TRAINING_UPDATES,
+        "KL_THRESHOLD":            KL_THRESHOLD,
+    }
 
-    logger.info("Saved run data and checkpoints to %s", run_dir)
+    # Create a one‐row DataFrame and write it out
+    df_hyper = pd.DataFrame([hyperparams])
+    hp_path = run_dir / "hyperparameters.csv"
+    df_hyper.to_csv(hp_path, index=False)
+    logger.info("Saved hyperparameters to %s", hp_path)
+
 
 if __name__ == "__main__":
     main()
