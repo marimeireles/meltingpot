@@ -82,6 +82,12 @@ def parse_args():
         choices=("DEBUG", "INFO", "WARNING", "ERROR", "COMPLETE"),
         help="Root logger verbosity",
     )
+    p.add_argument(
+    "--num-workers",
+    type=int,
+    default=4,
+    help="Number of parallel actor processes for data collection",
+    )
     return p.parse_args()
 
 
@@ -222,6 +228,52 @@ def collect_trajectory_batch_per_agent(
 
     return buffer
 
+# Parallelization
+# -------------------------------------------------------------------
+def actor_worker(worker_id, args, network_parameters, rng_key, env_config, ACTION_SET):
+    """One actor: builds its own env+RNG, collects steps_per_worker trajectories."""
+    # 1) Reconstruct env & roles
+    with env_config.unlocked() as cfg:
+        roles = cfg.default_player_roles
+        cfg.lab2d_settings = commons_harvest__open.build(roles, cfg)
+    env = builder.builder(**env_config)
+
+    # 2) Fold in worker_id so each stream is distinct
+    local_key = random.fold_in(rng_key, worker_id)
+    rngs = {agent: local_key for agent in network_parameters.keys()}
+
+    # 3) Collect a smaller chunk
+    steps_per_worker = BATCH_SIZE // args.num_workers
+    return collect_trajectory_batch_per_agent(
+        list(network_parameters.keys()),  # agent_list
+        env,
+        list(network_parameters.keys())[0],  # primary_agent_id
+        len(ACTION_SET),
+        network_parameters,
+        rngs,
+        ACTION_SET,
+        steps_per_agent=steps_per_worker,
+    )
+
+def merge_trajs(worker_trajs):
+    """Concatenate buffers from num_workers into one full batch."""
+    merged = {}
+    agent_list = list(worker_trajs[0].keys())
+
+    for agent in agent_list:
+        merged[agent] = {}
+        for key, first_list in worker_trajs[0][agent].items():
+            # If there are no entries for this key, produce an empty array:
+            if len(first_list) == 0:
+                merged[agent][key] = jnp.array([], dtype=jnp.float32)
+                continue
+
+            # Otherwise stack each worker's lists and then concatenate:
+            per_worker_arrs = [jnp.stack(w[agent][key]) for w in worker_trajs]
+            merged[agent][key] = jnp.concatenate(per_worker_arrs, axis=0)
+
+    return merged
+
 
 def main():
     # 1) Build the MeltingPot environment and initialize params
@@ -310,6 +362,8 @@ def main():
 
     # 2) Main training loop
     # -------------------------------------------------------------------
+    from concurrent.futures import ProcessPoolExecutor
+    pool = ProcessPoolExecutor(max_workers=args.num_workers)
     logger = logging.getLogger("train")
 
     # Define PPO loss and update functions that will be used in training
@@ -343,15 +397,21 @@ def main():
         return new_params, new_opt_state, loss
 
     for update_idx in range(TOTAL_TRAINING_UPDATES):
-        traj = collect_trajectory_batch_per_agent(
-            agent_list,
-            env,
-            primary_agent_id,
-            action_dimension,
-            network_parameters,
-            rng_key_per_agent,
-            ACTION_SET,
-        )
+        futures = [
+                pool.submit(
+                    actor_worker,
+                    wid,
+                    args,
+                    network_parameters,
+                    global_rng_key,
+                    env_config,
+                    ACTION_SET,
+                )
+                for wid in range(args.num_workers)
+            ]
+        worker_trajs = [f.result() for f in futures]
+        traj = merge_trajs(worker_trajs)
+
         logger.debug(
             "Collected %d environment steps",
             len(traj[primary_agent_id]["observations"] * (update_idx + 1)),
