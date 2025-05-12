@@ -15,31 +15,31 @@
 
 from collections.abc import Sequence
 
-from meltingpot.configs import substrates as substrate_configs
-from meltingpot.utils.substrates import substrate
-from meltingpot.utils.substrates import substrate_factory
 from ml_collections import config_dict
+
+from meltingpot.configs import substrates as substrate_configs
+from meltingpot.utils.substrates import substrate, substrate_factory
 
 SUBSTRATES = substrate_configs.SUBSTRATES
 
 
 def get_config(name: str) -> config_dict.ConfigDict:
-  """Returns the configs for the specified substrate."""
-  return substrate_configs.get_config(name).lock()
+    """Returns the configs for the specified substrate."""
+    return substrate_configs.get_config(name).lock()
 
 
 def build(name: str, *, roles: Sequence[str]) -> substrate.Substrate:
-  """Builds an instance of the specified substrate.
+    """Builds an instance of the specified substrate.
 
-  Args:
-    name: name of the substrate.
-    roles: sequence of strings defining each player's role. The length of
-      this sequence determines the number of players.
+    Args:
+      name: name of the substrate.
+      roles: sequence of strings defining each player's role. The length of
+        this sequence determines the number of players.
 
-  Returns:
-    The training substrate.
-  """
-  return get_factory(name).build(roles)
+    Returns:
+      The training substrate.
+    """
+    return get_factory(name).build(roles)
 
 
 def build_from_config(
@@ -47,40 +47,40 @@ def build_from_config(
     *,
     roles: Sequence[str],
 ) -> substrate.Substrate:
-  """Builds a substrate from the provided config.
+    """Builds a substrate from the provided config.
 
-  Args:
-    config: config resulting from `get_config`.
-    roles: sequence of strings defining each player's role. The length of
-      this sequence determines the number of players.
+    Args:
+      config: config resulting from `get_config`.
+      roles: sequence of strings defining each player's role. The length of
+        this sequence determines the number of players.
 
-  Returns:
-    The training substrate.
-  """
-  return get_factory_from_config(config).build(roles)
+    Returns:
+      The training substrate.
+    """
+    return get_factory_from_config(config).build(roles)
 
 
 def get_factory(name: str) -> substrate_factory.SubstrateFactory:
-  """Returns the factory for the specified substrate."""
-  config = substrate_configs.get_config(name)
-  return get_factory_from_config(config)
+    """Returns the factory for the specified substrate."""
+    config = substrate_configs.get_config(name)
+    return get_factory_from_config(config)
 
 
 def get_factory_from_config(
     config: config_dict.ConfigDict,
 ) -> substrate_factory.SubstrateFactory:
-  """Returns a factory from the provided config."""
+    """Returns a factory from the provided config."""
 
-  def lab2d_settings_builder(roles):
-    return config.lab2d_settings_builder(roles=roles, config=config)
+    def lab2d_settings_builder(roles):
+        return config.lab2d_settings_builder(roles=roles, config=config)
 
-  return substrate_factory.SubstrateFactory(
-      lab2d_settings_builder=lab2d_settings_builder,
-      individual_observations=config.individual_observation_names,
-      global_observations=config.global_observation_names,
-      action_table=config.action_set,
-      timestep_spec=config.timestep_spec,
-      action_spec=config.action_spec,
-      valid_roles=config.valid_roles,
-      default_player_roles=config.default_player_roles,
-  )
+    return substrate_factory.SubstrateFactory(
+        lab2d_settings_builder=lab2d_settings_builder,
+        individual_observations=config.individual_observation_names,
+        global_observations=config.global_observation_names,
+        action_table=config.action_set,
+        timestep_spec=config.timestep_spec,
+        action_spec=config.action_spec,
+        valid_roles=config.valid_roles,
+        default_player_roles=config.default_player_roles,
+    )

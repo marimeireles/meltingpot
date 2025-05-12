@@ -20,16 +20,14 @@ def configure_logging(level: str) -> None:
     )
 
 
-def load_data(
-    stats_dir: Path
-) -> Tuple[int, List[List[float]]]:
+def load_data(stats_dir: Path) -> Tuple[int, List[List[float]]]:
     """
     Load training statistics from files in `stats_dir`.
 
     Expects:
       - reward_history.csv         : columns = one per player, rows = updates
       - zap_data.npz               : compressed archive with arrays "zap" and "death"
-    
+
     Returns
     -------
     total_steps : int
@@ -42,7 +40,11 @@ def load_data(
     total_death_zap_path = stats_dir / "death_zap_matrix.csv"
     npz_path = stats_dir / "zap_data_through_time.npz"
 
-    missing = [p for p in (reward_path, npz_path, total_death_zap_path, total_zap_path) if not p.exists()]
+    missing = [
+        p
+        for p in (reward_path, npz_path, total_death_zap_path, total_zap_path)
+        if not p.exists()
+    ]
     if missing:
         raise FileNotFoundError(f"Missing file(s): {missing}")
 
@@ -54,22 +56,32 @@ def load_data(
 
     # Load zap arrays
     data = np.load(npz_path, mmap_mode="r")
-    zap_tt = data["zap"]              # shape [T, N, N]
-    death_zap_tt = data["death"]      # shape [T, N, N]
+    zap_tt = data["zap"]  # shape [T, N, N]
+    death_zap_tt = data["death"]  # shape [T, N, N]
     total_steps = death_zap_tt.shape[0]
 
     logging.info(
         "Loaded reward_history (%d updates for %d players) and zap_data (%d steps)",
-        len(rewards_list[0]), len(rewards_list), total_steps
+        len(rewards_list[0]),
+        len(rewards_list),
+        total_steps,
     )
-    return total_steps, rewards_list, total_steps, zap_tt, death_zap_tt, df_total_zap, df_death_total_zap
+    return (
+        total_steps,
+        rewards_list,
+        total_steps,
+        zap_tt,
+        death_zap_tt,
+        df_total_zap,
+        df_death_total_zap,
+    )
 
 
 def plot_cumulative_reward(
     rewards_list: List[List[float]],
     batch_size: int,
     save_dir: Path,
-    title: str = "Cumulative Reward Through Time"
+    title: str = "Cumulative Reward Through Time",
 ) -> None:
     """
     Plot and save cumulative reward as a function of environment steps.
@@ -105,11 +117,9 @@ def plot_cumulative_reward(
     plt.savefig(save_path)
     logger.info("Saved cumulative reward plot to %s", save_path)
 
+
 def plot_zapping_through_time(
-    zap_tt: np.ndarray,
-    save_dir: Path,
-    kind: str = "zap",
-    cumulative: bool = True
+    zap_tt: np.ndarray, save_dir: Path, kind: str = "zap", cumulative: bool = True
 ) -> None:
     """
     Plot per-agent 'kind' given over every timestep.
@@ -145,18 +155,16 @@ def plot_zapping_through_time(
     if cumulative:
         data = np.cumsum(per_step, axis=0)
         ylabel = f"Cumulative {kind.title()}s Given"
-        title   = f"Cumulative {kind.title()}s Given per Agent Over Time"
+        title = f"Cumulative {kind.title()}s Given per Agent Over Time"
     else:
         data = per_step
         ylabel = f"{kind.title()}s Given per Step"
-        title   = f"{kind.title()}s Given per Agent per Timestep"
+        title = f"{kind.title()}s Given per Agent per Timestep"
 
     # 4) Plot
     plt.figure(figsize=(12, 6))
     for agent_id in range(N):
-        plt.plot(np.arange(data.shape[0]),
-                 data[:, agent_id],
-                 label=f"Agent {agent_id}")
+        plt.plot(np.arange(data.shape[0]), data[:, agent_id], label=f"Agent {agent_id}")
     plt.xlabel("Timestep")
     plt.ylabel(ylabel)
     plt.title(title)
@@ -170,15 +178,13 @@ def plot_zapping_through_time(
     plt.savefig(save_path)
     logger.info("Saved %s plot to %s", kind, save_path)
 
+
 def plot_interaction_heatmap(
-    df_matrix: pd.DataFrame,
-    save_dir: Path,
-    name: str,
-    cmap: str = "viridis"
+    df_matrix: pd.DataFrame, save_dir: Path, name: str, cmap: str = "viridis"
 ) -> None:
     """
     Plot and save a heatmap of agent-to-agent interactions.
-    
+
     Parameters
     ----------
     df_matrix : pd.DataFrame
@@ -193,11 +199,7 @@ def plot_interaction_heatmap(
     logger = logging.getLogger(__name__)
     plt.figure(figsize=(8, 6))
     sns.heatmap(
-        df_matrix,
-        annot=True,
-        fmt="g",
-        cmap=cmap,
-        cbar_kws={"label": "Number of Kills"}
+        df_matrix, annot=True, fmt="g", cmap=cmap, cbar_kws={"label": "Number of Kills"}
     )
     plt.xlabel("Passive Agent ID")
     plt.ylabel("Active Agent ID")
@@ -208,6 +210,7 @@ def plot_interaction_heatmap(
     plt.savefig(save_path)
     logger.info("Saved %s heatmap to %s", name, save_path)
 
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Plot cumulative reward from training statistics."
@@ -215,13 +218,13 @@ def main() -> None:
     parser.add_argument(
         "stats_dir",
         type=Path,
-        help="Directory containing reward_history.csv and zap_data.npz"
+        help="Directory containing reward_history.csv and zap_data.npz",
     )
     parser.add_argument(
         "--log-level",
         default="INFO",
         choices=("DEBUG", "INFO", "WARNING", "ERROR"),
-        help="Logging verbosity level."
+        help="Logging verbosity level.",
     )
     args = parser.parse_args()
 
@@ -230,12 +233,21 @@ def main() -> None:
     logger.debug("Arguments: %s", args)
 
     # Load step count and reward streams
-    total_steps, rewards_list, total_steps, zap_tt, death_zap_tt, total_zap, total_death_zap = load_data(args.stats_dir)
+    (
+        total_steps,
+        rewards_list,
+        total_steps,
+        zap_tt,
+        death_zap_tt,
+        total_zap,
+        total_death_zap,
+    ) = load_data(args.stats_dir)
     plot_zapping_through_time(zap_tt, args.stats_dir, kind="zap", cumulative=True)
-    plot_zapping_through_time(death_zap_tt, args.stats_dir, kind="death", cumulative=True)
+    plot_zapping_through_time(
+        death_zap_tt, args.stats_dir, kind="death", cumulative=True
+    )
     plot_interaction_heatmap(total_zap, args.stats_dir, "zap_matrix")
     plot_interaction_heatmap(total_death_zap, args.stats_dir, "death_zap_matrix")
-
 
     # Compute batch size: how many env steps per update
     n_updates = len(rewards_list[0])
@@ -246,8 +258,7 @@ def main() -> None:
     batch_size = total_steps // n_updates
     if batch_size <= 0:
         logger.error(
-            "Invalid batch size (total_steps=%d, updates=%d)",
-            total_steps, n_updates
+            "Invalid batch size (total_steps=%d, updates=%d)", total_steps, n_updates
         )
         return
 

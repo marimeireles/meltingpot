@@ -26,38 +26,39 @@ from typing import Any, Sequence
 import chex
 import dm_env
 import dmlab2d
-from meltingpot.utils.substrates.wrappers import base
 import reactivex
+
+from meltingpot.utils.substrates.wrappers import base
 
 
 @chex.dataclass(frozen=True)
 class Lab2dObservables:
-  """Observables for a Lab2D environment.
+    """Observables for a Lab2D environment.
 
-  Attributes:
-    action: emits actions sent to the substrate from players.
-    timestep: emits timesteps sent from the substrate to players.
-    events: emits environment-specific events resulting from any interactions
-      with the Substrate. Each individual event is emitted as a single element:
-      (event_name, event_item).
-  """
+    Attributes:
+      action: emits actions sent to the substrate from players.
+      timestep: emits timesteps sent from the substrate to players.
+      events: emits environment-specific events resulting from any interactions
+        with the Substrate. Each individual event is emitted as a single element:
+        (event_name, event_item).
+    """
 
-  action: reactivex.Observable[Sequence[int]]
-  timestep: reactivex.Observable[dm_env.TimeStep]
-  events: reactivex.Observable[tuple[str, Any]]
+    action: reactivex.Observable[Sequence[int]]
+    timestep: reactivex.Observable[dm_env.TimeStep]
+    events: reactivex.Observable[tuple[str, Any]]
 
 
 class ObservableLab2d(dmlab2d.Environment):
-  """A DM Lab2D environment which is observable."""
+    """A DM Lab2D environment which is observable."""
 
-  @abc.abstractmethod
-  def observables(self) -> Lab2dObservables:
-    """The observables of the Lab2D environment."""
+    @abc.abstractmethod
+    def observables(self) -> Lab2dObservables:
+        """The observables of the Lab2D environment."""
 
 
 class ObservableLab2dWrapper(base.Lab2dWrapper, ObservableLab2d):
-  """Base class for wrappers of ObservableLab2d."""
+    """Base class for wrappers of ObservableLab2d."""
 
-  def observables(self, *args, **kwargs) -> ...:
-    """See base class."""
-    return self._env.observables(*args, **kwargs)
+    def observables(self, *args, **kwargs) -> ...:
+        """See base class."""
+        return self._env.observables(*args, **kwargs)

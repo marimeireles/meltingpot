@@ -29,10 +29,10 @@ the resource walls differs from episode to episode, so too does the negotiation
 problem to be solved.
 """
 
-from meltingpot.configs.substrates import territory as base_config
-from meltingpot.utils.substrates import map_helpers
-from meltingpot.utils.substrates import specs
 from ml_collections import config_dict
+
+from meltingpot.configs.substrates import territory as base_config
+from meltingpot.utils.substrates import map_helpers, specs
 
 build = base_config.build
 
@@ -91,24 +91,26 @@ CHAR_PREFAB_MAP = {
 
 
 def get_config():
-  """Default configuration."""
-  config = base_config.get_config()
+    """Default configuration."""
+    config = base_config.get_config()
 
-  # Override the map layout settings.
-  config.layout = config_dict.ConfigDict()
-  config.layout.ascii_map = ASCII_MAP
-  config.layout.char_prefab_map = CHAR_PREFAB_MAP
-  config.layout.topology = "BOUNDED"
+    # Override the map layout settings.
+    config.layout = config_dict.ConfigDict()
+    config.layout.ascii_map = ASCII_MAP
+    config.layout.char_prefab_map = CHAR_PREFAB_MAP
+    config.layout.topology = "BOUNDED"
 
-  # The specs of the environment (from a single-agent perspective).
-  config.timestep_spec = specs.timestep({
-      "RGB": specs.OBSERVATION["RGB"],
-      "READY_TO_SHOOT": specs.OBSERVATION["READY_TO_SHOOT"],
-      # Debug only (do not use the following observations in policies).
-      "WORLD.RGB": specs.rgb(184, 184),
-  })
+    # The specs of the environment (from a single-agent perspective).
+    config.timestep_spec = specs.timestep(
+        {
+            "RGB": specs.OBSERVATION["RGB"],
+            "READY_TO_SHOOT": specs.OBSERVATION["READY_TO_SHOOT"],
+            # Debug only (do not use the following observations in policies).
+            "WORLD.RGB": specs.rgb(184, 184),
+        }
+    )
 
-  # The roles assigned to each player.
-  config.default_player_roles = ("default",) * 5
+    # The roles assigned to each player.
+    config.default_player_roles = ("default",) * 5
 
-  return config
+    return config

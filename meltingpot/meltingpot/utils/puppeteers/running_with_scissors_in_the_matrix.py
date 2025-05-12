@@ -17,37 +17,37 @@ from meltingpot.utils.puppeteers import in_the_matrix
 
 
 class CounterPrevious(in_the_matrix.RespondToPrevious):
-  """Puppeteer for a running with scissors bot.
+    """Puppeteer for a running with scissors bot.
 
-  This bot will always play the best response strategy to whatever its
-  partner played in the previous interaction. So if its partner last played
-  rock then it will play paper. If its partner last played paper then it will
-  play scissors. If its partner last played scissors then it will play rock.
+    This bot will always play the best response strategy to whatever its
+    partner played in the previous interaction. So if its partner last played
+    rock then it will play paper. If its partner last played paper then it will
+    play scissors. If its partner last played scissors then it will play rock.
 
-  Important note: this puppeteer does not discriminate between coplayers. So it
-  only makes sense in two-player substrates (e.g.
-  `running_with_scissors_in_the_matrix__repeated`).
-  """
-
-  def __init__(
-      self,
-      rock_resource: in_the_matrix.Resource,
-      paper_resource: in_the_matrix.Resource,
-      scissors_resource: in_the_matrix.Resource,
-      margin: int,
-  ) -> None:
-    """Initializes the puppeteer.
-
-    Args:
-      rock_resource: The rock resource.
-      paper_resource: The paper resource.
-      scissors_resource: The scissors resource.
-      margin: Try to collect `margin` more of the target resource than the other
-        resource before interacting.
+    Important note: this puppeteer does not discriminate between coplayers. So it
+    only makes sense in two-player substrates (e.g.
+    `running_with_scissors_in_the_matrix__repeated`).
     """
-    responses = {
-        rock_resource: paper_resource,
-        paper_resource: scissors_resource,
-        scissors_resource: rock_resource,
-    }
-    super().__init__(responses, margin)
+
+    def __init__(
+        self,
+        rock_resource: in_the_matrix.Resource,
+        paper_resource: in_the_matrix.Resource,
+        scissors_resource: in_the_matrix.Resource,
+        margin: int,
+    ) -> None:
+        """Initializes the puppeteer.
+
+        Args:
+          rock_resource: The rock resource.
+          paper_resource: The paper resource.
+          scissors_resource: The scissors resource.
+          margin: Try to collect `margin` more of the target resource than the other
+            resource before interacting.
+        """
+        responses = {
+            rock_resource: paper_resource,
+            paper_resource: scissors_resource,
+            scissors_resource: rock_resource,
+        }
+        super().__init__(responses, margin)

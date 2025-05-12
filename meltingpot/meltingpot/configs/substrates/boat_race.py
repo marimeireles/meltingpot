@@ -32,10 +32,9 @@ action within the last few timesteps.
 from collections.abc import Mapping, Sequence
 from typing import Any
 
-from meltingpot.utils.substrates import colors
-from meltingpot.utils.substrates import shapes
-from meltingpot.utils.substrates import specs
 from ml_collections import config_dict as configdict
+
+from meltingpot.utils.substrates import colors, shapes, specs
 
 # Warning: setting `_ENABLE_DEBUG_OBSERVATIONS = True` may cause slowdown.
 _ENABLE_DEBUG_OBSERVATIONS = False
@@ -143,9 +142,7 @@ SCENE = {
                         "state": "boatRace",
                     },
                     {
-                        "state": (
-                            "semaphore_red"
-                        ),  # A temporary state at end game.
+                        "state": ("semaphore_red"),  # A temporary state at end game.
                     },
                 ],
             },
@@ -175,27 +172,29 @@ SCENE = {
     ],
 }
 if _ENABLE_DEBUG_OBSERVATIONS:
-  SCENE["components"].append({
-      "component": "GlobalMetricReporter",
-      "kwargs": {
-          "metrics": [
-              {
-                  "name": "RACE_START",
-                  "type": "tensor.Int32Tensor",
-                  "shape": (MANDATED_NUM_PLAYERS // 2, 2),
-                  "component": "GlobalRaceTracker",
-                  "variable": "raceStart",
-              },
-              {
-                  "name": "STROKES",
-                  "type": "tensor.Int32Tensor",
-                  "shape": (MANDATED_NUM_PLAYERS,),
-                  "component": "GlobalRaceTracker",
-                  "variable": "strokes",
-              },
-          ]
-      },
-  })
+    SCENE["components"].append(
+        {
+            "component": "GlobalMetricReporter",
+            "kwargs": {
+                "metrics": [
+                    {
+                        "name": "RACE_START",
+                        "type": "tensor.Int32Tensor",
+                        "shape": (MANDATED_NUM_PLAYERS // 2, 2),
+                        "component": "GlobalRaceTracker",
+                        "variable": "raceStart",
+                    },
+                    {
+                        "name": "STROKES",
+                        "type": "tensor.Int32Tensor",
+                        "shape": (MANDATED_NUM_PLAYERS,),
+                        "component": "GlobalRaceTracker",
+                        "variable": "strokes",
+                    },
+                ]
+            },
+        }
+    )
 
 FLOOR = {
     "name": "floor",
@@ -204,11 +203,13 @@ FLOOR = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "floor",
-                "stateConfigs": [{
-                    "state": "floor",
-                    "layer": "background",
-                    "sprite": "Floor",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "floor",
+                        "layer": "background",
+                        "sprite": "Floor",
+                    }
+                ],
             },
         },
         {
@@ -219,10 +220,12 @@ FLOOR = {
                     "Floor",
                 ],
                 "spriteShapes": [shapes.GRAINY_FLOOR],
-                "palettes": [{
-                    "+": (157, 142, 120, 255),
-                    "*": (154, 139, 115, 255),
-                }],
+                "palettes": [
+                    {
+                        "+": (157, 142, 120, 255),
+                        "*": (154, 139, 115, 255),
+                    }
+                ],
                 "noRotates": [True],
             },
         },
@@ -239,11 +242,13 @@ WALL = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "wall",
-                "stateConfigs": [{
-                    "state": "wall",
-                    "layer": "upperPhysical",
-                    "sprite": "Wall",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "wall",
+                        "layer": "upperPhysical",
+                        "sprite": "Wall",
+                    }
+                ],
             },
         },
         {
@@ -257,12 +262,14 @@ WALL = {
                     "Wall",
                 ],
                 "spriteShapes": [shapes.WALL],
-                "palettes": [{
-                    "*": (95, 95, 95, 255),
-                    "&": (100, 100, 100, 255),
-                    "@": (109, 109, 109, 255),
-                    "#": (152, 152, 152, 255),
-                }],
+                "palettes": [
+                    {
+                        "*": (95, 95, 95, 255),
+                        "&": (100, 100, 100, 255),
+                        "@": (109, 109, 109, 255),
+                        "#": (152, 152, 152, 255),
+                    }
+                ],
                 "noRotates": [True],
             },
         },
@@ -278,11 +285,13 @@ SPAWN_POINT = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "spawnPoint",
-                "stateConfigs": [{
-                    "state": "spawnPoint",
-                    "layer": "logic",
-                    "groups": ["spawnPoints"],
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "spawnPoint",
+                        "layer": "logic",
+                        "groups": ["spawnPoints"],
+                    }
+                ],
             },
         },
         {
@@ -338,62 +347,62 @@ SINGLE_APPLE = {
 
 
 def get_respawning_apple(bank_side: str):
-  initial_state = "apple" if bank_side == "N" else "applePause"
-  return {
-      "name": "apple",
-      "components": [
-          {
-              "component": "StateManager",
-              "kwargs": {
-                  "initialState": initial_state,
-                  "stateConfigs": [
-                      {
-                          "state": "apple",
-                          "layer": "superOverlay",
-                          "sprite": "apple",
-                      },
-                      {
-                          "state": "appleWait",
-                          "layer": "logic",
-                      },
-                      {
-                          "state": "applePause",
-                          "layer": "logic",
-                      },
-                  ],
-              },
-          },
-          {
-              "component": "Transform",
-          },
-          {
-              "component": "Appearance",
-              "kwargs": {
-                  "renderMode": "ascii_shape",
-                  "spriteNames": ["apple"],
-                  "spriteShapes": [shapes.HD_APPLE],
-                  "palettes": [shapes.get_palette((40, 180, 40, 255))],
-                  "noRotates": [False],
-              },
-          },
-          {
-              "component": "Edible",
-              "kwargs": {
-                  "liveState": "apple",
-                  "waitState": "appleWait",
-                  "rewardForEating": 1.0,
-              },
-          },
-          {
-              "component": "FixedRateRegrow",
-              "kwargs": {
-                  "liveState": "apple",
-                  "waitState": "appleWait",
-                  "regrowRate": 0.1,
-              },
-          },
-      ],
-  }
+    initial_state = "apple" if bank_side == "N" else "applePause"
+    return {
+        "name": "apple",
+        "components": [
+            {
+                "component": "StateManager",
+                "kwargs": {
+                    "initialState": initial_state,
+                    "stateConfigs": [
+                        {
+                            "state": "apple",
+                            "layer": "superOverlay",
+                            "sprite": "apple",
+                        },
+                        {
+                            "state": "appleWait",
+                            "layer": "logic",
+                        },
+                        {
+                            "state": "applePause",
+                            "layer": "logic",
+                        },
+                    ],
+                },
+            },
+            {
+                "component": "Transform",
+            },
+            {
+                "component": "Appearance",
+                "kwargs": {
+                    "renderMode": "ascii_shape",
+                    "spriteNames": ["apple"],
+                    "spriteShapes": [shapes.HD_APPLE],
+                    "palettes": [shapes.get_palette((40, 180, 40, 255))],
+                    "noRotates": [False],
+                },
+            },
+            {
+                "component": "Edible",
+                "kwargs": {
+                    "liveState": "apple",
+                    "waitState": "appleWait",
+                    "rewardForEating": 1.0,
+                },
+            },
+            {
+                "component": "FixedRateRegrow",
+                "kwargs": {
+                    "liveState": "apple",
+                    "waitState": "appleWait",
+                    "regrowRate": 0.1,
+                },
+            },
+        ],
+    }
 
 
 SEMAPHORE = {
@@ -447,312 +456,314 @@ SEMAPHORE = {
 
 
 def get_barrier(bank_side: str = "N"):
-  initial_state = "off" if bank_side == "N" else "on"
-  return {
-      "name": "barrier",
-      "components": [
-          {
-              "component": "StateManager",
-              "kwargs": {
-                  "initialState": initial_state,
-                  "stateConfigs": [
-                      {
-                          "state": "on",
-                          "layer": "upperPhysical",
-                          "sprite": "barrierOn",
-                          "groups": ["barrier"],
-                      },
-                      {
-                          "state": "off",
-                          "layer": "superOverlay",
-                          "sprite": "barrierOff",
-                          "groups": ["barrier"],
-                      },
-                  ],
-              },
-          },
-          {
-              "component": "Transform",
-          },
-          {
-              "component": "Appearance",
-              "kwargs": {
-                  "renderMode": "ascii_shape",
-                  "spriteNames": ["barrierOn", "barrierOff"],
-                  "spriteShapes": [shapes.BARRIER_ON, shapes.BARRIER_OFF],
-                  "palettes": [shapes.GRAY_PALETTE] * 2,
-                  "noRotates": [False] * 2,
-              },
-          },
-      ],
-  }
+    initial_state = "off" if bank_side == "N" else "on"
+    return {
+        "name": "barrier",
+        "components": [
+            {
+                "component": "StateManager",
+                "kwargs": {
+                    "initialState": initial_state,
+                    "stateConfigs": [
+                        {
+                            "state": "on",
+                            "layer": "upperPhysical",
+                            "sprite": "barrierOn",
+                            "groups": ["barrier"],
+                        },
+                        {
+                            "state": "off",
+                            "layer": "superOverlay",
+                            "sprite": "barrierOff",
+                            "groups": ["barrier"],
+                        },
+                    ],
+                },
+            },
+            {
+                "component": "Transform",
+            },
+            {
+                "component": "Appearance",
+                "kwargs": {
+                    "renderMode": "ascii_shape",
+                    "spriteNames": ["barrierOn", "barrierOff"],
+                    "spriteShapes": [shapes.BARRIER_ON, shapes.BARRIER_OFF],
+                    "palettes": [shapes.GRAY_PALETTE] * 2,
+                    "noRotates": [False] * 2,
+                },
+            },
+        ],
+    }
 
 
 def get_water(layer: str):
-  """Get a water game object at the specified layer, possibly with a goal."""
-  return {
-      "name": "water_{}".format(layer),
-      "components": [
-          {
-              "component": "StateManager",
-              "kwargs": {
-                  "initialState": "water_1",
-                  "stateConfigs": [
-                      {
-                          "state": "water_1",
-                          "layer": layer,
-                          "sprite": "water_1",
-                          "groups": ["water"],
-                      },
-                      {
-                          "state": "water_2",
-                          "layer": layer,
-                          "sprite": "water_2",
-                          "groups": ["water"],
-                      },
-                      {
-                          "state": "water_3",
-                          "layer": layer,
-                          "sprite": "water_3",
-                          "groups": ["water"],
-                      },
-                      {
-                          "state": "water_4",
-                          "layer": layer,
-                          "sprite": "water_4",
-                          "groups": ["water"],
-                      },
-                  ],
-              },
-          },
-          {
-              "component": "Transform",
-          },
-          {
-              "component": "Appearance",
-              "kwargs": {
-                  "renderMode": "ascii_shape",
-                  "spriteNames": ["water_1", "water_2", "water_3", "water_4"],
-                  "spriteShapes": [
-                      shapes.WATER_1,
-                      shapes.WATER_2,
-                      shapes.WATER_3,
-                      shapes.WATER_4,
-                  ],
-                  "palettes": [shapes.WATER_PALETTE] * 4,
-              },
-          },
-          {
-              "component": "Animation",
-              "kwargs": {
-                  "states": ["water_1", "water_2", "water_3", "water_4"],
-                  "gameFramesPerAnimationFrame": 2,
-                  "loop": True,
-                  "randomStartFrame": True,
-                  "group": "water",
-              },
-          },
-      ],
-  }
+    """Get a water game object at the specified layer, possibly with a goal."""
+    return {
+        "name": "water_{}".format(layer),
+        "components": [
+            {
+                "component": "StateManager",
+                "kwargs": {
+                    "initialState": "water_1",
+                    "stateConfigs": [
+                        {
+                            "state": "water_1",
+                            "layer": layer,
+                            "sprite": "water_1",
+                            "groups": ["water"],
+                        },
+                        {
+                            "state": "water_2",
+                            "layer": layer,
+                            "sprite": "water_2",
+                            "groups": ["water"],
+                        },
+                        {
+                            "state": "water_3",
+                            "layer": layer,
+                            "sprite": "water_3",
+                            "groups": ["water"],
+                        },
+                        {
+                            "state": "water_4",
+                            "layer": layer,
+                            "sprite": "water_4",
+                            "groups": ["water"],
+                        },
+                    ],
+                },
+            },
+            {
+                "component": "Transform",
+            },
+            {
+                "component": "Appearance",
+                "kwargs": {
+                    "renderMode": "ascii_shape",
+                    "spriteNames": ["water_1", "water_2", "water_3", "water_4"],
+                    "spriteShapes": [
+                        shapes.WATER_1,
+                        shapes.WATER_2,
+                        shapes.WATER_3,
+                        shapes.WATER_4,
+                    ],
+                    "palettes": [shapes.WATER_PALETTE] * 4,
+                },
+            },
+            {
+                "component": "Animation",
+                "kwargs": {
+                    "states": ["water_1", "water_2", "water_3", "water_4"],
+                    "gameFramesPerAnimationFrame": 2,
+                    "loop": True,
+                    "randomStartFrame": True,
+                    "group": "water",
+                },
+            },
+        ],
+    }
 
 
 def get_goal(bank_side: str = "N"):
-  return {
-      "name": "water_goal",
-      "components": [
-          {
-              "component": "StateManager",
-              "kwargs": {
-                  "initialState": "goalNonBlocking",
-                  "stateConfigs": [
-                      {
-                          "state": "goalNonBlocking",
-                          "layer": "logic",
-                      },
-                      {
-                          "state": "goalBlocking",
-                          "layer": "upperPhysical",
-                      },
-                  ],
-              },
-          },
-          {
-              "component": "Transform",
-          },
-          {
-              "component": "WaterGoal",
-              "kwargs": {"bank_side": bank_side},
-          },
-      ],
-  }
+    return {
+        "name": "water_goal",
+        "components": [
+            {
+                "component": "StateManager",
+                "kwargs": {
+                    "initialState": "goalNonBlocking",
+                    "stateConfigs": [
+                        {
+                            "state": "goalNonBlocking",
+                            "layer": "logic",
+                        },
+                        {
+                            "state": "goalBlocking",
+                            "layer": "upperPhysical",
+                        },
+                    ],
+                },
+            },
+            {
+                "component": "Transform",
+            },
+            {
+                "component": "WaterGoal",
+                "kwargs": {"bank_side": bank_side},
+            },
+        ],
+    }
 
 
 def get_boat(front: bool, left: bool):
-  suffix = "{}{}".format("F" if front else "R", "L" if left else "R")
-  shape = {
-      "FL": shapes.BOAT_FRONT_L,
-      "FR": shapes.BOAT_FRONT_R,
-      "RL": shapes.BOAT_REAR_L,
-      "RR": shapes.BOAT_REAR_R,
-  }
-  return {
-      "name": f"boat_{suffix}",
-      "components": [
-          {
-              "component": "StateManager",
-              "kwargs": {
-                  "initialState": "boat",
-                  "stateConfigs": [
-                      {
-                          "state": "boat",
-                          "layer": "lowerPhysical",
-                          "sprite": f"Boat{suffix}",
-                          "groups": ["boat"],
-                      },
-                      {
-                          "state": "boatFull",
-                          "layer": "overlay",
-                          "sprite": f"Boat{suffix}",
-                          "groups": ["boat"],
-                      },
-                  ],
-              },
-          },
-          {
-              "component": "Transform",
-          },
-          {
-              "component": "Appearance",
-              "kwargs": {
-                  "renderMode": "ascii_shape",
-                  "spriteNames": [f"Boat{suffix}"],
-                  "spriteShapes": [shape[suffix]],
-                  "palettes": [shapes.BOAT_PALETTE],
-                  "noRotates": [False],
-              },
-          },
-      ],
-  }
+    suffix = "{}{}".format("F" if front else "R", "L" if left else "R")
+    shape = {
+        "FL": shapes.BOAT_FRONT_L,
+        "FR": shapes.BOAT_FRONT_R,
+        "RL": shapes.BOAT_REAR_L,
+        "RR": shapes.BOAT_REAR_R,
+    }
+    return {
+        "name": f"boat_{suffix}",
+        "components": [
+            {
+                "component": "StateManager",
+                "kwargs": {
+                    "initialState": "boat",
+                    "stateConfigs": [
+                        {
+                            "state": "boat",
+                            "layer": "lowerPhysical",
+                            "sprite": f"Boat{suffix}",
+                            "groups": ["boat"],
+                        },
+                        {
+                            "state": "boatFull",
+                            "layer": "overlay",
+                            "sprite": f"Boat{suffix}",
+                            "groups": ["boat"],
+                        },
+                    ],
+                },
+            },
+            {
+                "component": "Transform",
+            },
+            {
+                "component": "Appearance",
+                "kwargs": {
+                    "renderMode": "ascii_shape",
+                    "spriteNames": [f"Boat{suffix}"],
+                    "spriteShapes": [shape[suffix]],
+                    "palettes": [shapes.BOAT_PALETTE],
+                    "noRotates": [False],
+                },
+            },
+        ],
+    }
 
 
 def get_seat(left: bool):
-  """Get a seat prefab. Left seats contain the BoatManager component."""
-  suffix = "L" if left else "R"
-  shape = {
-      "L": shapes.BOAT_SEAT_L,
-      "R": shapes.BOAT_SEAT_R,
-  }
-  seat = {
-      "name": f"seat_{suffix}",
-      "components": [
-          {
-              "component": "StateManager",
-              "kwargs": {
-                  "initialState": "seat",
-                  "stateConfigs": [
-                      {
-                          "state": "seat",
-                          "layer": "lowerPhysical",
-                          "sprite": f"Seat{suffix}",
-                          "groups": ["seat", "boat"],
-                      },
-                      {
-                          "state": "seatTaken",
-                          "layer": "overlay",
-                          "sprite": f"Seat{suffix}",
-                          "contact": "boat",
-                      },
-                      {
-                          "state": "seatUsed",
-                          "layer": "lowerPhysical",
-                          "sprite": f"Seat{suffix}",
-                      },
-                  ],
-              },
-          },
-          {
-              "component": "Transform",
-          },
-          {
-              "component": "Appearance",
-              "kwargs": {
-                  "renderMode": "ascii_shape",
-                  "spriteNames": [f"Seat{suffix}"],
-                  "spriteShapes": [shape[suffix]],
-                  "palettes": [shapes.BOAT_PALETTE],
-                  "noRotates": [False],
-              },
-          },
-          {
-              "component": "Seat",
-              "kwargs": {},
-          },
-      ],
-  }
-  if left:
-    seat["components"] += [{
-        "component": "BoatManager",
-        "kwargs": {
-            "flailEffectiveness": 0.1,
-        },
-    }]
-  return seat
+    """Get a seat prefab. Left seats contain the BoatManager component."""
+    suffix = "L" if left else "R"
+    shape = {
+        "L": shapes.BOAT_SEAT_L,
+        "R": shapes.BOAT_SEAT_R,
+    }
+    seat = {
+        "name": f"seat_{suffix}",
+        "components": [
+            {
+                "component": "StateManager",
+                "kwargs": {
+                    "initialState": "seat",
+                    "stateConfigs": [
+                        {
+                            "state": "seat",
+                            "layer": "lowerPhysical",
+                            "sprite": f"Seat{suffix}",
+                            "groups": ["seat", "boat"],
+                        },
+                        {
+                            "state": "seatTaken",
+                            "layer": "overlay",
+                            "sprite": f"Seat{suffix}",
+                            "contact": "boat",
+                        },
+                        {
+                            "state": "seatUsed",
+                            "layer": "lowerPhysical",
+                            "sprite": f"Seat{suffix}",
+                        },
+                    ],
+                },
+            },
+            {
+                "component": "Transform",
+            },
+            {
+                "component": "Appearance",
+                "kwargs": {
+                    "renderMode": "ascii_shape",
+                    "spriteNames": [f"Seat{suffix}"],
+                    "spriteShapes": [shape[suffix]],
+                    "palettes": [shapes.BOAT_PALETTE],
+                    "noRotates": [False],
+                },
+            },
+            {
+                "component": "Seat",
+                "kwargs": {},
+            },
+        ],
+    }
+    if left:
+        seat["components"] += [
+            {
+                "component": "BoatManager",
+                "kwargs": {
+                    "flailEffectiveness": 0.1,
+                },
+            }
+        ]
+    return seat
 
 
 def get_oar(left: bool):
-  suffix = "L" if left else "R"
-  shape = {
-      "L": [shapes.OAR_DOWN_L, shapes.OAR_UP_L, shapes.OAR_UP_L],
-      "R": [shapes.OAR_DOWN_R, shapes.OAR_UP_R, shapes.OAR_UP_R],
-  }
-  return {
-      "name": f"oar_{suffix}",
-      "components": [
-          {
-              "component": "StateManager",
-              "kwargs": {
-                  "initialState": "oarDown",
-                  "stateConfigs": [
-                      {
-                          "state": "oarDown",
-                          "layer": "overlay",
-                          "sprite": f"OarDown{suffix}",
-                          "groups": ["oar", "boat"],
-                      },
-                      {
-                          "state": "oarUp_row",
-                          "layer": "overlay",
-                          "sprite": f"OarUp{suffix}Row",
-                          "groups": ["oar", "boat"],
-                      },
-                      {
-                          "state": "oarUp_flail",
-                          "layer": "overlay",
-                          "sprite": f"OarUp{suffix}Flail",
-                          "groups": ["oar", "boat"],
-                      },
-                  ],
-              },
-          },
-          {
-              "component": "Transform",
-          },
-          {
-              "component": "Appearance",
-              "kwargs": {
-                  "renderMode": "ascii_shape",
-                  "spriteNames": [
-                      f"OarDown{suffix}",
-                      f"OarUp{suffix}Row",
-                      f"OarUp{suffix}Flail",
-                  ],
-                  "spriteShapes": shape[suffix],
-                  "palettes": [shapes.GRAY_PALETTE] * 3,
-                  "noRotates": [False] * 3,
-              },
-          },
-      ],
-  }
+    suffix = "L" if left else "R"
+    shape = {
+        "L": [shapes.OAR_DOWN_L, shapes.OAR_UP_L, shapes.OAR_UP_L],
+        "R": [shapes.OAR_DOWN_R, shapes.OAR_UP_R, shapes.OAR_UP_R],
+    }
+    return {
+        "name": f"oar_{suffix}",
+        "components": [
+            {
+                "component": "StateManager",
+                "kwargs": {
+                    "initialState": "oarDown",
+                    "stateConfigs": [
+                        {
+                            "state": "oarDown",
+                            "layer": "overlay",
+                            "sprite": f"OarDown{suffix}",
+                            "groups": ["oar", "boat"],
+                        },
+                        {
+                            "state": "oarUp_row",
+                            "layer": "overlay",
+                            "sprite": f"OarUp{suffix}Row",
+                            "groups": ["oar", "boat"],
+                        },
+                        {
+                            "state": "oarUp_flail",
+                            "layer": "overlay",
+                            "sprite": f"OarUp{suffix}Flail",
+                            "groups": ["oar", "boat"],
+                        },
+                    ],
+                },
+            },
+            {
+                "component": "Transform",
+            },
+            {
+                "component": "Appearance",
+                "kwargs": {
+                    "renderMode": "ascii_shape",
+                    "spriteNames": [
+                        f"OarDown{suffix}",
+                        f"OarUp{suffix}Row",
+                        f"OarUp{suffix}Flail",
+                    ],
+                    "spriteShapes": shape[suffix],
+                    "palettes": [shapes.GRAY_PALETTE] * 3,
+                    "noRotates": [False] * 3,
+                },
+            },
+        ],
+    }
 
 
 AVATAR = {
@@ -835,10 +846,12 @@ AVATAR = {
     ],
 }
 if _ENABLE_DEBUG_OBSERVATIONS:
-  AVATAR["components"].append({
-      "component": "LocationObserver",
-      "kwargs": {"objectIsAvatar": True, "alsoReportOrientation": True},
-  })
+    AVATAR["components"].append(
+        {
+            "component": "LocationObserver",
+            "kwargs": {"objectIsAvatar": True, "alsoReportOrientation": True},
+        }
+    )
 
 
 # PREFABS is a dictionary mapping names to template game objects that can
@@ -910,62 +923,63 @@ ACTION_SET = (
 
 
 def get_config():
-  """Configuration for the boat_race substrate."""
-  config = configdict.ConfigDict()
+    """Configuration for the boat_race substrate."""
+    config = configdict.ConfigDict()
 
-  # Specify the number of players to particate in each episode (optional).
-  config.recommended_num_players = MANDATED_NUM_PLAYERS
+    # Specify the number of players to particate in each episode (optional).
+    config.recommended_num_players = MANDATED_NUM_PLAYERS
 
-  # Action set configuration.
-  config.action_set = ACTION_SET
-  # Observation format configuration.
-  config.individual_observation_names = [
-      "RGB",
-  ]
-  config.global_observation_names = [
-      "WORLD.RGB",
-  ]
+    # Action set configuration.
+    config.action_set = ACTION_SET
+    # Observation format configuration.
+    config.individual_observation_names = [
+        "RGB",
+    ]
+    config.global_observation_names = [
+        "WORLD.RGB",
+    ]
 
-  # The specs of the environment (from a single-agent perspective).
-  config.action_spec = specs.action(len(ACTION_SET))
-  config.timestep_spec = specs.timestep({
-      "RGB": specs.OBSERVATION["RGB"],
-      # Debug only (do not use the following observations in policies).
-      "WORLD.RGB": specs.rgb(304, 208),
-  })
+    # The specs of the environment (from a single-agent perspective).
+    config.action_spec = specs.action(len(ACTION_SET))
+    config.timestep_spec = specs.timestep(
+        {
+            "RGB": specs.OBSERVATION["RGB"],
+            # Debug only (do not use the following observations in policies).
+            "WORLD.RGB": specs.rgb(304, 208),
+        }
+    )
 
-  # The roles assigned to each player.
-  config.valid_roles = frozenset({"default", "target"})
+    # The roles assigned to each player.
+    config.valid_roles = frozenset({"default", "target"})
 
-  return config
+    return config
 
 
 def build(
     roles: Sequence[str],
     config: configdict.ConfigDict,
 ) -> Mapping[str, Any]:
-  """Build boat_race substrate given player roles."""
-  assert len(roles) == MANDATED_NUM_PLAYERS, "Wrong number of players"
-  assert "num_races" in config, (
-      "Cannot build substrate without specifying the number of races. Try "
-      "using the specific config (e.g. `boat_race__eight_races`) instead."
-  )
+    """Build boat_race substrate given player roles."""
+    assert len(roles) == MANDATED_NUM_PLAYERS, "Wrong number of players"
+    assert "num_races" in config, (
+        "Cannot build substrate without specifying the number of races. Try "
+        "using the specific config (e.g. `boat_race__eight_races`) instead."
+    )
 
-  # Build the rest of the substrate definition.
-  substrate_definition = dict(
-      levelName="boat_race",
-      levelDirectory="meltingpot/lua/levels",
-      numPlayers=MANDATED_NUM_PLAYERS,
-      maxEpisodeLengthFrames=config.num_races
-      * (PARTNER_DURATION + RACE_DURATION),
-      spriteSize=8,
-      topology="BOUNDED",  # Choose from ["BOUNDED", "TORUS"],
-      simulation={
-          "map": ASCII_MAP,
-          "scene": SCENE,
-          "prefabs": PREFABS,
-          "charPrefabMap": CHAR_PREFAB_MAP,
-          "playerPalettes": PLAYER_COLOR_PALETTES,
-      },
-  )
-  return substrate_definition
+    # Build the rest of the substrate definition.
+    substrate_definition = dict(
+        levelName="boat_race",
+        levelDirectory="meltingpot/lua/levels",
+        numPlayers=MANDATED_NUM_PLAYERS,
+        maxEpisodeLengthFrames=config.num_races * (PARTNER_DURATION + RACE_DURATION),
+        spriteSize=8,
+        topology="BOUNDED",  # Choose from ["BOUNDED", "TORUS"],
+        simulation={
+            "map": ASCII_MAP,
+            "scene": SCENE,
+            "prefabs": PREFABS,
+            "charPrefabMap": CHAR_PREFAB_MAP,
+            "playerPalettes": PLAYER_COLOR_PALETTES,
+        },
+    )
+    return substrate_definition

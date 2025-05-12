@@ -13,10 +13,10 @@
 # limitations under the License.
 """Configuration for Factory of the Commons: Either Or."""
 
-from meltingpot.configs.substrates import factory_commons as base_config
-from meltingpot.utils.substrates import map_helpers
-from meltingpot.utils.substrates import specs
 from ml_collections import config_dict
+
+from meltingpot.configs.substrates import factory_commons as base_config
+from meltingpot.utils.substrates import map_helpers, specs
 
 build = base_config.build
 
@@ -50,9 +50,7 @@ blue_cube_wait = {"type": "all", "list": ["tiled_floor", "blue_cube_wait"]}
 CHAR_PREFAB_MAP = {
     " ": {"type": "all", "list": ["tiled_floor", "apple", "spawn_point"]},
     # Graspable objects.
-    "c": map_helpers.a_or_b_with_odds(
-        blue_cube_wait, blue_cube_live, odds=(1, 1)
-    ),
+    "c": map_helpers.a_or_b_with_odds(blue_cube_wait, blue_cube_live, odds=(1, 1)),
     "C": blue_cube_live,  # This blue cube will always be present.
     # New dynamic components.
     "l": {
@@ -107,25 +105,27 @@ CHAR_PREFAB_MAP = {
 
 
 def get_config():
-  """Default configuration."""
-  config = base_config.get_config()
-  # Specify a recommended number of players to particate in each episode.
-  config.recommended_num_players = 3
-  # Override the map layout settings.
-  config.layout = config_dict.ConfigDict()
-  config.layout.ascii_map = ASCII_MAP
-  config.layout.char_prefab_map = CHAR_PREFAB_MAP
+    """Default configuration."""
+    config = base_config.get_config()
+    # Specify a recommended number of players to particate in each episode.
+    config.recommended_num_players = 3
+    # Override the map layout settings.
+    config.layout = config_dict.ConfigDict()
+    config.layout.ascii_map = ASCII_MAP
+    config.layout.char_prefab_map = CHAR_PREFAB_MAP
 
-  # The roles assigned to each player.
-  config.valid_roles = frozenset({"default"})
-  config.default_player_roles = ("default",) * 3
+    # The roles assigned to each player.
+    config.valid_roles = frozenset({"default"})
+    config.default_player_roles = ("default",) * 3
 
-  # The specs of the environment (from a single-agent perspective).
-  config.timestep_spec = specs.timestep({
-      "RGB": specs.OBSERVATION["RGB"],
-      "READY_TO_SHOOT": specs.OBSERVATION["READY_TO_SHOOT"],
-      "STAMINA": specs.float64(),
-      # Debug only.
-      "WORLD.RGB": specs.rgb(128, 184),
-  })
-  return config
+    # The specs of the environment (from a single-agent perspective).
+    config.timestep_spec = specs.timestep(
+        {
+            "RGB": specs.OBSERVATION["RGB"],
+            "READY_TO_SHOOT": specs.OBSERVATION["READY_TO_SHOOT"],
+            "STAMINA": specs.float64(),
+            # Debug only.
+            "WORLD.RGB": specs.rgb(128, 184),
+        }
+    )
+    return config

@@ -22,22 +22,22 @@ def a_or_b_with_odds(
     b_descriptor: Union[str, Mapping[str, Any]],
     odds: Sequence[int],
 ) -> Mapping[str, Any]:
-  """Return a versus b with specified odds.
+    """Return a versus b with specified odds.
 
-  Args:
-      a_descriptor: One possibility. May be either a string or a dict that can
-          be read by the map parser.
-      b_descriptor: The other possibility. May be either a string or a dict that
-          can be read by the map parser.
-      odds: odds[0] is the number of outcomes where a is returned. odds[1] is
-          the number of outcomes where b is returned. Thus the probability of
-          returning a is odds[0] / sum(odds) and the probability of returning
-          b is odds[1] / sum(odds).
+    Args:
+        a_descriptor: One possibility. May be either a string or a dict that can
+            be read by the map parser.
+        b_descriptor: The other possibility. May be either a string or a dict that
+            can be read by the map parser.
+        odds: odds[0] is the number of outcomes where a is returned. odds[1] is
+            the number of outcomes where b is returned. Thus the probability of
+            returning a is odds[0] / sum(odds) and the probability of returning
+            b is odds[1] / sum(odds).
 
-  Returns:
-      The dict descriptor that can be used with the map parser to sample either
-      a or b at the specified odds.
-  """
-  a_odds, b_odds = odds
-  choices = [a_descriptor] * a_odds + [b_descriptor] * b_odds
-  return {"type": "choice", "list": choices}
+    Returns:
+        The dict descriptor that can be used with the map parser to sample either
+        a or b at the specified odds.
+    """
+    a_odds, b_odds = odds
+    choices = [a_descriptor] * a_odds + [b_descriptor] * b_odds
+    return {"type": "choice", "list": choices}

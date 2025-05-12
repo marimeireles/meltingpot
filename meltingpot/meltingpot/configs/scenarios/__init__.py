@@ -22,34 +22,34 @@ import immutabledict
 
 @dataclasses.dataclass(frozen=True)
 class ScenarioConfig:
-  """Scenario config.
+    """Scenario config.
 
-  Attributes:
-    description: a description of the scenario.
-    tags: tags for the scenario.
-    substrate: the substrate the scenario is based on.
-    roles: indicates what role the player in the corresponding player slot has.
-    is_focal: indicates whether the corresponding player slot is to be filled by
-      a focal player or a bot.
-    bots_by_role: names of the bots to sample from to fill the bot slots with
-      the corresponding role.
-  """
+    Attributes:
+      description: a description of the scenario.
+      tags: tags for the scenario.
+      substrate: the substrate the scenario is based on.
+      roles: indicates what role the player in the corresponding player slot has.
+      is_focal: indicates whether the corresponding player slot is to be filled by
+        a focal player or a bot.
+      bots_by_role: names of the bots to sample from to fill the bot slots with
+        the corresponding role.
+    """
 
-  description: str
-  tags: AbstractSet[str]
-  substrate: str
-  roles: Sequence[str]
-  is_focal: Sequence[bool]
-  bots_by_role: Mapping[str, AbstractSet[str]]
+    description: str
+    tags: AbstractSet[str]
+    substrate: str
+    roles: Sequence[str]
+    is_focal: Sequence[bool]
+    bots_by_role: Mapping[str, AbstractSet[str]]
 
-  def __post_init__(self):
-    object.__setattr__(self, "tags", frozenset(self.tags))
-    object.__setattr__(self, "roles", tuple(self.roles))
-    object.__setattr__(self, "is_focal", tuple(self.is_focal))
-    bots_by_role = immutabledict.immutabledict(
-        {role: frozenset(bots) for role, bots in self.bots_by_role.items()}
-    )
-    object.__setattr__(self, "bots_by_role", bots_by_role)
+    def __post_init__(self):
+        object.__setattr__(self, "tags", frozenset(self.tags))
+        object.__setattr__(self, "roles", tuple(self.roles))
+        object.__setattr__(self, "is_focal", tuple(self.is_focal))
+        bots_by_role = immutabledict.immutabledict(
+            {role: frozenset(bots) for role, bots in self.bots_by_role.items()}
+        )
+        object.__setattr__(self, "bots_by_role", bots_by_role)
 
 
 # Local additions/overrides.
@@ -127,8 +127,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
     ),
     allelopathic_harvest__open_2=ScenarioConfig(
         description=(
-            "focals are resident and visited by bots who plant either red or "
-            + "green"
+            "focals are resident and visited by bots who plant either red or " + "green"
         ),
         tags={
             "resident",
@@ -254,8 +253,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
     ),
     allelopathic_harvest__open_7=ScenarioConfig(
         description=(
-            "not very crowded, focals like red, visited by "
-            + "convention followers"
+            "not very crowded, focals like red, visited by " + "convention followers"
         ),
         tags={
             "convention_following",
@@ -278,8 +276,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
     ),
     allelopathic_harvest__open_8=ScenarioConfig(
         description=(
-            "very low population, focals like red, meeting "
-            + "convention followers"
+            "very low population, focals like red, meeting " + "convention followers"
         ),
         tags={
             "convention_following",
@@ -350,8 +347,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
     ),
     allelopathic_harvest__open_11=ScenarioConfig(
         description=(
-            "focals are resident, visited by a couple of convention "
-            + "followers"
+            "focals are resident, visited by a couple of convention " + "followers"
         ),
         tags={
             "convention_following",
@@ -407,12 +403,8 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
         roles=("bach_fan",) * 4 + ("stravinsky_fan",) * 4,
         is_focal=(True,) * 1 + (False,) * 7,
         bots_by_role=immutabledict.immutabledict(
-            bach_fan=(
-                "bach_or_stravinsky_in_the_matrix__arena__bach_picker_0",
-            ),
-            stravinsky_fan=(
-                "bach_or_stravinsky_in_the_matrix__arena__bach_picker_0",
-            ),
+            bach_fan=("bach_or_stravinsky_in_the_matrix__arena__bach_picker_0",),
+            stravinsky_fan=("bach_or_stravinsky_in_the_matrix__arena__bach_picker_0",),
         ),
     ),
     bach_or_stravinsky_in_the_matrix__arena_1=ScenarioConfig(
@@ -425,9 +417,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
         roles=("bach_fan",) * 4 + ("stravinsky_fan",) * 4,
         is_focal=(True,) * 1 + (False,) * 7,
         bots_by_role=immutabledict.immutabledict(
-            bach_fan=(
-                "bach_or_stravinsky_in_the_matrix__arena__stravinsky_picker_0",
-            ),
+            bach_fan=("bach_or_stravinsky_in_the_matrix__arena__stravinsky_picker_0",),
             stravinsky_fan=(
                 "bach_or_stravinsky_in_the_matrix__arena__stravinsky_picker_0",
             ),
@@ -457,9 +447,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
         roles=("bach_fan",) * 4 + ("stravinsky_fan",) * 4,
         is_focal=(True,) * 5 + (False,) * 3,
         bots_by_role=immutabledict.immutabledict(
-            stravinsky_fan=(
-                "bach_or_stravinsky_in_the_matrix__arena__bach_picker_0",
-            ),
+            stravinsky_fan=("bach_or_stravinsky_in_the_matrix__arena__bach_picker_0",),
         ),
     ),
     bach_or_stravinsky_in_the_matrix__arena_4=ScenarioConfig(
@@ -529,9 +517,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
         roles=("stravinsky_fan",) + ("bach_fan",),
         is_focal=(True,) + (False,),
         bots_by_role=immutabledict.immutabledict(
-            bach_fan=(
-                "bach_or_stravinsky_in_the_matrix__repeated__bach_picker_0",
-            ),
+            bach_fan=("bach_or_stravinsky_in_the_matrix__repeated__bach_picker_0",),
         ),
     ),
     bach_or_stravinsky_in_the_matrix__repeated_1=ScenarioConfig(
@@ -549,9 +535,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
         ),
     ),
     bach_or_stravinsky_in_the_matrix__repeated_2=ScenarioConfig(
-        description=(
-            "meeting a bot who plays stravinsky despite not being a " + "fan"
-        ),
+        description=("meeting a bot who plays stravinsky despite not being a " + "fan"),
         tags={
             "convention_following",
         },
@@ -597,8 +581,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
     ),
     bach_or_stravinsky_in_the_matrix__repeated_5=ScenarioConfig(
         description=(
-            "stravinsky fan focal agent meets an imperfectly "
-            + "copying partner"
+            "stravinsky fan focal agent meets an imperfectly " + "copying partner"
         ),
         tags={
             "reciprocity",
@@ -716,8 +699,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
     ),
     chemistry__three_metabolic_cycles_0=ScenarioConfig(
         description=(
-            "resident focal population meets a small mixture of "
-            + "background bots"
+            "resident focal population meets a small mixture of " + "background bots"
         ),
         tags={
             "resident",
@@ -787,9 +769,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
         tags={
             "resident",
         },
-        substrate=(
-            "chemistry__three_metabolic_cycles_with_plentiful_distractors"
-        ),
+        substrate=("chemistry__three_metabolic_cycles_with_plentiful_distractors"),
         roles=("default",) * 8,
         is_focal=(True,) * 5 + (False,) * 3,
         bots_by_role={
@@ -805,9 +785,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
         tags={
             "niche_discovery",
         },
-        substrate=(
-            "chemistry__three_metabolic_cycles_with_plentiful_distractors"
-        ),
+        substrate=("chemistry__three_metabolic_cycles_with_plentiful_distractors"),
         roles=("default",) * 8,
         is_focal=(True,) * 4 + (False,) * 4,
         bots_by_role={
@@ -821,9 +799,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
         tags={
             "niche_discovery",
         },
-        substrate=(
-            "chemistry__three_metabolic_cycles_with_plentiful_distractors"
-        ),
+        substrate=("chemistry__three_metabolic_cycles_with_plentiful_distractors"),
         roles=("default",) * 8,
         is_focal=(True,) * 4 + (False,) * 4,
         bots_by_role={
@@ -842,9 +818,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
             "visitor",
             "niche_discovery",
         },
-        substrate=(
-            "chemistry__three_metabolic_cycles_with_plentiful_distractors"
-        ),
+        substrate=("chemistry__three_metabolic_cycles_with_plentiful_distractors"),
         roles=("default",) * 8,
         is_focal=(True,) * 2 + (False,) * 6,
         bots_by_role={
@@ -857,8 +831,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
     ),
     chemistry__two_metabolic_cycles_0=ScenarioConfig(
         description=(
-            "resident focal population meets a small mixture of "
-            + "background bots"
+            "resident focal population meets a small mixture of " + "background bots"
         ),
         tags={
             "resident",
@@ -939,8 +912,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
     ),
     chemistry__two_metabolic_cycles_with_distractors_1=ScenarioConfig(
         description=(
-            "meeting one-sided bots running blue and avoid "
-            + "distractor molecules"
+            "meeting one-sided bots running blue and avoid " + "distractor molecules"
         ),
         tags={
             "niche_discovery",
@@ -956,8 +928,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
     ),
     chemistry__two_metabolic_cycles_with_distractors_2=ScenarioConfig(
         description=(
-            "meeting one-sided bots running green and avoid "
-            + "distractor molecules"
+            "meeting one-sided bots running green and avoid " + "distractor molecules"
         ),
         tags={
             "niche_discovery",
@@ -1008,8 +979,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
     ),
     chicken_in_the_matrix__arena_1=ScenarioConfig(
         description=(
-            "focals are resident and visitors are unconditional "
-            + "dove players"
+            "focals are resident and visitors are unconditional " + "dove players"
         ),
         tags={
             "resident",
@@ -1027,8 +997,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
     ),
     chicken_in_the_matrix__arena_2=ScenarioConfig(
         description=(
-            "focals are resident and visitors are unconditional"
-            + "hawk players"
+            "focals are resident and visitors are unconditional" + "hawk players"
         ),
         tags={
             "resident",
@@ -1660,9 +1629,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
         },
     ),
     clean_up_21=ScenarioConfig(
-        description=(
-            "resident focals are visited by a couple bots who free ride"
-        ),
+        description=("resident focals are visited by a couple bots who free ride"),
         tags={
             "resident",
             "acceptance",
@@ -1740,9 +1707,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
         },
     ),
     coins_3=ScenarioConfig(
-        description=(
-            "partner is a high-threshold (generous) strong " + "reciprocator"
-        ),
+        description=("partner is a high-threshold (generous) strong " + "reciprocator"),
         tags={
             "reciprocity",
         },
@@ -2766,9 +2731,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
         ),
     ),
     hidden_agenda_0=ScenarioConfig(
-        description=(
-            "A focal population is visited by impostor which hunts crewmates"
-        ),
+        description=("A focal population is visited by impostor which hunts crewmates"),
         tags={
             "resident",
         },
@@ -2955,9 +2918,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
         },
     ),
     predator_prey__alley_hunt_2=ScenarioConfig(
-        description=(
-            "a focal predator competes with background predators to eat prey"
-        ),
+        description=("a focal predator competes with background predators to eat prey"),
         tags={
             "visitor",
         },
@@ -3157,8 +3118,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
     ),
     predator_prey__orchard_1=ScenarioConfig(
         description=(
-            "focal predators aim to eat resident population of "
-            + "unspecialized prey"
+            "focal predators aim to eat resident population of " + "unspecialized prey"
         ),
         tags={
             "visitor",
@@ -3337,9 +3297,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
         },
     ),
     predator_prey__random_forest_2=ScenarioConfig(
-        description=(
-            "a focal predator competes with background predators to eat prey"
-        ),
+        description=("a focal predator competes with background predators to eat prey"),
         tags={
             "visitor",
         },
@@ -3401,8 +3359,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
     ),
     prisoners_dilemma_in_the_matrix__arena_1=ScenarioConfig(
         description=(
-            "focals are resident and visited by an unconditional "
-            + "cooperator"
+            "focals are resident and visited by an unconditional " + "cooperator"
         ),
         tags={
             "resident",
@@ -4977,8 +4934,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
     ),
     stag_hunt_in_the_matrix__arena_2=ScenarioConfig(
         description=(
-            "focals are resident and visitors are unconditional "
-            + "stag players"
+            "focals are resident and visitors are unconditional " + "stag players"
         ),
         tags={
             "resident",
@@ -4996,8 +4952,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
     ),
     stag_hunt_in_the_matrix__arena_3=ScenarioConfig(
         description=(
-            "focals are resident and visitors are unconditional"
-            + "hare players"
+            "focals are resident and visitors are unconditional" + "hare players"
         ),
         tags={
             "resident",
@@ -5504,9 +5459,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
         substrate="territory__rooms",
         roles=("default",) * 9,
         is_focal=(True,) + (False,) * 8,
-        bots_by_role={
-            "default": {"territory__rooms__puppet_considerate_claimer_0"}
-        },
+        bots_by_role={"default": {"territory__rooms__puppet_considerate_claimer_0"}},
     ),
     territory__rooms_5=ScenarioConfig(
         description=(
@@ -5518,25 +5471,19 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
         substrate="territory__rooms",
         roles=("default",) * 9,
         is_focal=(True,) * 7 + (False,) * 2,
-        bots_by_role={
-            "default": {"territory__rooms__puppet_considerate_claimer_0"}
-        },
+        bots_by_role={"default": {"territory__rooms__puppet_considerate_claimer_0"}},
     ),
     # territory__rooms_6 deleted due to
     # https://github.com/google-deepmind/meltingpot/issues/246.
     territory__rooms_7=ScenarioConfig(
-        description=(
-            "focals are resident, visited by an inconsiderate " + "claimer"
-        ),
+        description=("focals are resident, visited by an inconsiderate " + "claimer"),
         tags={
             "resident",
         },
         substrate="territory__rooms",
         roles=("default",) * 9,
         is_focal=(False,) + (True,) * 8,  # Reversed is_focal order for variety.
-        bots_by_role={
-            "default": {"territory__rooms__puppet_inconsiderate_claimer_0"}
-        },
+        bots_by_role={"default": {"territory__rooms__puppet_inconsiderate_claimer_0"}},
     ),
     territory__rooms_8=ScenarioConfig(
         description=(
@@ -5552,9 +5499,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
         roles=("default",) * 9,
         is_focal=(True,) * 8 + (False,) * 1,
         bots_by_role={
-            "default": {
-                "territory__rooms__puppet_inconsiderate_claimer_to_zapper_0"
-            }
+            "default": {"territory__rooms__puppet_inconsiderate_claimer_to_zapper_0"}
         },
     ),
     territory__rooms_9=ScenarioConfig(
@@ -5573,9 +5518,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
         roles=("default",) * 3,
         is_focal=(True,) * 2 + (False,) * 1,
         bots_by_role={
-            "default": {
-                "territory__rooms__puppet_inconsiderate_claimer_to_zapper_0"
-            }
+            "default": {"territory__rooms__puppet_inconsiderate_claimer_to_zapper_0"}
         },
     ),
     territory__rooms_10=ScenarioConfig(
@@ -5593,9 +5536,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
         roles=("default",) * 3,
         is_focal=(True,) * 2 + (False,) * 1,
         bots_by_role={
-            "default": {
-                "territory__rooms__puppet_inconsiderate_claimer_to_destroyer_0"
-            }
+            "default": {"territory__rooms__puppet_inconsiderate_claimer_to_destroyer_0"}
         },
     ),
     territory__rooms_11=ScenarioConfig(
@@ -5610,9 +5551,7 @@ SCENARIO_CONFIGS: Mapping[str, ScenarioConfig] = immutabledict.immutabledict(
         substrate="territory__rooms",
         roles=("default",) * 3,
         is_focal=(True,) + (False,) * 2,
-        bots_by_role={
-            "default": {"territory__rooms__puppet_considerate_claimer_0"}
-        },
+        bots_by_role={"default": {"territory__rooms__puppet_considerate_claimer_0"}},
     ),
     territory__rooms_12=ScenarioConfig(
         description=(

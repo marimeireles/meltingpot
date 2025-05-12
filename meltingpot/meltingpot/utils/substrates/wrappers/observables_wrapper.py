@@ -17,56 +17,57 @@ from typing import Mapping, Union
 
 import dm_env
 import dmlab2d
-from meltingpot.utils.substrates.wrappers import observables
 import numpy as np
 from reactivex import subject
+
+from meltingpot.utils.substrates.wrappers import observables
 
 Action = Union[int, float, np.ndarray]
 
 
 class ObservablesWrapper(observables.ObservableLab2dWrapper):
-  """Wrapper exposes timesteps, actions, and events as observables."""
+    """Wrapper exposes timesteps, actions, and events as observables."""
 
-  def __init__(self, env: dmlab2d.Environment):
-    """Initializes the object.
+    def __init__(self, env: dmlab2d.Environment):
+        """Initializes the object.
 
-    Args:
-      env: The environment to wrap.
-    """
-    super().__init__(env)
-    self._action_subject = subject.Subject()
-    self._timestep_subject = subject.Subject()
-    self._events_subject = subject.Subject()
-    self._observables = observables.Lab2dObservables(
-        action=self._action_subject,
-        events=self._events_subject,
-        timestep=self._timestep_subject,
-    )
+        Args:
+          env: The environment to wrap.
+        """
+        super().__init__(env)
+        self._action_subject = subject.Subject()
+        self._timestep_subject = subject.Subject()
+        self._events_subject = subject.Subject()
+        self._observables = observables.Lab2dObservables(
+            action=self._action_subject,
+            events=self._events_subject,
+            timestep=self._timestep_subject,
+        )
 
-  def reset(self) -> dm_env.TimeStep:
-    """See base class."""
-    timestep = super().reset()
-    self._timestep_subject.on_next(timestep)
-    for event in super().events():
-      self._events_subject.on_next(event)
-    return timestep
+    def reset(self) -> dm_env.TimeStep:
+        """See base class."""
+        timestep = super().reset()
+        self._timestep_subject.on_next(timestep)
+        for event in super().events():
+            self._events_subject.on_next(event)
+        return timestep
 
-  def step(self, action: Mapping[str, Action]) -> dm_env.TimeStep:
-    """See base class."""
-    self._action_subject.on_next(action)
-    timestep = super().step(action)
-    self._timestep_subject.on_next(timestep)
-    for event in super().events():
-      self._events_subject.on_next(event)
-    return timestep
+    def step(self, action: Mapping[str, Action]) -> dm_env.TimeStep:
+        """See base class."""
+        self._action_subject.on_next(action)
+        timestep = super().step(action)
+        self._timestep_subject.on_next(timestep)
+        for event in super().events():
+            self._events_subject.on_next(event)
+        return timestep
 
-  def close(self) -> None:
-    """See base class."""
-    super().close()
-    self._action_subject.on_completed()
-    self._timestep_subject.on_completed()
-    self._events_subject.on_completed()
+    def close(self) -> None:
+        """See base class."""
+        super().close()
+        self._action_subject.on_completed()
+        self._timestep_subject.on_completed()
+        self._events_subject.on_completed()
 
-  def observables(self) -> observables.Lab2dObservables:
-    """See base class."""
-    return self._observables
+    def observables(self) -> observables.Lab2dObservables:
+        """See base class."""
+        return self._observables

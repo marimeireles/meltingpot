@@ -33,9 +33,10 @@ Additionally, there are the clockwise and anti-clockwise strategies as in the
 Ring layout.
 """
 
+from ml_collections import config_dict
+
 from meltingpot.configs.substrates import collaborative_cooking as base_config
 from meltingpot.utils.substrates import specs
-from ml_collections import config_dict
 
 build = base_config.build
 
@@ -52,21 +53,23 @@ x###OO###
 
 
 def get_config():
-  """Default configuration."""
-  config = base_config.get_config()
+    """Default configuration."""
+    config = base_config.get_config()
 
-  # Override the map layout settings.
-  config.layout = config_dict.ConfigDict()
-  config.layout.ascii_map = ASCII_MAP
-  # The specs of the environment (from a single-agent perspective).
-  config.timestep_spec = specs.timestep({
-      "RGB": specs.rgb(40, 40),
-      # Debug only (do not use the following observations in policies).
-      "WORLD.RGB": specs.rgb(40, 72),
-  })
+    # Override the map layout settings.
+    config.layout = config_dict.ConfigDict()
+    config.layout.ascii_map = ASCII_MAP
+    # The specs of the environment (from a single-agent perspective).
+    config.timestep_spec = specs.timestep(
+        {
+            "RGB": specs.rgb(40, 40),
+            # Debug only (do not use the following observations in policies).
+            "WORLD.RGB": specs.rgb(40, 72),
+        }
+    )
 
-  # The roles assigned to each player.
-  config.valid_roles = frozenset({"default"})
-  config.default_player_roles = ("default",) * 2
+    # The roles assigned to each player.
+    config.valid_roles = frozenset({"default"})
+    config.default_player_roles = ("default",) * 2
 
-  return config
+    return config

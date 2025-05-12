@@ -15,8 +15,8 @@
 
 from unittest import mock
 
-from absl.testing import absltest
-from absl.testing import parameterized
+from absl.testing import absltest, parameterized
+
 from meltingpot.testing import puppeteers
 from meltingpot.utils.puppeteers import gift_refinements
 
@@ -27,52 +27,52 @@ _GIFT = mock.sentinel.gift
 
 class GiftRefinementsCooperatorTest(parameterized.TestCase):
 
-  @parameterized.parameters(
-      [(0, 0, 0), _COLLECT],
-      [(0, 0, 1), _CONSUME],
-      [(1, 0, 0), _GIFT],
-      [(2, 0, 0), _GIFT],
-      [(2, 0, 2), _CONSUME],
-      [(1, 1, 0), _CONSUME],
-      [(1, 1, 1), _CONSUME],
-      [(5, 2, 0), _CONSUME],
-      [(5, 5, 5), _CONSUME],
-  )
-  def test(self, inventory, expected):
-    puppeteer = gift_refinements.GiftRefinementsCooperator(
-        collect_goal=_COLLECT,
-        consume_goal=_CONSUME,
-        gift_goal=_GIFT,
+    @parameterized.parameters(
+        [(0, 0, 0), _COLLECT],
+        [(0, 0, 1), _CONSUME],
+        [(1, 0, 0), _GIFT],
+        [(2, 0, 0), _GIFT],
+        [(2, 0, 2), _CONSUME],
+        [(1, 1, 0), _CONSUME],
+        [(1, 1, 1), _CONSUME],
+        [(5, 2, 0), _CONSUME],
+        [(5, 5, 5), _CONSUME],
     )
-    (actual,), _ = puppeteers.goals_from_observations(
-        puppeteer, [{"INVENTORY": inventory}]
-    )
-    self.assertEqual(actual, expected)
+    def test(self, inventory, expected):
+        puppeteer = gift_refinements.GiftRefinementsCooperator(
+            collect_goal=_COLLECT,
+            consume_goal=_CONSUME,
+            gift_goal=_GIFT,
+        )
+        (actual,), _ = puppeteers.goals_from_observations(
+            puppeteer, [{"INVENTORY": inventory}]
+        )
+        self.assertEqual(actual, expected)
 
 
 class GiftRefinementsExtremeCooperatorTest(parameterized.TestCase):
 
-  @parameterized.parameters(
-      [(0, 0, 0), _COLLECT],
-      [(0, 0, 1), _CONSUME],
-      [(1, 0, 0), _GIFT],
-      [(2, 0, 2), _CONSUME],
-      [(1, 1, 0), _GIFT],
-      [(1, 1, 1), _CONSUME],
-      [(5, 2, 0), _GIFT],
-      [(5, 5, 5), _CONSUME],
-  )
-  def test(self, inventory, expected):
-    puppeteer = gift_refinements.GiftRefinementsExtremeCooperator(
-        collect_goal=_COLLECT,
-        consume_goal=_CONSUME,
-        gift_goal=_GIFT,
+    @parameterized.parameters(
+        [(0, 0, 0), _COLLECT],
+        [(0, 0, 1), _CONSUME],
+        [(1, 0, 0), _GIFT],
+        [(2, 0, 2), _CONSUME],
+        [(1, 1, 0), _GIFT],
+        [(1, 1, 1), _CONSUME],
+        [(5, 2, 0), _GIFT],
+        [(5, 5, 5), _CONSUME],
     )
-    (actual,), _ = puppeteers.goals_from_observations(
-        puppeteer, [{"INVENTORY": inventory}]
-    )
-    self.assertEqual(actual, expected)
+    def test(self, inventory, expected):
+        puppeteer = gift_refinements.GiftRefinementsExtremeCooperator(
+            collect_goal=_COLLECT,
+            consume_goal=_CONSUME,
+            gift_goal=_GIFT,
+        )
+        (actual,), _ = puppeteers.goals_from_observations(
+            puppeteer, [{"INVENTORY": inventory}]
+        )
+        self.assertEqual(actual, expected)
 
 
 if __name__ == "__main__":
-  absltest.main()
+    absltest.main()

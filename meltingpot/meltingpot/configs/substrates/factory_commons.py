@@ -15,10 +15,9 @@
 
 from typing import Any, Dict, Generator, Mapping, Sequence
 
-from meltingpot.utils.substrates import colors
-from meltingpot.utils.substrates import shapes
-from meltingpot.utils.substrates import specs
 from ml_collections import config_dict
+
+from meltingpot.utils.substrates import colors, shapes, specs
 
 # Warning: setting `_ENABLE_DEBUG_OBSERVATIONS = True` may cause slowdown.
 _ENABLE_DEBUG_OBSERVATIONS = False
@@ -44,11 +43,13 @@ FLOOR_MARKING = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "floor_marking",
-                "stateConfigs": [{
-                    "state": "floor_marking",
-                    "layer": "lowestPhysical",
-                    "sprite": "floor_marking",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "floor_marking",
+                        "layer": "lowestPhysical",
+                        "sprite": "floor_marking",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -112,12 +113,15 @@ PINK_CUBE_DISPENSING_ANIMATION = {
                     shapes.CUBE_DISPENSING_ANIMATION_2,
                     shapes.CUBE_DISPENSING_ANIMATION_3,
                 ],
-                "palettes": [{
-                    "a": (255, 174, 182, 255),
-                    "A": (240, 161, 169, 255),
-                    "&": (237, 140, 151, 255),
-                    "x": (0, 0, 0, 0),
-                }] * 3,
+                "palettes": [
+                    {
+                        "a": (255, 174, 182, 255),
+                        "A": (240, 161, 169, 255),
+                        "&": (237, 140, 151, 255),
+                        "x": (0, 0, 0, 0),
+                    }
+                ]
+                * 3,
                 "noRotates": [True] * 3,
             },
         },
@@ -158,10 +162,12 @@ DISPENSER_INDICATOR_PINK_CUBE = {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["dispenser_pink_cube"],
                 "spriteShapes": [shapes.HOPPER_INDICATOR_SINGLE_BLOCK],
-                "palettes": [{
-                    "x": (0, 0, 0, 0),
-                    "a": (255, 174, 182, 255),
-                }],
+                "palettes": [
+                    {
+                        "x": (0, 0, 0, 0),
+                        "a": (255, 174, 182, 255),
+                    }
+                ],
                 "noRotates": [False],
             },
         },
@@ -183,11 +189,13 @@ SPAWN_POINT = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "spawnPoint",
-                "stateConfigs": [{
-                    "state": "spawnPoint",
-                    "layer": "alternateLogic",
-                    "groups": ["spawnPoints"],
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "spawnPoint",
+                        "layer": "alternateLogic",
+                        "groups": ["spawnPoints"],
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -196,102 +204,103 @@ SPAWN_POINT = {
 
 
 def get_blue_cube(initial_state: str):
-  """Get a blue cube prefab."""
-  prefab = {
-      "name": "blue_cube_live",
-      "components": [
-          {
-              "component": "StateManager",
-              "kwargs": {
-                  "initialState": initial_state,
-                  "stateConfigs": [
-                      {
-                          "state": "blue_cube",
-                          "layer": "lowerPhysical",
-                          "sprite": "blue_cube",
-                      },
-                      {
-                          "state": "blue_jump",
-                          "layer": "lowerPhysical",
-                          "sprite": "blue_jump",
-                      },
-                      {
-                          "state": "blue_cube_drop_one",
-                          "layer": "lowerPhysical",
-                          "sprite": "blue_cube_drop_one",
-                      },
-                      {
-                          "state": "blue_cube_drop_two",
-                          "layer": "lowerPhysical",
-                          "sprite": "blue_cube_drop_two",
-                      },
-                      {
-                          "state": "waitState",
-                      },
-                  ],
-              },
-          },
-          {"component": "Transform"},
-          {
-              "component": "Appearance",
-              "kwargs": {
-                  "renderMode": "ascii_shape",
-                  "spriteNames": [
-                      "blue_cube",
-                      "blue_cube_drop_one",
-                      "blue_cube_drop_two",
-                      "blue_jump",
-                  ],
-                  "spriteShapes": [
-                      shapes.BLOCK,
-                      shapes.BLOCK_DROP_1,
-                      shapes.BLOCK_DROP_2,
-                      shapes.CUBE_DISPENSING_ANIMATION_1,
-                  ],
-                  "palettes": [
-                      shapes.FACTORY_OBJECTS_PALETTE,
-                  ] * 4,
-                  "noRotates": [True] * 4,
-              },
-          },
-          {
-              "component": "Receivable",
-              "kwargs": {
-                  "waitState": "waitState",
-                  "liveState": "blue_cube",
-              },
-          },
-          {
-              "component": "ReceiverDropAnimation",
-              "kwargs": {
-                  "dropOne": "blue_cube_drop_one",
-                  "dropTwo": "blue_cube_drop_two",
-              },
-          },
-          {"component": "Token", "kwargs": {"type": "BlueCube"}},
-          {
-              "component": "ObjectJumpAnimation",
-              "kwargs": {
-                  "jump": "blue_jump",
-                  "drop": "blue_cube",
-                  "waitState": "waitState",
-              },
-          },
-          {
-              "component": "Graspable",
-              "kwargs": {
-                  "graspableStates": ("blue_cube",),
-                  "disconnectStates": (
-                      "blue_jump",
-                      "blue_cube_drop_one",
-                      "blue_cube_drop_two",
-                      "waitState",
-                  ),
-              },
-          },
-      ],
-  }
-  return prefab
+    """Get a blue cube prefab."""
+    prefab = {
+        "name": "blue_cube_live",
+        "components": [
+            {
+                "component": "StateManager",
+                "kwargs": {
+                    "initialState": initial_state,
+                    "stateConfigs": [
+                        {
+                            "state": "blue_cube",
+                            "layer": "lowerPhysical",
+                            "sprite": "blue_cube",
+                        },
+                        {
+                            "state": "blue_jump",
+                            "layer": "lowerPhysical",
+                            "sprite": "blue_jump",
+                        },
+                        {
+                            "state": "blue_cube_drop_one",
+                            "layer": "lowerPhysical",
+                            "sprite": "blue_cube_drop_one",
+                        },
+                        {
+                            "state": "blue_cube_drop_two",
+                            "layer": "lowerPhysical",
+                            "sprite": "blue_cube_drop_two",
+                        },
+                        {
+                            "state": "waitState",
+                        },
+                    ],
+                },
+            },
+            {"component": "Transform"},
+            {
+                "component": "Appearance",
+                "kwargs": {
+                    "renderMode": "ascii_shape",
+                    "spriteNames": [
+                        "blue_cube",
+                        "blue_cube_drop_one",
+                        "blue_cube_drop_two",
+                        "blue_jump",
+                    ],
+                    "spriteShapes": [
+                        shapes.BLOCK,
+                        shapes.BLOCK_DROP_1,
+                        shapes.BLOCK_DROP_2,
+                        shapes.CUBE_DISPENSING_ANIMATION_1,
+                    ],
+                    "palettes": [
+                        shapes.FACTORY_OBJECTS_PALETTE,
+                    ]
+                    * 4,
+                    "noRotates": [True] * 4,
+                },
+            },
+            {
+                "component": "Receivable",
+                "kwargs": {
+                    "waitState": "waitState",
+                    "liveState": "blue_cube",
+                },
+            },
+            {
+                "component": "ReceiverDropAnimation",
+                "kwargs": {
+                    "dropOne": "blue_cube_drop_one",
+                    "dropTwo": "blue_cube_drop_two",
+                },
+            },
+            {"component": "Token", "kwargs": {"type": "BlueCube"}},
+            {
+                "component": "ObjectJumpAnimation",
+                "kwargs": {
+                    "jump": "blue_jump",
+                    "drop": "blue_cube",
+                    "waitState": "waitState",
+                },
+            },
+            {
+                "component": "Graspable",
+                "kwargs": {
+                    "graspableStates": ("blue_cube",),
+                    "disconnectStates": (
+                        "blue_jump",
+                        "blue_cube_drop_one",
+                        "blue_cube_drop_two",
+                        "waitState",
+                    ),
+                },
+            },
+        ],
+    }
+    return prefab
 
 
 BANANA = {
@@ -345,7 +354,8 @@ BANANA = {
                 ],
                 "palettes": [
                     shapes.FACTORY_OBJECTS_PALETTE,
-                ] * 4,
+                ]
+                * 4,
                 "noRotates": [True] * 4,
             },
         },
@@ -513,12 +523,15 @@ PINK_CUBE = {
                     shapes.BLOCK_DROP_2,
                     shapes.CUBE_DISPENSING_ANIMATION_1,
                 ],
-                "palettes": [{
-                    "a": (255, 174, 182, 255),
-                    "A": (240, 161, 169, 255),
-                    "&": (237, 140, 151, 255),
-                    "x": (0, 0, 0, 0),
-                }] * 4,
+                "palettes": [
+                    {
+                        "a": (255, 174, 182, 255),
+                        "A": (240, 161, 169, 255),
+                        "&": (237, 140, 151, 255),
+                        "x": (0, 0, 0, 0),
+                    }
+                ]
+                * 4,
                 "noRotates": [True] * 4,
             },
         },
@@ -844,12 +857,15 @@ PINK_CUBE_DISPENSING = {
                     shapes.CUBE_DISPENSING_ANIMATION_2,
                     shapes.CUBE_DISPENSING_ANIMATION_3,
                 ],
-                "palettes": [{
-                    "a": (255, 174, 182, 255),
-                    "A": (240, 161, 169, 255),
-                    "&": (237, 140, 151, 255),
-                    "x": (0, 0, 0, 0),
-                }] * 3,
+                "palettes": [
+                    {
+                        "a": (255, 174, 182, 255),
+                        "A": (240, 161, 169, 255),
+                        "&": (237, 140, 151, 255),
+                        "x": (0, 0, 0, 0),
+                    }
+                ]
+                * 3,
                 "noRotates": [True] * 3,
             },
         },
@@ -958,14 +974,17 @@ HOPPER_BODY = {
                     shapes.HOPPER_BODY,
                     shapes.HOPPER_BODY_ACTIVATED,
                 ],
-                "palettes": [{
-                    "a": (140, 129, 129, 255),
-                    "b": (84, 77, 77, 255),
-                    "f": (92, 98, 120, 255),
-                    "g": (92, 98, 120, 255),
-                    "c": (92, 98, 120, 255),
-                    "x": (0, 0, 0, 0),
-                }] * 2,
+                "palettes": [
+                    {
+                        "a": (140, 129, 129, 255),
+                        "b": (84, 77, 77, 255),
+                        "f": (92, 98, 120, 255),
+                        "g": (92, 98, 120, 255),
+                        "c": (92, 98, 120, 255),
+                        "x": (0, 0, 0, 0),
+                    }
+                ]
+                * 2,
                 "noRotates": [False] * 2,
             },
         },
@@ -1147,10 +1166,12 @@ HOPPER_INDICATOR_PINK_CUBE = {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["hopper_pink_cube"],
                 "spriteShapes": [shapes.HOPPER_INDICATOR_SINGLE_BLOCK],
-                "palettes": [{
-                    "x": (0, 0, 0, 0),
-                    "a": (255, 174, 182, 255),
-                }],
+                "palettes": [
+                    {
+                        "x": (0, 0, 0, 0),
+                        "a": (255, 174, 182, 255),
+                    }
+                ],
                 "noRotates": [False],
             },
         },
@@ -1449,11 +1470,13 @@ NW_WALL_CORNER = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "nw_wall_corner",
-                "stateConfigs": [{
-                    "state": "nw_wall_corner",
-                    "layer": "lowerPhysical",
-                    "sprite": "NwWallCorner",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "nw_wall_corner",
+                        "layer": "lowerPhysical",
+                        "sprite": "NwWallCorner",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -1479,11 +1502,13 @@ NE_WALL_CORNER = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "ne_wall_corner",
-                "stateConfigs": [{
-                    "state": "ne_wall_corner",
-                    "layer": "upperPhysical",
-                    "sprite": "NeWallCorner",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "ne_wall_corner",
+                        "layer": "upperPhysical",
+                        "sprite": "NeWallCorner",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -1509,11 +1534,13 @@ WALL_HORIZONTAL = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "wall_horizontal",
-                "stateConfigs": [{
-                    "state": "wall_horizontal",
-                    "layer": "lowerPhysical",
-                    "sprite": "WallHorizontal",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "wall_horizontal",
+                        "layer": "lowerPhysical",
+                        "sprite": "WallHorizontal",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -1539,11 +1566,13 @@ WALL_T_COUPLING = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "wall_t_coupling",
-                "stateConfigs": [{
-                    "state": "wall_t_coupling",
-                    "layer": "upperPhysical",
-                    "sprite": "WallTCoupling",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "wall_t_coupling",
+                        "layer": "upperPhysical",
+                        "sprite": "WallTCoupling",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -1569,11 +1598,13 @@ WALL_EAST = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "wall_east",
-                "stateConfigs": [{
-                    "state": "wall_east",
-                    "layer": "lowerPhysical",
-                    "sprite": "WallEast",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "wall_east",
+                        "layer": "lowerPhysical",
+                        "sprite": "WallEast",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -1599,11 +1630,13 @@ WALL_WEST = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "wall_west",
-                "stateConfigs": [{
-                    "state": "wall_west",
-                    "layer": "lowerPhysical",
-                    "sprite": "WallWest",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "wall_west",
+                        "layer": "lowerPhysical",
+                        "sprite": "WallWest",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -1629,11 +1662,13 @@ WALL_MIDDLE = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "wall_middle",
-                "stateConfigs": [{
-                    "state": "wall_middle",
-                    "layer": "lowerPhysical",
-                    "sprite": "WallMiddle",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "wall_middle",
+                        "layer": "lowerPhysical",
+                        "sprite": "WallMiddle",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -1659,11 +1694,13 @@ THRESHOLD = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "threshold",
-                "stateConfigs": [{
-                    "state": "threshold",
-                    "layer": "lowestPhysical",
-                    "sprite": "Threshold",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "threshold",
+                        "layer": "lowestPhysical",
+                        "sprite": "Threshold",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -1687,11 +1724,13 @@ TILED_FLOOR = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "tiled_floor",
-                "stateConfigs": [{
-                    "state": "tiled_floor",
-                    "layer": "background",
-                    "sprite": "tiled_floor",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "tiled_floor",
+                        "layer": "background",
+                        "sprite": "tiled_floor",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -1715,11 +1754,13 @@ FLOOR_MARKING = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "floor_marking",
-                "stateConfigs": [{
-                    "state": "floor_marking",
-                    "layer": "lowestPhysical",
-                    "sprite": "floor_marking",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "floor_marking",
+                        "layer": "lowestPhysical",
+                        "sprite": "floor_marking",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -1743,11 +1784,13 @@ FLOOR_MARKING_TOP = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "floor_marking_top",
-                "stateConfigs": [{
-                    "state": "floor_marking_top",
-                    "layer": "lowestPhysical",
-                    "sprite": "floor_marking_top",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "floor_marking_top",
+                        "layer": "lowestPhysical",
+                        "sprite": "floor_marking_top",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -1771,11 +1814,13 @@ FLOOR_MARKING_BOTTOM = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "floor_marking_bottom",
-                "stateConfigs": [{
-                    "state": "floor_marking_bottom",
-                    "layer": "lowestPhysical",
-                    "sprite": "floor_marking_bottom",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "floor_marking_bottom",
+                        "layer": "lowestPhysical",
+                        "sprite": "floor_marking_bottom",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -1935,126 +1980,133 @@ ACTION_SET = (
 
 
 def create_scene():
-  """Creates the global scene."""
-  scene = {
-      "name": "scene",
-      "components": [
-          {
-              "component": "StateManager",
-              "kwargs": {
-                  "initialState": "scene",
-                  "stateConfigs": [{
-                      "state": "scene",
-                  }],
-              },
-          },
-          {"component": "Transform"},
-          {
-              "component": "StochasticIntervalEpisodeEnding",
-              "kwargs": {
-                  "minimumFramesPerEpisode": 1000,
-                  "intervalLength": 100,  # Set equal to unroll length.
-                  "probabilityTerminationPerInterval": 0.1,
-              },
-          },
-      ],
-  }
+    """Creates the global scene."""
+    scene = {
+        "name": "scene",
+        "components": [
+            {
+                "component": "StateManager",
+                "kwargs": {
+                    "initialState": "scene",
+                    "stateConfigs": [
+                        {
+                            "state": "scene",
+                        }
+                    ],
+                },
+            },
+            {"component": "Transform"},
+            {
+                "component": "StochasticIntervalEpisodeEnding",
+                "kwargs": {
+                    "minimumFramesPerEpisode": 1000,
+                    "intervalLength": 100,  # Set equal to unroll length.
+                    "probabilityTerminationPerInterval": 0.1,
+                },
+            },
+        ],
+    }
 
-  return scene
+    return scene
 
 
 def _create_stamina_overlay(
     player_idx: int,
     max_stamina_bar_states: int,
 ) -> Generator[Dict[str, Any], None, None]:
-  """Create stamina marker overlay objects."""
-  # Lua is 1-indexed.
-  lua_idx = player_idx + 1
+    """Create stamina marker overlay objects."""
+    # Lua is 1-indexed.
+    lua_idx = player_idx + 1
 
-  stamina_bar_state_configs = [
-      # Invisible inactive (dead) overlay type.
-      {"state": "staminaBarWait"},
-  ]
-  stamina_bar_sprite_names = []
-  stamina_bar_sprite_shapes = []
+    stamina_bar_state_configs = [
+        # Invisible inactive (dead) overlay type.
+        {"state": "staminaBarWait"},
+    ]
+    stamina_bar_sprite_names = []
+    stamina_bar_sprite_shapes = []
 
-  # Each player's stamina bars must be in their own layer so they do not
-  # interact/collide with other players' stamina bars.
-  stamina_bar_layer = f"superOverlay_{player_idx}"
+    # Each player's stamina bars must be in their own layer so they do not
+    # interact/collide with other players' stamina bars.
+    stamina_bar_layer = f"superOverlay_{player_idx}"
 
-  # Declare one state per level of the stamina bar.
-  for i in range(max_stamina_bar_states):
-    sprite_name = f"sprite_for_level_{i}"
-    stamina_bar_state_configs.append({
-        "state": f"level_{i}",
-        "layer": stamina_bar_layer,
-        "sprite": sprite_name,
-    })
-    stamina_bar_sprite_names.append(sprite_name)
-    xs = "\nxxxxxxxx"
-    blank_space = xs * 7
-    number_of_rs = max(6 - i, 0)
-    number_of_ys = i if i < 7 else 12 - i
-    number_of_gs = max(i - 6, 0)
-    if i >= 13:
-      level = blank_space + xs
-    else:
-      level = (
-          blank_space
-          + "\nx"
-          + "G" * number_of_gs
-          + "Y" * number_of_ys
-          + "R" * number_of_rs
-          + "x"
-      )
-    empty = "\n".join(["x" * 8] * 8)
-    # Replace the east/south/west sprites with invisible sprites so the only
-    # stamina bar rendered is the one in the direction that the current player
-    # is facing.
-    stamina_bar_sprite_shapes.append((level, empty, empty, empty))
-
-  # Create a stamina bar for each compass direction. Only the direction the
-  # current player is facing is visible.
-  for direction in ("N", "E", "S", "W"):
-    yield {
-        "name": "avatar_stamina_bar",
-        "components": [
+    # Declare one state per level of the stamina bar.
+    for i in range(max_stamina_bar_states):
+        sprite_name = f"sprite_for_level_{i}"
+        stamina_bar_state_configs.append(
             {
-                "component": "StateManager",
-                "kwargs": {
-                    "initialState": "staminaBarWait",
-                    "stateConfigs": stamina_bar_state_configs,
+                "state": f"level_{i}",
+                "layer": stamina_bar_layer,
+                "sprite": sprite_name,
+            }
+        )
+        stamina_bar_sprite_names.append(sprite_name)
+        xs = "\nxxxxxxxx"
+        blank_space = xs * 7
+        number_of_rs = max(6 - i, 0)
+        number_of_ys = i if i < 7 else 12 - i
+        number_of_gs = max(i - 6, 0)
+        if i >= 13:
+            level = blank_space + xs
+        else:
+            level = (
+                blank_space
+                + "\nx"
+                + "G" * number_of_gs
+                + "Y" * number_of_ys
+                + "R" * number_of_rs
+                + "x"
+            )
+        empty = "\n".join(["x" * 8] * 8)
+        # Replace the east/south/west sprites with invisible sprites so the only
+        # stamina bar rendered is the one in the direction that the current player
+        # is facing.
+        stamina_bar_sprite_shapes.append((level, empty, empty, empty))
+
+    # Create a stamina bar for each compass direction. Only the direction the
+    # current player is facing is visible.
+    for direction in ("N", "E", "S", "W"):
+        yield {
+            "name": "avatar_stamina_bar",
+            "components": [
+                {
+                    "component": "StateManager",
+                    "kwargs": {
+                        "initialState": "staminaBarWait",
+                        "stateConfigs": stamina_bar_state_configs,
+                    },
                 },
-            },
-            {
-                "component": "Transform",
-            },
-            {
-                "component": "Appearance",
-                "kwargs": {
-                    "renderMode": "ascii_shape",
-                    "spriteNames": stamina_bar_sprite_names,
-                    "spriteShapes": stamina_bar_sprite_shapes,
-                    "palettes": [{
-                        "G": (62, 137, 72, 255),
-                        "Y": (255, 216, 97, 255),
-                        "R": (162, 38, 51, 255),
-                        "x": INVISIBLE,
-                    }] * max_stamina_bar_states,
-                    "noRotates": [True] * max_stamina_bar_states,
+                {
+                    "component": "Transform",
                 },
-            },
-            {
-                "component": "StaminaBar",
-                "kwargs": {
-                    "playerIndex": lua_idx,
-                    "waitState": "staminaBarWait",
-                    "layer": stamina_bar_layer,
-                    "direction": direction,
+                {
+                    "component": "Appearance",
+                    "kwargs": {
+                        "renderMode": "ascii_shape",
+                        "spriteNames": stamina_bar_sprite_names,
+                        "spriteShapes": stamina_bar_sprite_shapes,
+                        "palettes": [
+                            {
+                                "G": (62, 137, 72, 255),
+                                "Y": (255, 216, 97, 255),
+                                "R": (162, 38, 51, 255),
+                                "x": INVISIBLE,
+                            }
+                        ]
+                        * max_stamina_bar_states,
+                        "noRotates": [True] * max_stamina_bar_states,
+                    },
                 },
-            },
-        ],
-    }
+                {
+                    "component": "StaminaBar",
+                    "kwargs": {
+                        "playerIndex": lua_idx,
+                        "waitState": "staminaBarWait",
+                        "layer": stamina_bar_layer,
+                        "direction": direction,
+                    },
+                },
+            ],
+        }
 
 
 def create_avatar_object(
@@ -2062,318 +2114,320 @@ def create_avatar_object(
     target_sprite_self: Dict[str, Any],
     max_stamina_bar_states: int,
 ) -> Dict[str, Any]:
-  """Create an avatar object."""
-  # Lua is 1-indexed.
-  lua_index = player_idx + 1
-  # Setup the self vs other sprite mapping.
-  avatar_sprite_name = "avatarSprite{}".format(lua_index)
-  grappling_sprite = "AvatarGrappling" + str(lua_index)
-  grappled_sprite = "AvatarGrappled" + str(lua_index)
+    """Create an avatar object."""
+    # Lua is 1-indexed.
+    lua_index = player_idx + 1
+    # Setup the self vs other sprite mapping.
+    avatar_sprite_name = "avatarSprite{}".format(lua_index)
+    grappling_sprite = "AvatarGrappling" + str(lua_index)
+    grappled_sprite = "AvatarGrappled" + str(lua_index)
 
-  custom_sprite_map = {
-      avatar_sprite_name: target_sprite_self["default"]["name"],
-      grappling_sprite: target_sprite_self["grappling"]["name"],
-      grappled_sprite: target_sprite_self["grappled"]["name"],
-  }
+    custom_sprite_map = {
+        avatar_sprite_name: target_sprite_self["default"]["name"],
+        grappling_sprite: target_sprite_self["grappling"]["name"],
+        grappled_sprite: target_sprite_self["grappled"]["name"],
+    }
 
-  live_state_name = "player{}".format(lua_index)
-  grappling_state_name = f"player{lua_index}_grappling"
-  grappled_state_name = f"player{lua_index}_grappled"
+    live_state_name = "player{}".format(lua_index)
+    grappling_state_name = f"player{lua_index}_grappling"
+    grappled_state_name = f"player{lua_index}_grappled"
 
-  color_palette = shapes.get_palette(colors.palette[player_idx])
-  # Add character mappings to avatar pallete for Magic Beam overlay
-  color_palette["P"] = (196, 77, 190, 130)
-  color_palette["p"] = (184, 72, 178, 80)
-  spawn_group = "spawnPoints"
+    color_palette = shapes.get_palette(colors.palette[player_idx])
+    # Add character mappings to avatar pallete for Magic Beam overlay
+    color_palette["P"] = (196, 77, 190, 130)
+    color_palette["p"] = (184, 72, 178, 80)
+    spawn_group = "spawnPoints"
 
-  avatar_object = {
-      "name": "avatar",
-      "components": [
-          {
-              "component": "StateManager",
-              "kwargs": {
-                  "initialState": live_state_name,
-                  "stateConfigs": [
-                      # Initial player state.
-                      {
-                          "state": live_state_name,
-                          "layer": "midPhysical",
-                          "sprite": avatar_sprite_name,
-                          "contact": "avatar",
-                          "groups": ["players"],
-                      },
-                      {
-                          "state": grappling_state_name,
-                          "layer": "upperPhysical",
-                          "sprite": grappling_sprite,
-                          "contact": "avatar",
-                          "groups": ["players"],
-                      },
-                      {
-                          "state": grappled_state_name,
-                          "layer": "upperPhysical",
-                          "sprite": grappled_sprite,
-                          "contact": "avatar",
-                          "groups": ["players"],
-                      },
-                      # Player wait type for times when they are zapped out.
-                      {"state": "playerWait", "groups": ["playerWaits"]},
-                  ],
-              },
-          },
-          {"component": "Transform"},
-          {
-              "component": "Appearance",
-              "kwargs": {
-                  "renderMode": "ascii_shape",
-                  "spriteNames": [
-                      avatar_sprite_name,
-                      grappling_sprite,
-                      grappled_sprite,
-                  ],
-                  "spriteShapes": [
-                      shapes.CUTE_AVATAR,
-                      shapes.CUTE_AVATAR_ARMS_UP,
-                      shapes.MAGIC_GRAPPLED_AVATAR,
-                  ],
-                  "palettes": [color_palette] * 3,
-                  "noRotates": [True] * 3,
-              },
-          },
-          {
-              "component": "AdditionalSprites",
-              "kwargs": {
-                  "renderMode": "ascii_shape",
-                  "customSpriteNames": [
-                      target_sprite_self["default"]["name"],
-                      target_sprite_self["grappling"]["name"],
-                      target_sprite_self["grappled"]["name"],
-                  ],
-                  "customSpriteShapes": [
-                      target_sprite_self["default"]["shape"],
-                      target_sprite_self["grappling"]["shape"],
-                      target_sprite_self["grappled"]["shape"],
-                  ],
-                  "customPalettes": [
-                      target_sprite_self["default"]["palette"],
-                      target_sprite_self["grappling"]["palette"],
-                      target_sprite_self["grappled"]["palette"],
-                  ],
-                  "customNoRotates": [
-                      target_sprite_self["default"]["noRotate"],
-                      target_sprite_self["grappling"]["noRotate"],
-                      target_sprite_self["grappled"]["noRotate"],
-                  ],
-              },
-          },
-          {
-              "component": "Avatar",
-              "kwargs": {
-                  "index": lua_index,
-                  "aliveState": live_state_name,
-                  "additionalLiveStates": [
-                      grappled_state_name,
-                      grappling_state_name,
-                  ],
-                  "waitState": "playerWait",
-                  "spawnGroup": spawn_group,
-                  "actionOrder": [
-                      "move",
-                      "turn",
-                      "pickup",
-                      "grasp",
-                      # Grappling actions
-                      "hold",
-                      "shove",
-                  ],
-                  "actionSpec": {
-                      "move": {"default": 0, "min": 0, "max": len(_COMPASS)},
-                      "turn": {"default": 0, "min": -1, "max": 1},
-                      "pickup": {"default": 0, "min": 0, "max": 1},
-                      "grasp": {"default": 0, "min": 0, "max": 1},
-                      # Grappling actions
-                      "hold": {"default": 0, "min": 0, "max": 1},
-                      "shove": {"default": 0, "min": -1, "max": 1},
-                  },
-                  "view": {
-                      "left": 5,
-                      "right": 5,
-                      "forward": 9,
-                      "backward": 1,
-                      "centered": False,
-                  },
-                  "spriteMap": custom_sprite_map,
-              },
-          },
-          {
-              "component": "AvatarGrasp",
-              "kwargs": {
-                  "shape": GRASP_SHAPE,
-                  "palette": color_palette,
-                  "graspAction": "grasp",
-                  # If multiple objects are at the same position then grasp them
-                  # according to their layer in order `precedenceOrder`.
-                  "precedenceOrder": (
-                      "appleLayer",
-                      "lowerPhysical",
-                  ),
-              },
-          },
-          {
-              "component": "Grappling",
-              "kwargs": {
-                  "shape": shapes.MAGIC_BEAM,
-                  "palette": shapes.MAGIC_BEAM_PALETTE,
-                  "liveState": live_state_name,
-                  "grappledState": grappled_state_name,
-                  "grapplingState": grappling_state_name,
-              },
-          },
-          {
-              "component": "ReadyToShootObservation",
-              "kwargs": {
-                  # In this case READY_TO_SHOOT will be 1 if hold is allowed and
-                  # will be 0 if not.
-                  "zapperComponent": "Grappling",
-              },
-          },
-          {
-              "component": "Stamina",
-              "kwargs": {
-                  "maxStamina": max_stamina_bar_states,
-                  "classConfig": {
-                      "name": "player",
-                      "greenFreezeTime": 0,
-                      "yellowFreezeTime": 2,
-                      "redFreezeTime": 6,
-                      # `decrementRate` = 0.5 means decrease stamina on every
-                      # other costly step. `decrementRate` = 1 means decrease
-                      # stamina on every costly step.
-                      "decrementRate": 1.0,
-                  },
-                  "amountInvisible": 6,
-                  "amountGreen": 6,
-                  "amountYellow": 6,
-                  "amountRed": 1,
-                  "costlyActions": [
-                      "move",
-                  ],
-              },
-          },
-          {
-              "component": "StaminaObservation",
-              "kwargs": {
-                  "staminaComponent": "Stamina",
-              },
-          },
-      ],
-  }
-  if _ENABLE_DEBUG_OBSERVATIONS:
-    avatar_object["components"].append({
-        "component": "LocationObserver",
-        "kwargs": {"objectIsAvatar": True, "alsoReportOrientation": True},
-    })
+    avatar_object = {
+        "name": "avatar",
+        "components": [
+            {
+                "component": "StateManager",
+                "kwargs": {
+                    "initialState": live_state_name,
+                    "stateConfigs": [
+                        # Initial player state.
+                        {
+                            "state": live_state_name,
+                            "layer": "midPhysical",
+                            "sprite": avatar_sprite_name,
+                            "contact": "avatar",
+                            "groups": ["players"],
+                        },
+                        {
+                            "state": grappling_state_name,
+                            "layer": "upperPhysical",
+                            "sprite": grappling_sprite,
+                            "contact": "avatar",
+                            "groups": ["players"],
+                        },
+                        {
+                            "state": grappled_state_name,
+                            "layer": "upperPhysical",
+                            "sprite": grappled_sprite,
+                            "contact": "avatar",
+                            "groups": ["players"],
+                        },
+                        # Player wait type for times when they are zapped out.
+                        {"state": "playerWait", "groups": ["playerWaits"]},
+                    ],
+                },
+            },
+            {"component": "Transform"},
+            {
+                "component": "Appearance",
+                "kwargs": {
+                    "renderMode": "ascii_shape",
+                    "spriteNames": [
+                        avatar_sprite_name,
+                        grappling_sprite,
+                        grappled_sprite,
+                    ],
+                    "spriteShapes": [
+                        shapes.CUTE_AVATAR,
+                        shapes.CUTE_AVATAR_ARMS_UP,
+                        shapes.MAGIC_GRAPPLED_AVATAR,
+                    ],
+                    "palettes": [color_palette] * 3,
+                    "noRotates": [True] * 3,
+                },
+            },
+            {
+                "component": "AdditionalSprites",
+                "kwargs": {
+                    "renderMode": "ascii_shape",
+                    "customSpriteNames": [
+                        target_sprite_self["default"]["name"],
+                        target_sprite_self["grappling"]["name"],
+                        target_sprite_self["grappled"]["name"],
+                    ],
+                    "customSpriteShapes": [
+                        target_sprite_self["default"]["shape"],
+                        target_sprite_self["grappling"]["shape"],
+                        target_sprite_self["grappled"]["shape"],
+                    ],
+                    "customPalettes": [
+                        target_sprite_self["default"]["palette"],
+                        target_sprite_self["grappling"]["palette"],
+                        target_sprite_self["grappled"]["palette"],
+                    ],
+                    "customNoRotates": [
+                        target_sprite_self["default"]["noRotate"],
+                        target_sprite_self["grappling"]["noRotate"],
+                        target_sprite_self["grappled"]["noRotate"],
+                    ],
+                },
+            },
+            {
+                "component": "Avatar",
+                "kwargs": {
+                    "index": lua_index,
+                    "aliveState": live_state_name,
+                    "additionalLiveStates": [
+                        grappled_state_name,
+                        grappling_state_name,
+                    ],
+                    "waitState": "playerWait",
+                    "spawnGroup": spawn_group,
+                    "actionOrder": [
+                        "move",
+                        "turn",
+                        "pickup",
+                        "grasp",
+                        # Grappling actions
+                        "hold",
+                        "shove",
+                    ],
+                    "actionSpec": {
+                        "move": {"default": 0, "min": 0, "max": len(_COMPASS)},
+                        "turn": {"default": 0, "min": -1, "max": 1},
+                        "pickup": {"default": 0, "min": 0, "max": 1},
+                        "grasp": {"default": 0, "min": 0, "max": 1},
+                        # Grappling actions
+                        "hold": {"default": 0, "min": 0, "max": 1},
+                        "shove": {"default": 0, "min": -1, "max": 1},
+                    },
+                    "view": {
+                        "left": 5,
+                        "right": 5,
+                        "forward": 9,
+                        "backward": 1,
+                        "centered": False,
+                    },
+                    "spriteMap": custom_sprite_map,
+                },
+            },
+            {
+                "component": "AvatarGrasp",
+                "kwargs": {
+                    "shape": GRASP_SHAPE,
+                    "palette": color_palette,
+                    "graspAction": "grasp",
+                    # If multiple objects are at the same position then grasp them
+                    # according to their layer in order `precedenceOrder`.
+                    "precedenceOrder": (
+                        "appleLayer",
+                        "lowerPhysical",
+                    ),
+                },
+            },
+            {
+                "component": "Grappling",
+                "kwargs": {
+                    "shape": shapes.MAGIC_BEAM,
+                    "palette": shapes.MAGIC_BEAM_PALETTE,
+                    "liveState": live_state_name,
+                    "grappledState": grappled_state_name,
+                    "grapplingState": grappling_state_name,
+                },
+            },
+            {
+                "component": "ReadyToShootObservation",
+                "kwargs": {
+                    # In this case READY_TO_SHOOT will be 1 if hold is allowed and
+                    # will be 0 if not.
+                    "zapperComponent": "Grappling",
+                },
+            },
+            {
+                "component": "Stamina",
+                "kwargs": {
+                    "maxStamina": max_stamina_bar_states,
+                    "classConfig": {
+                        "name": "player",
+                        "greenFreezeTime": 0,
+                        "yellowFreezeTime": 2,
+                        "redFreezeTime": 6,
+                        # `decrementRate` = 0.5 means decrease stamina on every
+                        # other costly step. `decrementRate` = 1 means decrease
+                        # stamina on every costly step.
+                        "decrementRate": 1.0,
+                    },
+                    "amountInvisible": 6,
+                    "amountGreen": 6,
+                    "amountYellow": 6,
+                    "amountRed": 1,
+                    "costlyActions": [
+                        "move",
+                    ],
+                },
+            },
+            {
+                "component": "StaminaObservation",
+                "kwargs": {
+                    "staminaComponent": "Stamina",
+                },
+            },
+        ],
+    }
+    if _ENABLE_DEBUG_OBSERVATIONS:
+        avatar_object["components"].append(
+            {
+                "component": "LocationObserver",
+                "kwargs": {"objectIsAvatar": True, "alsoReportOrientation": True},
+            }
+        )
 
-  return avatar_object
+    return avatar_object
 
 
 def create_avatar_objects(num_players: int, max_stamina_bar_states: int = 19):
-  """Returns list of avatar objects of length 'num_players'."""
-  avatar_objects = []
-  for player_idx in range(num_players):
-    avatar_object = create_avatar_object(
-        player_idx, TARGET_SPRITE_SELF, max_stamina_bar_states - 1
-    )
-    stamina_bar_objects = _create_stamina_overlay(
-        player_idx, max_stamina_bar_states
-    )
-    enter_obstacle = _create_enter_obstacle(player_idx)
-    avatar_objects.append(avatar_object)
-    avatar_objects.append(enter_obstacle)
-    avatar_objects.extend(stamina_bar_objects)
+    """Returns list of avatar objects of length 'num_players'."""
+    avatar_objects = []
+    for player_idx in range(num_players):
+        avatar_object = create_avatar_object(
+            player_idx, TARGET_SPRITE_SELF, max_stamina_bar_states - 1
+        )
+        stamina_bar_objects = _create_stamina_overlay(
+            player_idx, max_stamina_bar_states
+        )
+        enter_obstacle = _create_enter_obstacle(player_idx)
+        avatar_objects.append(avatar_object)
+        avatar_objects.append(enter_obstacle)
+        avatar_objects.extend(stamina_bar_objects)
 
-  return avatar_objects
+    return avatar_objects
 
 
 def _create_enter_obstacle(player_idx: int) -> Dict[str, Any]:
-  # Lua is 1-indexed.
-  lua_idx = player_idx + 1
-  return {
-      "name": "enter_obstacle",
-      "components": [
-          {
-              "component": "StateManager",
-              "kwargs": {
-                  "initialState": "obstacleWait",
-                  "stateConfigs": [
-                      {"state": "obstacleWait"},
-                      {
-                          "state": "obstacleLive",
-                          "layer": "lowerPhysical",
-                      },
-                  ],
-              },
-          },
-          {
-              "component": "Transform",
-          },
-          {
-              "component": "AvatarConnector",
-              "kwargs": {
-                  "playerIndex": lua_idx,
-                  "aliveState": "obstacleLive",
-                  "waitState": "obstacleWait",
-              },
-          },
-      ],
-  }
+    # Lua is 1-indexed.
+    lua_idx = player_idx + 1
+    return {
+        "name": "enter_obstacle",
+        "components": [
+            {
+                "component": "StateManager",
+                "kwargs": {
+                    "initialState": "obstacleWait",
+                    "stateConfigs": [
+                        {"state": "obstacleWait"},
+                        {
+                            "state": "obstacleLive",
+                            "layer": "lowerPhysical",
+                        },
+                    ],
+                },
+            },
+            {
+                "component": "Transform",
+            },
+            {
+                "component": "AvatarConnector",
+                "kwargs": {
+                    "playerIndex": lua_idx,
+                    "aliveState": "obstacleLive",
+                    "waitState": "obstacleWait",
+                },
+            },
+        ],
+    }
 
 
 def get_config():
-  """Default configuration for training on the factory2d level."""
-  config = config_dict.ConfigDict()
+    """Default configuration for training on the factory2d level."""
+    config = config_dict.ConfigDict()
 
-  # Specify the number of players to particate in each episode (optional).
-  config.recommended_num_players = 12
+    # Specify the number of players to particate in each episode (optional).
+    config.recommended_num_players = 12
 
-  # Action set configuration.
-  config.action_set = ACTION_SET
-  # Observation format configuration.
-  config.individual_observation_names = [
-      "RGB",
-      "READY_TO_SHOOT",
-      "STAMINA",
-  ]
-  config.global_observation_names = [
-      "WORLD.RGB",
-  ]
+    # Action set configuration.
+    config.action_set = ACTION_SET
+    # Observation format configuration.
+    config.individual_observation_names = [
+        "RGB",
+        "READY_TO_SHOOT",
+        "STAMINA",
+    ]
+    config.global_observation_names = [
+        "WORLD.RGB",
+    ]
 
-  config.action_spec = specs.action(len(ACTION_SET))
-  config.valid_roles = frozenset({"default"})
+    config.action_spec = specs.action(len(ACTION_SET))
+    config.valid_roles = frozenset({"default"})
 
-  return config
+    return config
 
 
 def build(
     roles: Sequence[str],
     config: config_dict.ConfigDict,
 ) -> Mapping[str, Any]:
-  """Build substrate definition given player roles."""
-  num_players = len(roles)
-  # Build the rest of the substrate definition.
-  substrate_definition = dict(
-      levelName="factory_of_the_commons",
-      levelDirectory="meltingpot/lua/levels",
-      numPlayers=num_players,
-      maxEpisodeLengthFrames=5000,  # The maximum possible number of frames.
-      spriteSize=8,
-      topology="BOUNDED",  # Choose from ["BOUNDED", "TORUS"],
-      simulation={
-          "map": config.layout.ascii_map,
-          "gameObjects": create_avatar_objects(num_players),
-          "scene": create_scene(),
-          "prefabs": PREFABS,
-          "charPrefabMap": config.layout.char_prefab_map,
-      },
-  )
-  return substrate_definition
+    """Build substrate definition given player roles."""
+    num_players = len(roles)
+    # Build the rest of the substrate definition.
+    substrate_definition = dict(
+        levelName="factory_of_the_commons",
+        levelDirectory="meltingpot/lua/levels",
+        numPlayers=num_players,
+        maxEpisodeLengthFrames=5000,  # The maximum possible number of frames.
+        spriteSize=8,
+        topology="BOUNDED",  # Choose from ["BOUNDED", "TORUS"],
+        simulation={
+            "map": config.layout.ascii_map,
+            "gameObjects": create_avatar_objects(num_players),
+            "scene": create_scene(),
+            "prefabs": PREFABS,
+            "charPrefabMap": config.layout.char_prefab_map,
+        },
+    )
+    return substrate_definition

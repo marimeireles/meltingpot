@@ -17,29 +17,30 @@ from typing import Callable
 
 import dm_env
 import dmlab2d
+
 from meltingpot.utils.substrates.wrappers import base
 
 
 class ResetWrapper(base.Lab2dWrapper):
-  """Wrapper that rebuilds the environment on reset."""
+    """Wrapper that rebuilds the environment on reset."""
 
-  def __init__(self, build_environment: Callable[[], dmlab2d.Environment]):
-    """Initializes the object.
+    def __init__(self, build_environment: Callable[[], dmlab2d.Environment]):
+        """Initializes the object.
 
-    Args:
-      build_environment: Called to build the underlying environment.
-    """
-    env = build_environment()
-    super().__init__(env)
-    self._rebuild_environment = build_environment
-    self._reset = False
+        Args:
+          build_environment: Called to build the underlying environment.
+        """
+        env = build_environment()
+        super().__init__(env)
+        self._rebuild_environment = build_environment
+        self._reset = False
 
-  def reset(self) -> dm_env.TimeStep:
-    """Rebuilds the environment and calls reset on it."""
-    if self._reset:
-      self._env.close()
-      self._env = self._rebuild_environment()
-    else:
-      # Don't rebuild on very first reset call (it's inefficient).
-      self._reset = True
-    return super().reset()
+    def reset(self) -> dm_env.TimeStep:
+        """Rebuilds the environment and calls reset on it."""
+        if self._reset:
+            self._env.close()
+            self._env = self._rebuild_environment()
+        else:
+            # Don't rebuild on very first reset call (it's inefficient).
+            self._reset = True
+        return super().reset()

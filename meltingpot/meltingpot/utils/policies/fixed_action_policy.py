@@ -16,30 +16,31 @@
 from typing import Tuple
 
 import dm_env
+
 from meltingpot.utils.policies import policy
 
 
 class FixedActionPolicy(policy.Policy[Tuple[()]]):
-  """Always performs the same action, regardless of observations."""
+    """Always performs the same action, regardless of observations."""
 
-  def __init__(self, action: int):
-    """Initializes the policy.
+    def __init__(self, action: int):
+        """Initializes the policy.
 
-    Args:
-      action: The action that that the policy will always emit, regardless of
-        its observations.
-    """
-    self._action = action
+        Args:
+          action: The action that that the policy will always emit, regardless of
+            its observations.
+        """
+        self._action = action
 
-  def step(
-      self, timestep: dm_env.TimeStep, prev_state: Tuple[()]
-  ) -> Tuple[int, Tuple[()]]:
-    """See base class."""
-    return self._action, prev_state
+    def step(
+        self, timestep: dm_env.TimeStep, prev_state: Tuple[()]
+    ) -> Tuple[int, Tuple[()]]:
+        """See base class."""
+        return self._action, prev_state
 
-  def initial_state(self) -> Tuple[()]:
-    """See base class."""
-    return ()
+    def initial_state(self) -> Tuple[()]:
+        """See base class."""
+        return ()
 
-  def close(self) -> None:
-    """See base class."""
+    def close(self) -> None:
+        """See base class."""

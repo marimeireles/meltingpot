@@ -14,27 +14,28 @@
 """Puppeteer the emits a fixed goal."""
 
 import dm_env
+
 from meltingpot.utils.puppeteers import puppeteer
 
 
 class FixedGoal(puppeteer.Puppeteer[tuple[()]]):
-  """Puppeteer that emits the same goal on every step."""
+    """Puppeteer that emits the same goal on every step."""
 
-  def __init__(self, goal: puppeteer.PuppetGoal) -> None:
-    """Initializes the puppeteer.
+    def __init__(self, goal: puppeteer.PuppetGoal) -> None:
+        """Initializes the puppeteer.
 
-    Args:
-      goal: goal to pass to the puppet.
-    """
-    self._goal = goal
+        Args:
+          goal: goal to pass to the puppet.
+        """
+        self._goal = goal
 
-  def initial_state(self) -> tuple[()]:
-    """See base class."""
-    return ()
+    def initial_state(self) -> tuple[()]:
+        """See base class."""
+        return ()
 
-  def step(
-      self, timestep: dm_env.TimeStep, prev_state: tuple[()]
-  ) -> tuple[dm_env.TimeStep, tuple[()]]:
-    """See base class."""
-    timestep = puppeteer.puppet_timestep(timestep, self._goal)
-    return timestep, prev_state
+    def step(
+        self, timestep: dm_env.TimeStep, prev_state: tuple[()]
+    ) -> tuple[dm_env.TimeStep, tuple[()]]:
+        """See base class."""
+        timestep = puppeteer.puppet_timestep(timestep, self._goal)
+        return timestep, prev_state

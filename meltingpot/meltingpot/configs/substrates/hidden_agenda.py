@@ -59,9 +59,9 @@ considered a tie, and players get zero reward.
 import copy
 from typing import Any, Mapping, Sequence
 
-from meltingpot.utils.substrates import shapes
-from meltingpot.utils.substrates import specs
 from ml_collections import config_dict
+
+from meltingpot.utils.substrates import shapes, specs
 
 # Warning: setting `_ENABLE_DEBUG_OBSERVATIONS = True` may cause slowdown.
 _ENABLE_DEBUG_OBSERVATIONS = False
@@ -163,11 +163,13 @@ NW_WALL_CORNER = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "nw_wall_corner",
-                "stateConfigs": [{
-                    "state": "nw_wall_corner",
-                    "layer": "upperPhysical",
-                    "sprite": "NwWallCorner",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "nw_wall_corner",
+                        "layer": "upperPhysical",
+                        "sprite": "NwWallCorner",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -191,11 +193,13 @@ NE_WALL_CORNER = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "ne_wall_corner",
-                "stateConfigs": [{
-                    "state": "ne_wall_corner",
-                    "layer": "upperPhysical",
-                    "sprite": "NeWallCorner",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "ne_wall_corner",
+                        "layer": "upperPhysical",
+                        "sprite": "NeWallCorner",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -219,11 +223,13 @@ SE_WALL_CORNER = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "se_wall_corner",
-                "stateConfigs": [{
-                    "state": "se_wall_corner",
-                    "layer": "upperPhysical",
-                    "sprite": "SeWallCorner",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "se_wall_corner",
+                        "layer": "upperPhysical",
+                        "sprite": "SeWallCorner",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -247,11 +253,13 @@ SW_WALL_CORNER = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "sw_wall_corner",
-                "stateConfigs": [{
-                    "state": "sw_wall_corner",
-                    "layer": "upperPhysical",
-                    "sprite": "SwWallCorner",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "sw_wall_corner",
+                        "layer": "upperPhysical",
+                        "sprite": "SwWallCorner",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -275,11 +283,13 @@ WALL_NORTH = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "wall_north",
-                "stateConfigs": [{
-                    "state": "wall_north",
-                    "layer": "upperPhysical",
-                    "sprite": "WallNorth",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "wall_north",
+                        "layer": "upperPhysical",
+                        "sprite": "WallNorth",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -303,11 +313,13 @@ TCOUPLING_E = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "tcoupling_e",
-                "stateConfigs": [{
-                    "state": "tcoupling_e",
-                    "layer": "upperPhysical",
-                    "sprite": "TcouplingE",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "tcoupling_e",
+                        "layer": "upperPhysical",
+                        "sprite": "TcouplingE",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -331,11 +343,13 @@ TCOUPLING_W = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "tcoupling_w",
-                "stateConfigs": [{
-                    "state": "tcoupling_w",
-                    "layer": "upperPhysical",
-                    "sprite": "TcouplingW",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "tcoupling_w",
+                        "layer": "upperPhysical",
+                        "sprite": "TcouplingW",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -359,11 +373,13 @@ TCOUPLING_N = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "tcoupling_n",
-                "stateConfigs": [{
-                    "state": "tcoupling_n",
-                    "layer": "upperPhysical",
-                    "sprite": "TcouplingN",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "tcoupling_n",
+                        "layer": "upperPhysical",
+                        "sprite": "TcouplingN",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -387,11 +403,13 @@ TCOUPLING_S = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "tcoupling_s",
-                "stateConfigs": [{
-                    "state": "tcoupling_s",
-                    "layer": "upperPhysical",
-                    "sprite": "TcouplingS",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "tcoupling_s",
+                        "layer": "upperPhysical",
+                        "sprite": "TcouplingS",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -415,11 +433,13 @@ W_SHIP_SOLID_WALL = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "w_ship_solid_wall",
-                "stateConfigs": [{
-                    "state": "w_ship_solid_wall",
-                    "layer": "upperPhysical",
-                    "sprite": "WShipSolidWall",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "w_ship_solid_wall",
+                        "layer": "upperPhysical",
+                        "sprite": "WShipSolidWall",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -443,11 +463,13 @@ N_SHIP_SOLID_WALL = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "n_ship_solid_wall",
-                "stateConfigs": [{
-                    "state": "n_ship_solid_wall",
-                    "layer": "upperPhysical",
-                    "sprite": "NShipSolidWall",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "n_ship_solid_wall",
+                        "layer": "upperPhysical",
+                        "sprite": "NShipSolidWall",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -471,11 +493,13 @@ E_SHIP_SOLID_WALL = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "e_ship_solid_wall",
-                "stateConfigs": [{
-                    "state": "e_ship_solid_wall",
-                    "layer": "upperPhysical",
-                    "sprite": "EShipSolidWall",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "e_ship_solid_wall",
+                        "layer": "upperPhysical",
+                        "sprite": "EShipSolidWall",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -499,11 +523,13 @@ S_SHIP_SOLID_WALL = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "s_ship_solid_wall",
-                "stateConfigs": [{
-                    "state": "s_ship_solid_wall",
-                    "layer": "upperPhysical",
-                    "sprite": "SShipSolidWall",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "s_ship_solid_wall",
+                        "layer": "upperPhysical",
+                        "sprite": "SShipSolidWall",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -527,11 +553,13 @@ WALL_WEST = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "wall_west",
-                "stateConfigs": [{
-                    "state": "wall_west",
-                    "layer": "upperPhysical",
-                    "sprite": "WallWest",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "wall_west",
+                        "layer": "upperPhysical",
+                        "sprite": "WallWest",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -555,11 +583,13 @@ NW_GRATE = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "nw_grate",
-                "stateConfigs": [{
-                    "state": "nw_grate",
-                    "layer": "background",
-                    "sprite": "nw_grate",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "nw_grate",
+                        "layer": "background",
+                        "sprite": "nw_grate",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -583,11 +613,13 @@ N_GRATE = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "n_grate",
-                "stateConfigs": [{
-                    "state": "n_grate",
-                    "layer": "background",
-                    "sprite": "n_grate",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "n_grate",
+                        "layer": "background",
+                        "sprite": "n_grate",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -611,11 +643,13 @@ NE_GRATE = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "ne_grate",
-                "stateConfigs": [{
-                    "state": "ne_grate",
-                    "layer": "background",
-                    "sprite": "ne_grate",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "ne_grate",
+                        "layer": "background",
+                        "sprite": "ne_grate",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -639,11 +673,13 @@ W_GRATE = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "w_grate",
-                "stateConfigs": [{
-                    "state": "w_grate",
-                    "layer": "background",
-                    "sprite": "w_grate",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "w_grate",
+                        "layer": "background",
+                        "sprite": "w_grate",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -667,11 +703,13 @@ INNER_GRATE = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "inner_grate",
-                "stateConfigs": [{
-                    "state": "inner_grate",
-                    "layer": "background",
-                    "sprite": "inner_grate",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "inner_grate",
+                        "layer": "background",
+                        "sprite": "inner_grate",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -695,11 +733,13 @@ E_GRATE = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "e_grate",
-                "stateConfigs": [{
-                    "state": "e_grate",
-                    "layer": "background",
-                    "sprite": "e_grate",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "e_grate",
+                        "layer": "background",
+                        "sprite": "e_grate",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -723,11 +763,13 @@ SE_GRATE = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "se_grate",
-                "stateConfigs": [{
-                    "state": "se_grate",
-                    "layer": "background",
-                    "sprite": "se_grate",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "se_grate",
+                        "layer": "background",
+                        "sprite": "se_grate",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -751,11 +793,13 @@ S_GRATE = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "s_grate",
-                "stateConfigs": [{
-                    "state": "s_grate",
-                    "layer": "background",
-                    "sprite": "s_grate",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "s_grate",
+                        "layer": "background",
+                        "sprite": "s_grate",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -779,11 +823,13 @@ SW_GRATE = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "sw_grate",
-                "stateConfigs": [{
-                    "state": "sw_grate",
-                    "layer": "background",
-                    "sprite": "sw_grate",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "sw_grate",
+                        "layer": "background",
+                        "sprite": "sw_grate",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -807,11 +853,13 @@ GLASS_WALL = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "glass_wall",
-                "stateConfigs": [{
-                    "state": "glass_wall",
-                    "layer": "upperPhysical",
-                    "sprite": "glass_wall",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "glass_wall",
+                        "layer": "upperPhysical",
+                        "sprite": "glass_wall",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -835,11 +883,13 @@ FILL = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "fill",
-                "stateConfigs": [{
-                    "state": "fill",
-                    "layer": "upperPhysical",
-                    "sprite": "fill",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "fill",
+                        "layer": "upperPhysical",
+                        "sprite": "fill",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -849,9 +899,11 @@ FILL = {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["fill"],
                 "spriteShapes": [shapes.FILL],
-                "palettes": [{
-                    "i": (58, 68, 102, 255),
-                }],
+                "palettes": [
+                    {
+                        "i": (58, 68, 102, 255),
+                    }
+                ],
                 "noRotates": [False],
             },
         },
@@ -865,11 +917,13 @@ TILED_FLOOR = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "tiled_floor",
-                "stateConfigs": [{
-                    "state": "tiled_floor",
-                    "layer": "background",
-                    "sprite": "tiled_floor",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "tiled_floor",
+                        "layer": "background",
+                        "sprite": "tiled_floor",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -879,10 +933,12 @@ TILED_FLOOR = {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["tiled_floor"],
                 "spriteShapes": [shapes.TILED_FLOOR_GREY],
-                "palettes": [{
-                    "o": (204, 199, 192, 255),
-                    "-": (194, 189, 182, 255),
-                }],
+                "palettes": [
+                    {
+                        "o": (204, 199, 192, 255),
+                        "-": (194, 189, 182, 255),
+                    }
+                ],
                 "noRotates": [False],
             },
         },
@@ -896,11 +952,13 @@ WOOD_FLOOR = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "wood_floor",
-                "stateConfigs": [{
-                    "state": "wood_floor",
-                    "layer": "background",
-                    "sprite": "wood_floor",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "wood_floor",
+                        "layer": "background",
+                        "sprite": "wood_floor",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -924,11 +982,13 @@ METAL_FLOORING = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "metal_flooring",
-                "stateConfigs": [{
-                    "state": "metal_flooring",
-                    "layer": "background",
-                    "sprite": "metal_flooring",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "metal_flooring",
+                        "layer": "background",
+                        "sprite": "metal_flooring",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -952,11 +1012,13 @@ METAL_PANEL_FLOORING = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "metal_panel_flooring",
-                "stateConfigs": [{
-                    "state": "metal_panel_flooring",
-                    "layer": "background",
-                    "sprite": "metal_panel_flooring",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "metal_panel_flooring",
+                        "layer": "background",
+                        "sprite": "metal_panel_flooring",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -980,11 +1042,13 @@ CHECKERED_FLOORING = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "checkered_flooring",
-                "stateConfigs": [{
-                    "state": "checkered_flooring",
-                    "layer": "background",
-                    "sprite": "checkered_flooring",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "checkered_flooring",
+                        "layer": "background",
+                        "sprite": "checkered_flooring",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -994,10 +1058,12 @@ CHECKERED_FLOORING = {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["checkered_flooring"],
                 "spriteShapes": [shapes.CHECKERED_TILE],
-                "palettes": [{
-                    "X": (120, 108, 108, 255),
-                    "x": (115, 103, 103, 255),
-                }],
+                "palettes": [
+                    {
+                        "X": (120, 108, 108, 255),
+                        "x": (115, 103, 103, 255),
+                    }
+                ],
                 "noRotates": [False],
             },
         },
@@ -1011,11 +1077,13 @@ TILED_FLOORING1 = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "tiled_flooring1",
-                "stateConfigs": [{
-                    "state": "tiled_flooring1",
-                    "layer": "background",
-                    "sprite": "tiled_flooring1",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "tiled_flooring1",
+                        "layer": "background",
+                        "sprite": "tiled_flooring1",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -1039,11 +1107,13 @@ TILED_FLOORING2 = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "tiled_flooring2",
-                "stateConfigs": [{
-                    "state": "tiled_flooring2",
-                    "layer": "background",
-                    "sprite": "tiled_flooring2",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "tiled_flooring2",
+                        "layer": "background",
+                        "sprite": "tiled_flooring2",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -1067,11 +1137,13 @@ THRESHOLD = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "threshold",
-                "stateConfigs": [{
-                    "state": "threshold",
-                    "layer": "background",
-                    "sprite": "threshold",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "threshold",
+                        "layer": "background",
+                        "sprite": "threshold",
+                    }
+                ],
             },
         },
         {"component": "Transform"},
@@ -1081,10 +1153,12 @@ THRESHOLD = {
                 "renderMode": "ascii_shape",
                 "spriteNames": ["threshold"],
                 "spriteShapes": [shapes.THRESHOLD],
-                "palettes": [{
-                    "X": (92, 95, 92, 255),
-                    "x": (106, 108, 106, 255),
-                }],
+                "palettes": [
+                    {
+                        "X": (92, 95, 92, 255),
+                        "x": (106, 108, 106, 255),
+                    }
+                ],
                 "noRotates": [False],
             },
         },
@@ -1100,10 +1174,12 @@ SPAWN_POINT = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "spawnPoint",
-                "stateConfigs": [{
-                    "state": "spawnPoint",
-                    "groups": ["spawnPoints"],
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "spawnPoint",
+                        "groups": ["spawnPoints"],
+                    }
+                ],
             },
         },
         {
@@ -1119,10 +1195,12 @@ VOTING_SPAWN_POINT = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "votingSpawnPoint",
-                "stateConfigs": [{
-                    "state": "votingSpawnPoint",
-                    "groups": ["votingSpawnPoints"],
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "votingSpawnPoint",
+                        "groups": ["votingSpawnPoints"],
+                    }
+                ],
             },
         },
         {
@@ -1138,10 +1216,12 @@ TELEPORT_SPAWN_POINT = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "teleportSpawnPoint",
-                "stateConfigs": [{
-                    "state": "teleportSpawnPoint",
-                    "groups": ["teleportSpawnPoints"],
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "teleportSpawnPoint",
+                        "groups": ["teleportSpawnPoints"],
+                    }
+                ],
             },
         },
         {
@@ -1152,91 +1232,93 @@ TELEPORT_SPAWN_POINT = {
 
 
 def get_gem_prefab(crewmate_pseudoreward: float):
-  return {
-      "name": "gem",
-      "components": [
-          {
-              "component": "StateManager",
-              "kwargs": {
-                  "initialState": "gem",
-                  "stateConfigs": [
-                      {
-                          "state": "gem",
-                          "layer": "lowerPhysical",
-                          "sprite": "Gem",
-                      },
-                      {
-                          "state": "gemWait",
-                      },
-                  ],
-              },
-          },
-          {
-              "component": "Transform",
-          },
-          {
-              "component": "Appearance",
-              "kwargs": {
-                  "renderMode": "ascii_shape",
-                  "spriteNames": [
-                      "Gem",
-                  ],
-                  "spriteShapes": [shapes.SMALL_SPHERE],
-                  "palettes": [shapes.MOULD_PALETTE],
-                  "noRotates": [True],
-              },
-          },
-          {
-              "component": "Collectable",
-              "kwargs": {
-                  "liveState": "gem",
-                  "waitState": "gemWait",
-                  "rewardForCollecting_crewmate": crewmate_pseudoreward,
-                  "rewardForCollecting_impostor": 0.0,
-                  "regrowRate": 0.001,
-              },
-          },
-      ],
-  }
+    return {
+        "name": "gem",
+        "components": [
+            {
+                "component": "StateManager",
+                "kwargs": {
+                    "initialState": "gem",
+                    "stateConfigs": [
+                        {
+                            "state": "gem",
+                            "layer": "lowerPhysical",
+                            "sprite": "Gem",
+                        },
+                        {
+                            "state": "gemWait",
+                        },
+                    ],
+                },
+            },
+            {
+                "component": "Transform",
+            },
+            {
+                "component": "Appearance",
+                "kwargs": {
+                    "renderMode": "ascii_shape",
+                    "spriteNames": [
+                        "Gem",
+                    ],
+                    "spriteShapes": [shapes.SMALL_SPHERE],
+                    "palettes": [shapes.MOULD_PALETTE],
+                    "noRotates": [True],
+                },
+            },
+            {
+                "component": "Collectable",
+                "kwargs": {
+                    "liveState": "gem",
+                    "waitState": "gemWait",
+                    "rewardForCollecting_crewmate": crewmate_pseudoreward,
+                    "rewardForCollecting_impostor": 0.0,
+                    "regrowRate": 0.001,
+                },
+            },
+        ],
+    }
 
 
 def get_gem_deposit_prefab(crewmate_pseudoreward: float):
-  return {
-      "name": "gem_deposit",
-      "components": [
-          {
-              "component": "StateManager",
-              "kwargs": {
-                  "initialState": "gemDeposit",
-                  "stateConfigs": [{
-                      "state": "gemDeposit",
-                      "layer": "lowerPhysical",
-                      "sprite": "GemDeposit",
-                  }],
-              },
-          },
-          {
-              "component": "Transform",
-          },
-          {
-              "component": "Appearance",
-              "kwargs": {
-                  "renderMode": "ascii_shape",
-                  "spriteNames": ["GemDeposit"],
-                  "spriteShapes": ["x"],
-                  "palettes": [shapes.GRATE_PALETTE],
-                  "noRotates": [False],
-              },
-          },
-          {
-              "component": "Deposit",
-              "kwargs": {
-                  "crewmateReward": crewmate_pseudoreward,
-                  "impostorReward": 0.0,
-              },
-          },
-      ],
-  }
+    return {
+        "name": "gem_deposit",
+        "components": [
+            {
+                "component": "StateManager",
+                "kwargs": {
+                    "initialState": "gemDeposit",
+                    "stateConfigs": [
+                        {
+                            "state": "gemDeposit",
+                            "layer": "lowerPhysical",
+                            "sprite": "GemDeposit",
+                        }
+                    ],
+                },
+            },
+            {
+                "component": "Transform",
+            },
+            {
+                "component": "Appearance",
+                "kwargs": {
+                    "renderMode": "ascii_shape",
+                    "spriteNames": ["GemDeposit"],
+                    "spriteShapes": ["x"],
+                    "palettes": [shapes.GRATE_PALETTE],
+                    "noRotates": [False],
+                },
+            },
+            {
+                "component": "Deposit",
+                "kwargs": {
+                    "crewmateReward": crewmate_pseudoreward,
+                    "impostorReward": 0.0,
+                },
+            },
+        ],
+    }
 
 
 def create_player(
@@ -1246,228 +1328,228 @@ def create_player(
     pseudoreward_for_freezing: float,
     pseudoreward_for_being_frozen: float,
 ):
-  """Create a prefab for a Player (Impostor or Crewmate).
+    """Create a prefab for a Player (Impostor or Crewmate).
 
-  Args:
-    player_idx: The index of this player.
-    role: Whether this player will be a `crewmate` or an `impostor`.
-    num_players: The number of players in the environment.
-    pseudoreward_for_freezing: Peudoreward given when the impostor successfully
-      freezes a crewmate.
-    pseudoreward_for_being_frozen: Pseudoreward (usually negative) given to a
-      crewmate that was frozen by the impostor.
+    Args:
+      player_idx: The index of this player.
+      role: Whether this player will be a `crewmate` or an `impostor`.
+      num_players: The number of players in the environment.
+      pseudoreward_for_freezing: Peudoreward given when the impostor successfully
+        freezes a crewmate.
+      pseudoreward_for_being_frozen: Pseudoreward (usually negative) given to a
+        crewmate that was frozen by the impostor.
 
-  Returns:
-    A prefab (dictionary) for a Player.
-  """
-  # Lua is 1-indexed.
-  lua_index = player_idx + 1
-  live_state_name = f"player{lua_index}"
-  avatar_sprite_name = f"avatarSprite{lua_index}"
+    Returns:
+      A prefab (dictionary) for a Player.
+    """
+    # Lua is 1-indexed.
+    lua_index = player_idx + 1
+    live_state_name = f"player{lua_index}"
+    avatar_sprite_name = f"avatarSprite{lua_index}"
 
-  if role == "impostor":
-    sprite_map = {avatar_sprite_name: f"Player_impostor{lua_index}"}
-  else:
-    sprite_map = {}
+    if role == "impostor":
+        sprite_map = {avatar_sprite_name: f"Player_impostor{lua_index}"}
+    else:
+        sprite_map = {}
 
-  player = {
-      "name": "player",
-      "components": [
-          {
-              "component": "StateManager",
-              "kwargs": {
-                  "initialState": live_state_name,
-                  "stateConfigs": [
-                      {
-                          "state": live_state_name,
-                          "layer": "upperPhysical",
-                          "sprite": avatar_sprite_name,
-                          "contact": "avatar",
-                      },
-                      {"state": "playerWait"},
-                      {
-                          "state": "playerBody",
-                          "layer": "upperPhysical",
-                          "sprite": "Player_tagged",
-                      },
-                  ],
-              },
-          },
-          {
-              "component": "Transform",
-          },
-          {
-              "component": "Appearance",
-              "kwargs": {
-                  "renderMode": "ascii_shape",
-                  "spriteNames": [avatar_sprite_name, "Player_tagged"],
-                  "spriteShapes": [
-                      shapes.CUTE_AVATAR,
-                      shapes.CUTE_AVATAR_FROZEN,
-                  ],
-                  "palettes": [
-                      shapes.get_palette(HIDDEN_AGENDA_COLORS[player_idx]),
-                      shapes.get_palette(HIDDEN_AGENDA_COLORS[player_idx]),
-                  ],
-                  "noRotates": [True],
-              },
-          },
-          {
-              "component": "AdditionalPlayerSprites",
-              "kwargs": {
-                  "renderMode": "ascii_shape",
-                  "customSpriteNames": [
-                      "Player_impostor" + str(i + 1) for i in range(num_players)
-                  ],
-                  "customSpriteShapes": [
-                      shapes.CUTE_AVATAR_W_BUBBLE
-                  ] * num_players,
-                  "customPalettes": [
-                      shapes.get_palette(HIDDEN_AGENDA_COLORS[i])
-                      for i in range(num_players)
-                  ],
-                  "customNoRotates": [True],
-              },
-          },
-          {
-              "component": "Avatar",
-              "kwargs": {
-                  "index": lua_index,
-                  "spawnGroup": "spawnPoints",
-                  "aliveState": live_state_name,
-                  "waitState": "playerWait",
-                  "actionOrder": ["move", "turn", "tag", "vote"],
-                  "actionSpec": {
-                      "move": {"default": 0, "min": 0, "max": len(COMPASS)},
-                      "turn": {"default": 0, "min": -1, "max": 1},
-                      "tag": {"default": 0, "min": 0, "max": 1},
-                      "vote": {"default": 0, "min": 0, "max": num_players + 1},
-                  },
-                  "view": {
-                      "left": 5,
-                      "right": 5,
-                      "forward": 9,
-                      "backward": 1,
-                      "centered": False,
-                  },
-                  "spriteMap": sprite_map,
-              },
-          },
-          {
-              "component": "Role",
-              "kwargs": {
-                  "frozenState": "playerBody",
-                  "role": role,  # `crewmate` or `impostor`.
-              },
-          },
-          {
-              "component": "Inventory",
-              "kwargs": {
-                  "max_gems": 1,
-              },
-          },
-          {
-              "component": "AdditionalObserver",
-              "kwargs": {
-                  "num_players": num_players,
-              },
-          },
-          {
-              "component": "Tagger",
-              "kwargs": {
-                  "cooldownTime": 50,
-                  "beamLength": 2,
-                  "beamRadius": 2,
-                  "penaltyForBeingTagged": pseudoreward_for_being_frozen,
-                  "rewardForTagging": pseudoreward_for_freezing,
-                  "removeHitPlayer": "freeze",
-              },
-          },
-          {
-              "component": "ReadyToShootObservation",
-              "kwargs": {
-                  "zapperComponent": "Tagger",
-              },
-          },
-          {
-              "component": "Voting",
-              "kwargs": {
-                  "spawnGroup": "votingSpawnPoints",
-                  "votingActive": False,
-                  "votingMethod": "deliberation",
-                  "votingValues": {},
-              },
-          },
-      ],
-  }
-  if _ENABLE_DEBUG_OBSERVATIONS:
-    player["components"].append({
-        "component": "LocationObserver",
-        "kwargs": {"objectIsAvatar": True, "alsoReportOrientation": True},
-    })
+    player = {
+        "name": "player",
+        "components": [
+            {
+                "component": "StateManager",
+                "kwargs": {
+                    "initialState": live_state_name,
+                    "stateConfigs": [
+                        {
+                            "state": live_state_name,
+                            "layer": "upperPhysical",
+                            "sprite": avatar_sprite_name,
+                            "contact": "avatar",
+                        },
+                        {"state": "playerWait"},
+                        {
+                            "state": "playerBody",
+                            "layer": "upperPhysical",
+                            "sprite": "Player_tagged",
+                        },
+                    ],
+                },
+            },
+            {
+                "component": "Transform",
+            },
+            {
+                "component": "Appearance",
+                "kwargs": {
+                    "renderMode": "ascii_shape",
+                    "spriteNames": [avatar_sprite_name, "Player_tagged"],
+                    "spriteShapes": [
+                        shapes.CUTE_AVATAR,
+                        shapes.CUTE_AVATAR_FROZEN,
+                    ],
+                    "palettes": [
+                        shapes.get_palette(HIDDEN_AGENDA_COLORS[player_idx]),
+                        shapes.get_palette(HIDDEN_AGENDA_COLORS[player_idx]),
+                    ],
+                    "noRotates": [True],
+                },
+            },
+            {
+                "component": "AdditionalPlayerSprites",
+                "kwargs": {
+                    "renderMode": "ascii_shape",
+                    "customSpriteNames": [
+                        "Player_impostor" + str(i + 1) for i in range(num_players)
+                    ],
+                    "customSpriteShapes": [shapes.CUTE_AVATAR_W_BUBBLE] * num_players,
+                    "customPalettes": [
+                        shapes.get_palette(HIDDEN_AGENDA_COLORS[i])
+                        for i in range(num_players)
+                    ],
+                    "customNoRotates": [True],
+                },
+            },
+            {
+                "component": "Avatar",
+                "kwargs": {
+                    "index": lua_index,
+                    "spawnGroup": "spawnPoints",
+                    "aliveState": live_state_name,
+                    "waitState": "playerWait",
+                    "actionOrder": ["move", "turn", "tag", "vote"],
+                    "actionSpec": {
+                        "move": {"default": 0, "min": 0, "max": len(COMPASS)},
+                        "turn": {"default": 0, "min": -1, "max": 1},
+                        "tag": {"default": 0, "min": 0, "max": 1},
+                        "vote": {"default": 0, "min": 0, "max": num_players + 1},
+                    },
+                    "view": {
+                        "left": 5,
+                        "right": 5,
+                        "forward": 9,
+                        "backward": 1,
+                        "centered": False,
+                    },
+                    "spriteMap": sprite_map,
+                },
+            },
+            {
+                "component": "Role",
+                "kwargs": {
+                    "frozenState": "playerBody",
+                    "role": role,  # `crewmate` or `impostor`.
+                },
+            },
+            {
+                "component": "Inventory",
+                "kwargs": {
+                    "max_gems": 1,
+                },
+            },
+            {
+                "component": "AdditionalObserver",
+                "kwargs": {
+                    "num_players": num_players,
+                },
+            },
+            {
+                "component": "Tagger",
+                "kwargs": {
+                    "cooldownTime": 50,
+                    "beamLength": 2,
+                    "beamRadius": 2,
+                    "penaltyForBeingTagged": pseudoreward_for_being_frozen,
+                    "rewardForTagging": pseudoreward_for_freezing,
+                    "removeHitPlayer": "freeze",
+                },
+            },
+            {
+                "component": "ReadyToShootObservation",
+                "kwargs": {
+                    "zapperComponent": "Tagger",
+                },
+            },
+            {
+                "component": "Voting",
+                "kwargs": {
+                    "spawnGroup": "votingSpawnPoints",
+                    "votingActive": False,
+                    "votingMethod": "deliberation",
+                    "votingValues": {},
+                },
+            },
+        ],
+    }
+    if _ENABLE_DEBUG_OBSERVATIONS:
+        player["components"].append(
+            {
+                "component": "LocationObserver",
+                "kwargs": {"objectIsAvatar": True, "alsoReportOrientation": True},
+            }
+        )
 
-  return player
+    return player
 
 
 def create_prefabs(
     crewmate_collect_pseudoreward: float,
     crewmate_deposit_pseudoreward: float,
 ):
-  """Create prefabs dictionary from individual prefabs.
+    """Create prefabs dictionary from individual prefabs.
 
-  Args:
-    crewmate_collect_pseudoreward: Pseudoreward given to crewmates when they
-      collect a gem.
-    crewmate_deposit_pseudoreward: Pseudoreward given to crewmates when they
-      deposit a gem.
+    Args:
+      crewmate_collect_pseudoreward: Pseudoreward given to crewmates when they
+        collect a gem.
+      crewmate_deposit_pseudoreward: Pseudoreward given to crewmates when they
+        deposit a gem.
 
-  Returns:
-    A dictionary of prefabs for components in the environment.
-  """
+    Returns:
+      A dictionary of prefabs for components in the environment.
+    """
 
-  # PREFABS is a dictionary mapping names to template game objects that can
-  # be cloned and placed in multiple locations accoring to an ascii map.
-  prefabs = {
-      "nw_wall_corner": NW_WALL_CORNER,
-      "ne_wall_corner": NE_WALL_CORNER,
-      "sw_wall_corner": SW_WALL_CORNER,
-      "n_ship_solid_wall": N_SHIP_SOLID_WALL,
-      "e_ship_solid_wall": E_SHIP_SOLID_WALL,
-      "s_ship_solid_wall": S_SHIP_SOLID_WALL,
-      "w_ship_solid_wall": W_SHIP_SOLID_WALL,
-      "wall_north": WALL_NORTH,
-      "se_wall_corner": SE_WALL_CORNER,
-      "tcoupling_e": TCOUPLING_E,
-      "tcoupling_w": TCOUPLING_W,
-      "tcoupling_n": TCOUPLING_N,
-      "tcoupling_s": TCOUPLING_S,
-      "wall_west": WALL_WEST,
-      "nw_grate": NW_GRATE,
-      "n_grate": N_GRATE,
-      "ne_grate": NE_GRATE,
-      "w_grate": W_GRATE,
-      "inner_grate": INNER_GRATE,
-      "e_grate": E_GRATE,
-      "se_grate": SE_GRATE,
-      "s_grate": S_GRATE,
-      "sw_grate": SW_GRATE,
-      "glass_wall": GLASS_WALL,
-      "fill": FILL,
-      "tiled_floor": TILED_FLOOR,
-      "tiled_flooring1": TILED_FLOORING1,
-      "tiled_flooring2": TILED_FLOORING2,
-      "wood_flooring": WOOD_FLOOR,
-      "metal_flooring": METAL_FLOORING,
-      "metal_panel_flooring": METAL_PANEL_FLOORING,
-      "checkered_flooring": CHECKERED_FLOORING,
-      "threshold": THRESHOLD,
-      "gem": get_gem_prefab(crewmate_collect_pseudoreward),
-      "spawn_point": SPAWN_POINT,
-      "voting_spawn_point": VOTING_SPAWN_POINT,
-      "teleport_spawn_point": TELEPORT_SPAWN_POINT,
-      "gem_deposit": get_gem_deposit_prefab(crewmate_deposit_pseudoreward),
-  }
-  return prefabs
+    # PREFABS is a dictionary mapping names to template game objects that can
+    # be cloned and placed in multiple locations accoring to an ascii map.
+    prefabs = {
+        "nw_wall_corner": NW_WALL_CORNER,
+        "ne_wall_corner": NE_WALL_CORNER,
+        "sw_wall_corner": SW_WALL_CORNER,
+        "n_ship_solid_wall": N_SHIP_SOLID_WALL,
+        "e_ship_solid_wall": E_SHIP_SOLID_WALL,
+        "s_ship_solid_wall": S_SHIP_SOLID_WALL,
+        "w_ship_solid_wall": W_SHIP_SOLID_WALL,
+        "wall_north": WALL_NORTH,
+        "se_wall_corner": SE_WALL_CORNER,
+        "tcoupling_e": TCOUPLING_E,
+        "tcoupling_w": TCOUPLING_W,
+        "tcoupling_n": TCOUPLING_N,
+        "tcoupling_s": TCOUPLING_S,
+        "wall_west": WALL_WEST,
+        "nw_grate": NW_GRATE,
+        "n_grate": N_GRATE,
+        "ne_grate": NE_GRATE,
+        "w_grate": W_GRATE,
+        "inner_grate": INNER_GRATE,
+        "e_grate": E_GRATE,
+        "se_grate": SE_GRATE,
+        "s_grate": S_GRATE,
+        "sw_grate": SW_GRATE,
+        "glass_wall": GLASS_WALL,
+        "fill": FILL,
+        "tiled_floor": TILED_FLOOR,
+        "tiled_flooring1": TILED_FLOORING1,
+        "tiled_flooring2": TILED_FLOORING2,
+        "wood_flooring": WOOD_FLOOR,
+        "metal_flooring": METAL_FLOORING,
+        "metal_panel_flooring": METAL_PANEL_FLOORING,
+        "checkered_flooring": CHECKERED_FLOORING,
+        "threshold": THRESHOLD,
+        "gem": get_gem_prefab(crewmate_collect_pseudoreward),
+        "spawn_point": SPAWN_POINT,
+        "voting_spawn_point": VOTING_SPAWN_POINT,
+        "teleport_spawn_point": TELEPORT_SPAWN_POINT,
+        "gem_deposit": get_gem_deposit_prefab(crewmate_deposit_pseudoreward),
+    }
+    return prefabs
 
 
 # Primitive action components.
@@ -1486,194 +1568,210 @@ TAG = {"move": 0, "turn": 0, "tag": 1, "vote": 0}
 
 
 def create_action_set(num_players):
-  """Create the action set for the agents."""
-  action_set = [
-      NOOP,
-      FORWARD,
-      BACKWARD,
-      STEP_LEFT,
-      STEP_RIGHT,
-      TURN_LEFT,
-      TURN_RIGHT,
-      TAG,
-  ]
-  # vote for each player and no-vote.
-  for player in range(1, num_players + 2):
-    vote = copy.deepcopy(NOOP)
-    vote["vote"] = player
-    action_set.append(vote)
-  return action_set
+    """Create the action set for the agents."""
+    action_set = [
+        NOOP,
+        FORWARD,
+        BACKWARD,
+        STEP_LEFT,
+        STEP_RIGHT,
+        TURN_LEFT,
+        TURN_RIGHT,
+        TAG,
+    ]
+    # vote for each player and no-vote.
+    for player in range(1, num_players + 2):
+        vote = copy.deepcopy(NOOP)
+        vote["vote"] = player
+        action_set.append(vote)
+    return action_set
 
 
 def get_config():
-  """Default configuration for the Hidden Agenda level."""
-  config = config_dict.ConfigDict()
+    """Default configuration for the Hidden Agenda level."""
+    config = config_dict.ConfigDict()
 
-  # Specify the number of players to particate in each episode (optional).
-  config.recommended_num_players = MANDATED_NUM_PLAYERS
+    # Specify the number of players to particate in each episode (optional).
+    config.recommended_num_players = MANDATED_NUM_PLAYERS
 
-  # Configurable pseudorewards.
-  # The canonical substrate requires these pseudorewards to be 0. However,
-  # you can set them to something else to improve training. For example, you'd
-  # use `crewmate_collect_pseudoreward=0.25` and
-  # `crewmate_deposit_pseudoreward=0.25` to aid the crewmates in learning to
-  # collect and deposit gems. Also, you can set `pseudoreward_for_freezing=1`
-  # and `pseudoreward_for_being_frozen=-1` to help players learn about freezing
-  # mechanics.
-  config.pseudorewards = dict(
-      crewmate_collect_pseudoreward=0.0,
-      crewmate_deposit_pseudoreward=0.0,
-      pseudoreward_for_freezing=0.0,
-      pseudoreward_for_being_frozen=0.0,
-  )
+    # Configurable pseudorewards.
+    # The canonical substrate requires these pseudorewards to be 0. However,
+    # you can set them to something else to improve training. For example, you'd
+    # use `crewmate_collect_pseudoreward=0.25` and
+    # `crewmate_deposit_pseudoreward=0.25` to aid the crewmates in learning to
+    # collect and deposit gems. Also, you can set `pseudoreward_for_freezing=1`
+    # and `pseudoreward_for_being_frozen=-1` to help players learn about freezing
+    # mechanics.
+    config.pseudorewards = dict(
+        crewmate_collect_pseudoreward=0.0,
+        crewmate_deposit_pseudoreward=0.0,
+        pseudoreward_for_freezing=0.0,
+        pseudoreward_for_being_frozen=0.0,
+    )
 
-  config.scene_prefab = {
-      "name": "scene",
-      "components": [
-          {
-              "component": "StateManager",
-              "kwargs": {
-                  "initialState": "scene",
-                  "stateConfigs": [{
-                      "state": "scene",
-                  }],
-              },
-          },
-          {
-              "component": "Transform",
-          },
-          {
-              "component": "Progress",
-              "kwargs": config_dict.ConfigDict({
-                  "num_players": MANDATED_NUM_PLAYERS,
-                  "goal": 32,
-                  "potential_pseudorewards": False,
-                  "crewmate_task_reward": 1,
-                  "impostor_task_reward": -1,
-                  "crewmate_tag_reward": -1,
-                  "impostor_tag_reward": 1,
-                  "crewmate_vote_reward": 1,
-                  "impostor_vote_reward": -1,
-                  "incorrect_vote_reward": 0,
-                  "correct_vote_reward": 0,
-                  "step_reward": 0,
-                  "teleport_spawn_group": "teleportSpawnPoints",
-                  "voting_params": {
-                      "type": "deliberation",
-                      "votingPhaseCooldown": 25,
-                      "votingFrameFrequency": 200,
-                      "taggingTriggerVoting": True,
-                  },
-              }),
-          },
-      ],
-  }
-  # The voting matrix metric is always used.
-  metrics = [{
-      "name": "VOTING",
-      "type": "tensor.DoubleTensor",
-      "shape": (MANDATED_NUM_PLAYERS, MANDATED_NUM_PLAYERS + 2),
-      "component": "Progress",
-      "variable": "votingMatrix",
-  }]
-  if _ENABLE_DEBUG_OBSERVATIONS:
-    metrics.append({
-        "name": "GLOBAL_PROGRESS",
-        "type": "tensor.DoubleTensor",
-        "shape": (1,),
-        "component": "Progress",
-        "variable": "progress_bar",
-    })
-    metrics.append({
-        "name": "IDENTITIES",
-        "type": "tensor.DoubleTensor",
-        "shape": (MANDATED_NUM_PLAYERS,),
-        "component": "Progress",
-        "variable": "identity_tensor",
-    })
-    metrics.append({
-        "name": "VOTING",
-        "type": "tensor.DoubleTensor",
-        "shape": (MANDATED_NUM_PLAYERS, MANDATED_NUM_PLAYERS + 2),
-        "component": "Progress",
-        "variable": "votingMatrix",
-    })
+    config.scene_prefab = {
+        "name": "scene",
+        "components": [
+            {
+                "component": "StateManager",
+                "kwargs": {
+                    "initialState": "scene",
+                    "stateConfigs": [
+                        {
+                            "state": "scene",
+                        }
+                    ],
+                },
+            },
+            {
+                "component": "Transform",
+            },
+            {
+                "component": "Progress",
+                "kwargs": config_dict.ConfigDict(
+                    {
+                        "num_players": MANDATED_NUM_PLAYERS,
+                        "goal": 32,
+                        "potential_pseudorewards": False,
+                        "crewmate_task_reward": 1,
+                        "impostor_task_reward": -1,
+                        "crewmate_tag_reward": -1,
+                        "impostor_tag_reward": 1,
+                        "crewmate_vote_reward": 1,
+                        "impostor_vote_reward": -1,
+                        "incorrect_vote_reward": 0,
+                        "correct_vote_reward": 0,
+                        "step_reward": 0,
+                        "teleport_spawn_group": "teleportSpawnPoints",
+                        "voting_params": {
+                            "type": "deliberation",
+                            "votingPhaseCooldown": 25,
+                            "votingFrameFrequency": 200,
+                            "taggingTriggerVoting": True,
+                        },
+                    }
+                ),
+            },
+        ],
+    }
+    # The voting matrix metric is always used.
+    metrics = [
+        {
+            "name": "VOTING",
+            "type": "tensor.DoubleTensor",
+            "shape": (MANDATED_NUM_PLAYERS, MANDATED_NUM_PLAYERS + 2),
+            "component": "Progress",
+            "variable": "votingMatrix",
+        }
+    ]
+    if _ENABLE_DEBUG_OBSERVATIONS:
+        metrics.append(
+            {
+                "name": "GLOBAL_PROGRESS",
+                "type": "tensor.DoubleTensor",
+                "shape": (1,),
+                "component": "Progress",
+                "variable": "progress_bar",
+            }
+        )
+        metrics.append(
+            {
+                "name": "IDENTITIES",
+                "type": "tensor.DoubleTensor",
+                "shape": (MANDATED_NUM_PLAYERS,),
+                "component": "Progress",
+                "variable": "identity_tensor",
+            }
+        )
+        metrics.append(
+            {
+                "name": "VOTING",
+                "type": "tensor.DoubleTensor",
+                "shape": (MANDATED_NUM_PLAYERS, MANDATED_NUM_PLAYERS + 2),
+                "component": "Progress",
+                "variable": "votingMatrix",
+            }
+        )
 
-  # Add the global metrics reporter
-  config.scene_prefab["components"].append(
-      {"component": "GlobalMetricReporter", "kwargs": {"metrics": metrics}}
-  )
+    # Add the global metrics reporter
+    config.scene_prefab["components"].append(
+        {"component": "GlobalMetricReporter", "kwargs": {"metrics": metrics}}
+    )
 
-  # Action set configuration.
-  config.action_set = create_action_set(MANDATED_NUM_PLAYERS)
+    # Action set configuration.
+    config.action_set = create_action_set(MANDATED_NUM_PLAYERS)
 
-  # Observation format configuration.
-  config.individual_observation_names = [
-      "RGB",
-      "INVENTORY",
-      "READY_TO_SHOOT",
-      "VOTING",
-  ]
-  config.global_observation_names = [
-      "WORLD.RGB",
-  ]
+    # Observation format configuration.
+    config.individual_observation_names = [
+        "RGB",
+        "INVENTORY",
+        "READY_TO_SHOOT",
+        "VOTING",
+    ]
+    config.global_observation_names = [
+        "WORLD.RGB",
+    ]
 
-  # The specs of the environment (from a single-agent perspective).
-  config.action_spec = specs.action(len(config.action_set))
-  config.timestep_spec = specs.timestep({
-      "RGB": specs.OBSERVATION["RGB"],
-      "INVENTORY": specs.inventory(1),
-      "READY_TO_SHOOT": specs.OBSERVATION["READY_TO_SHOOT"],
-      "VOTING": specs.float64(MANDATED_NUM_PLAYERS, MANDATED_NUM_PLAYERS + 2),
-      # Debug only (do not use the following observations in policies).
-      "WORLD.RGB": specs.rgb(176, 264),
-  })
+    # The specs of the environment (from a single-agent perspective).
+    config.action_spec = specs.action(len(config.action_set))
+    config.timestep_spec = specs.timestep(
+        {
+            "RGB": specs.OBSERVATION["RGB"],
+            "INVENTORY": specs.inventory(1),
+            "READY_TO_SHOOT": specs.OBSERVATION["READY_TO_SHOOT"],
+            "VOTING": specs.float64(MANDATED_NUM_PLAYERS, MANDATED_NUM_PLAYERS + 2),
+            # Debug only (do not use the following observations in policies).
+            "WORLD.RGB": specs.rgb(176, 264),
+        }
+    )
 
-  # The roles assigned to each player.
-  config.valid_roles = frozenset({
-      "crewmate",
-      "impostor",
-  })
-  config.default_player_roles = ("crewmate",) * 4 + ("impostor",)
+    # The roles assigned to each player.
+    config.valid_roles = frozenset(
+        {
+            "crewmate",
+            "impostor",
+        }
+    )
+    config.default_player_roles = ("crewmate",) * 4 + ("impostor",)
 
-  return config
+    return config
 
 
 def build(
     roles: Sequence[str],
     config: config_dict.ConfigDict,
 ) -> Mapping[str, Any]:
-  """Build the hidden_agenda substrate given player preferences."""
-  # Build avatars.
-  num_players = len(roles)
-  avatar_objects = []
-  for player_idx, role in enumerate(roles):
-    # Create an avatar with the correct role.
-    avatar_objects.append(
-        create_player(
-            player_idx=player_idx,
-            role=role,
-            num_players=num_players,
-            pseudoreward_for_freezing=config.pseudorewards.pseudoreward_for_freezing,
-            pseudoreward_for_being_frozen=config.pseudorewards.pseudoreward_for_being_frozen,
+    """Build the hidden_agenda substrate given player preferences."""
+    # Build avatars.
+    num_players = len(roles)
+    avatar_objects = []
+    for player_idx, role in enumerate(roles):
+        # Create an avatar with the correct role.
+        avatar_objects.append(
+            create_player(
+                player_idx=player_idx,
+                role=role,
+                num_players=num_players,
+                pseudoreward_for_freezing=config.pseudorewards.pseudoreward_for_freezing,
+                pseudoreward_for_being_frozen=config.pseudorewards.pseudoreward_for_being_frozen,
+            )
         )
+    substrate_definition = dict(
+        levelName="hidden_agenda",
+        levelDirectory="meltingpot/lua/levels",
+        maxEpisodeLengthFrames=3000,
+        spriteSize=8,
+        numPlayers=num_players,
+        topology="BOUNDED",  # Choose from ["BOUNDED", "TORUS"],
+        simulation={
+            "map": ASCII_MAP,
+            "gameObjects": avatar_objects,
+            "prefabs": create_prefabs(
+                config.pseudorewards.crewmate_collect_pseudoreward,
+                config.pseudorewards.crewmate_deposit_pseudoreward,
+            ),
+            "charPrefabMap": CHAR_PREFAB_MAP,
+            "scene": config.scene_prefab,
+        },
     )
-  substrate_definition = dict(
-      levelName="hidden_agenda",
-      levelDirectory="meltingpot/lua/levels",
-      maxEpisodeLengthFrames=3000,
-      spriteSize=8,
-      numPlayers=num_players,
-      topology="BOUNDED",  # Choose from ["BOUNDED", "TORUS"],
-      simulation={
-          "map": ASCII_MAP,
-          "gameObjects": avatar_objects,
-          "prefabs": create_prefabs(
-              config.pseudorewards.crewmate_collect_pseudoreward,
-              config.pseudorewards.crewmate_deposit_pseudoreward,
-          ),
-          "charPrefabMap": CHAR_PREFAB_MAP,
-          "scene": config.scene_prefab,
-      },
-  )
-  return substrate_definition
+    return substrate_definition

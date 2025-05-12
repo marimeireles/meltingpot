@@ -28,55 +28,53 @@ _GOAL_DTYPE = np.int32
 
 
 class Puppeteer(Generic[State], metaclass=abc.ABCMeta):
-  """A puppeteer that controls the timestep forwarded to the puppet.
+    """A puppeteer that controls the timestep forwarded to the puppet.
 
-  Must not possess any mutable state not in `initial_state`.
-  """
-
-  @abc.abstractmethod
-  def initial_state(self) -> State:
-    """Returns the initial state of the puppeteer.
-
-    Must not have any side effects.
+    Must not possess any mutable state not in `initial_state`.
     """
 
-  @abc.abstractmethod
-  def step(
-      self, timestep: dm_env.TimeStep, prev_state: State
-  ) -> Tuple[dm_env.TimeStep, State]:
-    """Steps the puppeteer.
+    @abc.abstractmethod
+    def initial_state(self) -> State:
+        """Returns the initial state of the puppeteer.
 
-    Must not have any side effects.
+        Must not have any side effects.
+        """
 
-    Args:
-      timestep: information from the environment.
-      prev_state: the previous state of the puppeteer.
+    @abc.abstractmethod
+    def step(
+        self, timestep: dm_env.TimeStep, prev_state: State
+    ) -> Tuple[dm_env.TimeStep, State]:
+        """Steps the puppeteer.
 
-    Returns:
-      timestep: the timestep to forward to the puppet.
-      next_state: the state for the next step call.
-    """
+        Must not have any side effects.
+
+        Args:
+          timestep: information from the environment.
+          prev_state: the previous state of the puppeteer.
+
+        Returns:
+          timestep: the timestep to forward to the puppet.
+          next_state: the state for the next step call.
+        """
 
 
-def puppet_timestep(
-    timestep: dm_env.TimeStep, goal: PuppetGoal
-) -> dm_env.TimeStep:
-  """Returns a timestep with a goal observation added."""
-  puppet_observation = immutabledict.immutabledict(
-      timestep.observation, **{_GOAL_OBSERVATION_KEY: goal}
-  )
-  return timestep._replace(observation=puppet_observation)
+def puppet_timestep(timestep: dm_env.TimeStep, goal: PuppetGoal) -> dm_env.TimeStep:
+    """Returns a timestep with a goal observation added."""
+    puppet_observation = immutabledict.immutabledict(
+        timestep.observation, **{_GOAL_OBSERVATION_KEY: goal}
+    )
+    return timestep._replace(observation=puppet_observation)
 
 
 def puppet_goals(
     names: Sequence[str], dtype: ... = _GOAL_DTYPE
 ) -> Mapping[str, PuppetGoal]:
-  """Returns a mapping from goal name to a one-hot goal vector for a puppet.
+    """Returns a mapping from goal name to a one-hot goal vector for a puppet.
 
-  Args:
-    names: names for each of the corresponding goals.
-    dtype: dtype of the one-hot goals to return.
-  """
-  goals = np.eye(len(names), dtype=dtype)
-  goals.setflags(write=False)
-  return immutabledict.immutabledict(zip(names, goals))
+    Args:
+      names: names for each of the corresponding goals.
+      dtype: dtype of the one-hot goals to return.
+    """
+    goals = np.eye(len(names), dtype=dtype)
+    goals.setflags(write=False)
+    return immutabledict.immutabledict(zip(names, goals))

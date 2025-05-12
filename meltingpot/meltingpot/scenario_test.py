@@ -13,44 +13,44 @@
 # limitations under the License.
 """Tests of scenarios."""
 
-from absl.testing import absltest
-from absl.testing import parameterized
 import dm_env
+import numpy as np
+from absl.testing import absltest, parameterized
+
 from meltingpot import scenario
 from meltingpot.testing import substrates as test_utils
-import numpy as np
 
 
 @parameterized.named_parameters((name, name) for name in scenario.SCENARIOS)
 class ScenarioTest(test_utils.SubstrateTestCase):
 
-  def test_scenario(self, name):
-    factory = scenario.get_factory(name)
-    num_players = factory.num_focal_players()
-    action_spec = [factory.action_spec()] * num_players
-    reward_spec = [factory.timestep_spec().reward] * num_players
-    discount_spec = factory.timestep_spec().discount
-    observation_spec = dict(factory.timestep_spec().observation)
-    observation_spec["COLLECTIVE_REWARD"] = dm_env.specs.Array(
-        shape=(), dtype=np.float64, name="COLLECTIVE_REWARD"
-    )
-    observation_spec = [observation_spec] * num_players
-    with factory.build() as env:
-      with self.subTest("step"):
-        self.assert_step_matches_specs(env)
-      with self.subTest("discount_spec"):
-        self.assertSequenceEqual(env.action_spec(), action_spec)
-      with self.subTest("reward_spec"):
-        self.assertSequenceEqual(env.reward_spec(), reward_spec)
-      with self.subTest("discount_spec"):
-        self.assertEqual(env.discount_spec(), discount_spec)
-      with self.subTest("observation_spec"):
-        self.assertSequenceEqual(env.observation_spec(), observation_spec)
-      with self.subTest("only_permitted"):
-        self.assertContainsSubset(
-            factory.timestep_spec().observation, scenario.PERMITTED_OBSERVATIONS
+    def test_scenario(self, name):
+        factory = scenario.get_factory(name)
+        num_players = factory.num_focal_players()
+        action_spec = [factory.action_spec()] * num_players
+        reward_spec = [factory.timestep_spec().reward] * num_players
+        discount_spec = factory.timestep_spec().discount
+        observation_spec = dict(factory.timestep_spec().observation)
+        observation_spec["COLLECTIVE_REWARD"] = dm_env.specs.Array(
+            shape=(), dtype=np.float64, name="COLLECTIVE_REWARD"
         )
+        observation_spec = [observation_spec] * num_players
+        with factory.build() as env:
+            with self.subTest("step"):
+                self.assert_step_matches_specs(env)
+            with self.subTest("discount_spec"):
+                self.assertSequenceEqual(env.action_spec(), action_spec)
+            with self.subTest("reward_spec"):
+                self.assertSequenceEqual(env.reward_spec(), reward_spec)
+            with self.subTest("discount_spec"):
+                self.assertEqual(env.discount_spec(), discount_spec)
+            with self.subTest("observation_spec"):
+                self.assertSequenceEqual(env.observation_spec(), observation_spec)
+            with self.subTest("only_permitted"):
+                self.assertContainsSubset(
+                    factory.timestep_spec().observation, scenario.PERMITTED_OBSERVATIONS
+                )
 
 
 if __name__ == "__main__":
-  absltest.main()
+    absltest.main()

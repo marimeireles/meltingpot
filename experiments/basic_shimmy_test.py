@@ -1,6 +1,8 @@
 from shimmy import MeltingPotCompatibilityV0
 
-env = MeltingPotCompatibilityV0(substrate_name="commons_harvest__open", render_mode="human")
+env = MeltingPotCompatibilityV0(
+    substrate_name="commons_harvest__open", render_mode="human"
+)
 
 observations = env.reset()
 

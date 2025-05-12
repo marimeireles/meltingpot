@@ -34,125 +34,125 @@ LIGHT_STONE = (204, 204, 204, 255)
 
 
 def rgb_to_rgba(rgb: ColorRGB, alpha: int = 255) -> ColorRGBA:
-  return (rgb[0], rgb[1], rgb[2], alpha)
+    return (rgb[0], rgb[1], rgb[2], alpha)
 
 
 def scale_color(
     color_tuple: ColorRGBA, factor: float, alpha: Optional[int] = None
 ) -> ColorRGBA:
-  """Scale an RGBA color tuple by a given factor.
+    """Scale an RGBA color tuple by a given factor.
 
-  This function scales, multiplicatively, the RGB values of a color tuple by the
-  given amount, clamped to a maximum of 255. The alpha channel is either
-  overwritten by the specified one, or if none is specified, it is inherited by
-  the original color.
+    This function scales, multiplicatively, the RGB values of a color tuple by the
+    given amount, clamped to a maximum of 255. The alpha channel is either
+    overwritten by the specified one, or if none is specified, it is inherited by
+    the original color.
 
-  Args:
-    color_tuple: The original color to scale.
-    factor: The factor to multiplicatively scale the RGB channels by.
-    alpha: If provided, the new color will have this alpha, otherwise, inherit
-      from original color_tuple.
+    Args:
+      color_tuple: The original color to scale.
+      factor: The factor to multiplicatively scale the RGB channels by.
+      alpha: If provided, the new color will have this alpha, otherwise, inherit
+        from original color_tuple.
 
-  Returns:
-    A new color tuple, with its RGB channels scaled.
-  """
-  if len(color_tuple) == 3:
-    color_tuple = rgb_to_rgba(color_tuple)  # pytype: disable=wrong-arg-types
-  scaled = [int(min(x * factor, 255)) for x in color_tuple]
-  scaled[3] = alpha if alpha is not None else color_tuple[-1]
-  return tuple(scaled)
+    Returns:
+      A new color tuple, with its RGB channels scaled.
+    """
+    if len(color_tuple) == 3:
+        color_tuple = rgb_to_rgba(color_tuple)  # pytype: disable=wrong-arg-types
+    scaled = [int(min(x * factor, 255)) for x in color_tuple]
+    scaled[3] = alpha if alpha is not None else color_tuple[-1]
+    return tuple(scaled)
 
 
 # LINT.IfChange
 def get_palette(color: Color) -> Dict[str, ColorRGBA]:
-  """Convert provided color to a palette suitable for the player text shape.
+    """Convert provided color to a palette suitable for the player text shape.
 
-  The overall palette is:
+    The overall palette is:
 
-  'x' Transparent
-  ',' Black
-  'O' Dark gray
-  'o' 45% darker color than the base palette color
-  '&' 25% darker color than the base palette color
-  '*' The base color of the palette
-  '@' 25% lighter color than the base palette color
-  '#' White
-  'r' A rotation of the main color: RGB -> RBG
-  'R' A 25% lighter color than the rotation of the main color: RGB -> RBG
+    'x' Transparent
+    ',' Black
+    'O' Dark gray
+    'o' 45% darker color than the base palette color
+    '&' 25% darker color than the base palette color
+    '*' The base color of the palette
+    '@' 25% lighter color than the base palette color
+    '#' White
+    'r' A rotation of the main color: RGB -> RBG
+    'R' A 25% lighter color than the rotation of the main color: RGB -> RBG
 
-  Args:
-    color (tuple of length 4): Red, Green, Blue, Alpha (transparency).
+    Args:
+      color (tuple of length 4): Red, Green, Blue, Alpha (transparency).
 
-  Returns:
-    palette (dict): maps palette symbols to suitable colors.
-  """
-  palette = {
-      "*": (color[0], color[1], color[2], 255),
-      "&": scale_color(color, 0.75, 255),
-      "o": scale_color(color, 0.55, 255),
-      "!": scale_color(color, 0.65, 255),
-      "~": scale_color(color, 0.9, 255),
-      "@": scale_color(color, 1.25, 255),
-      "r": (color[0], color[2], color[1], 255),
-      "R": scale_color((color[0], color[2], color[1], 255), 1.25, 255),
-      "%": (178, 206, 234, 255),
-      "#": WHITE,
-      "O": DARK_GRAY,
-      ",": BLACK,
-      "x": ALPHA,
-  }
-  return palette
+    Returns:
+      palette (dict): maps palette symbols to suitable colors.
+    """
+    palette = {
+        "*": (color[0], color[1], color[2], 255),
+        "&": scale_color(color, 0.75, 255),
+        "o": scale_color(color, 0.55, 255),
+        "!": scale_color(color, 0.65, 255),
+        "~": scale_color(color, 0.9, 255),
+        "@": scale_color(color, 1.25, 255),
+        "r": (color[0], color[2], color[1], 255),
+        "R": scale_color((color[0], color[2], color[1], 255), 1.25, 255),
+        "%": (178, 206, 234, 255),
+        "#": WHITE,
+        "O": DARK_GRAY,
+        ",": BLACK,
+        "x": ALPHA,
+    }
+    return palette
 
 
 # LINT.ThenChange(//meltingpot/lua/modules/colors.lua)
 
 
 def flip_horizontal(sprite: str) -> str:
-  flipped = ""
-  for line in sprite.split("\n"):
-    flipped += line[::-1] + "\n"
-  return flipped[:-1]
+    flipped = ""
+    for line in sprite.split("\n"):
+        flipped += line[::-1] + "\n"
+    return flipped[:-1]
 
 
 def flip_vertical(sprite: str) -> str:
-  flipped = ""
-  for line in sprite[1:].split("\n"):
-    flipped = line + "\n" + flipped
-  return flipped
+    flipped = ""
+    for line in sprite[1:].split("\n"):
+        flipped = line + "\n" + flipped
+    return flipped
 
 
 def convert_rgb_to_rgba(rgb_tuple: ColorRGB) -> ColorRGBA:
-  rgba_tuple = (rgb_tuple[0], rgb_tuple[1], rgb_tuple[2], 255)
-  return rgba_tuple
+    rgba_tuple = (rgb_tuple[0], rgb_tuple[1], rgb_tuple[2], 255)
+    return rgba_tuple
 
 
 def adjust_color_brightness(
     color_tuple: Union[ColorRGB, ColorRGBA], factor: float
 ) -> ColorRGBA:
-  """Adjust color brightness by first converting to hsv and then back to rgb."""
-  hsv = colorsys.rgb_to_hsv(color_tuple[0], color_tuple[1], color_tuple[2])
-  adjusted_hsv = (hsv[0], hsv[1], hsv[2] * factor)
-  adjusted_rgb = colorsys.hsv_to_rgb(*adjusted_hsv)
-  if len(color_tuple) == 3:
-    output_color = (adjusted_rgb[0], adjusted_rgb[1], adjusted_rgb[2], 255)
-  elif len(color_tuple) == 4:
-    output_color = (
-        adjusted_rgb[0],
-        adjusted_rgb[1],
-        adjusted_rgb[2],
-        color_tuple[3],
-    )
-  return tuple([int(x) for x in output_color])
+    """Adjust color brightness by first converting to hsv and then back to rgb."""
+    hsv = colorsys.rgb_to_hsv(color_tuple[0], color_tuple[1], color_tuple[2])
+    adjusted_hsv = (hsv[0], hsv[1], hsv[2] * factor)
+    adjusted_rgb = colorsys.hsv_to_rgb(*adjusted_hsv)
+    if len(color_tuple) == 3:
+        output_color = (adjusted_rgb[0], adjusted_rgb[1], adjusted_rgb[2], 255)
+    elif len(color_tuple) == 4:
+        output_color = (
+            adjusted_rgb[0],
+            adjusted_rgb[1],
+            adjusted_rgb[2],
+            color_tuple[3],
+        )
+    return tuple([int(x) for x in output_color])
 
 
 def get_diamond_palette(base_color: ColorRGB) -> Dict[str, ColorRGBA]:
-  return {
-      "x": ALPHA,
-      "a": (252, 252, 252, 255),
-      "b": convert_rgb_to_rgba(base_color),
-      "c": adjust_color_brightness(base_color, 0.25),
-      "d": convert_rgb_to_rgba(base_color),
-  }
+    return {
+        "x": ALPHA,
+        "a": (252, 252, 252, 255),
+        "b": convert_rgb_to_rgba(base_color),
+        "c": adjust_color_brightness(base_color, 0.25),
+        "d": convert_rgb_to_rgba(base_color),
+    }
 
 
 HD_AVATAR_N = """

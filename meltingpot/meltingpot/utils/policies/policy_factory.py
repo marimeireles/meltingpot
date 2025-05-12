@@ -17,38 +17,39 @@ import abc
 from typing import Callable
 
 import dm_env
+
 from meltingpot.utils.policies import policy
 
 
 class PolicyFactory(metaclass=abc.ABCMeta):
-  """Factory for producing instances of a specific policy."""
+    """Factory for producing instances of a specific policy."""
 
-  def __init__(
-      self,
-      *,
-      timestep_spec: dm_env.TimeStep,
-      action_spec: dm_env.specs.DiscreteArray,
-      builder: Callable[[], policy.Policy],
-  ) -> None:
-    """Initializes the object.
+    def __init__(
+        self,
+        *,
+        timestep_spec: dm_env.TimeStep,
+        action_spec: dm_env.specs.DiscreteArray,
+        builder: Callable[[], policy.Policy],
+    ) -> None:
+        """Initializes the object.
 
-    Args:
-      timestep_spec: spec of the timestep expected by the policy.
-      action_spec: spec of the action returned by the policy.
-      builder: callable that builds the policy.
-    """
-    self._timestep_spec = timestep_spec
-    self._action_spec = action_spec
-    self._builder = builder
+        Args:
+          timestep_spec: spec of the timestep expected by the policy.
+          action_spec: spec of the action returned by the policy.
+          builder: callable that builds the policy.
+        """
+        self._timestep_spec = timestep_spec
+        self._action_spec = action_spec
+        self._builder = builder
 
-  def timestep_spec(self) -> dm_env.TimeStep:
-    """Returns spec of the timestep expected by the policy."""
-    return self._timestep_spec
+    def timestep_spec(self) -> dm_env.TimeStep:
+        """Returns spec of the timestep expected by the policy."""
+        return self._timestep_spec
 
-  def action_spec(self) -> dm_env.specs.DiscreteArray:
-    """Returns spec of the action returned by the policy."""
-    return self._action_spec
+    def action_spec(self) -> dm_env.specs.DiscreteArray:
+        """Returns spec of the action returned by the policy."""
+        return self._action_spec
 
-  def build(self) -> policy.Policy:
-    """Returns a policy for the bot."""
-    return self._builder()
+    def build(self) -> policy.Policy:
+        """Returns a policy for the bot."""
+        return self._builder()

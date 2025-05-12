@@ -1,51 +1,49 @@
-from shimmy import MeltingPotCompatibilityV0
-
-import jax
-import jax.numpy as jnp
-from jax import random, jit, value_and_grad
-
-import flax.linen as nn
-import optax
-import distrax
-
+import csv
 # ── Added for checkpointing, logging, data export, and metrics ──────────────────
 import pathlib
-from flax import serialization
 from datetime import datetime
-import csv
-import pandas as pd
-import numpy as np
 
+import distrax
+import flax.linen as nn
+import jax
+import jax.numpy as jnp
+import numpy as np
+import optax
+import pandas as pd
+from flax import serialization
+from jax import jit, random, value_and_grad
+from shimmy import MeltingPotCompatibilityV0
 from tqdm import trange
+
 # ───────────────────────────────────────────────────────────────────────────────
 
 # --- Hyperparameters -----------------------------------------------------------
-DISCOUNT_FACTOR     = 0.99
-LEARNING_RATE       = 3e-4
-PPO_CLIP_EPSILON    = 0.2
-STEPS_PER_UPDATE    = 128
-PPO_EPOCHS          = 4
-TOTAL_UPDATES       = 100
+DISCOUNT_FACTOR = 0.99
+LEARNING_RATE = 3e-4
+PPO_CLIP_EPSILON = 0.2
+STEPS_PER_UPDATE = 128
+PPO_EPOCHS = 4
+TOTAL_UPDATES = 100
 
 # KL-based early stopping
-KL_THRESHOLD        = 0.005
-KL_PATIENCE         = 10
+KL_THRESHOLD = 0.005
+KL_PATIENCE = 10
 # ----------------------------------------------------------------------------
 
 # 1) Create environment
 env = MeltingPotCompatibilityV0(
-    substrate_name="commons_harvest__open",
-    render_mode="rgb_array"
+    substrate_name="commons_harvest__open", render_mode="rgb_array"
 )
-agents        = env.possible_agents
+agents = env.possible_agents
 num_agents = len(agents)
 primary_agent = agents[0]
-action_dim    = env.action_space(primary_agent).n
-rgb_space     = env.observation_space(primary_agent)["RGB"]
-H, W, C       = rgb_space.shape
-obs_shape     = (C, H, W)
-fire_zap_counts  = np.zeros((num_agents, num_agents), dtype=int)
+action_dim = env.action_space(primary_agent).n
+rgb_space = env.observation_space(primary_agent)["RGB"]
+H, W, C = rgb_space.shape
+obs_shape = (C, H, W)
+fire_zap_counts = np.zeros((num_agents, num_agents), dtype=int)
 death_zap_counts = np.zeros((num_agents, num_agents), dtype=int)
+
 
 # 2) Define convolutional actor-critic network
 class ActorCritic(nn.Module):
@@ -54,36 +52,42 @@ class ActorCritic(nn.Module):
     @nn.compact
     def __call__(self, x):
         x = x / 255.0
-        x = nn.Conv(32, (8,8), (4,4))(x); x = nn.relu(x)
-        x = nn.Conv(64, (4,4), (2,2))(x); x = nn.relu(x)
-        x = nn.Conv(64, (3,3), (1,1))(x); x = nn.relu(x)
+        x = nn.Conv(32, (8, 8), (4, 4))(x)
+        x = nn.relu(x)
+        x = nn.Conv(64, (4, 4), (2, 2))(x)
+        x = nn.relu(x)
+        x = nn.Conv(64, (3, 3), (1, 1))(x)
+        x = nn.relu(x)
         x = x.reshape((x.shape[0], -1))
-        x = nn.Dense(512)(x); x = nn.relu(x)
+        x = nn.Dense(512)(x)
+        x = nn.relu(x)
         logits = nn.Dense(self.action_dim)(x)
-        value  = nn.Dense(1)(x)
+        value = nn.Dense(1)(x)
         return logits, jnp.squeeze(value, -1)
 
+
 # 3) Initialization
-rng                 = random.PRNGKey(0)
-params              = {}
-optim_states        = {}
-rngs                = {}
+rng = random.PRNGKey(0)
+params = {}
+optim_states = {}
+rngs = {}
 # metrics histories
-gini_history        = []
+gini_history = []
 resource_stock_hist = []
-harvest_rate_hist   = {a: [] for a in agents}
-cumulative_rewards  = []
-spatial_pos_hist    = {a: [] for a in agents}
+harvest_rate_hist = {a: [] for a in agents}
+cumulative_rewards = []
+spatial_pos_hist = {a: [] for a in agents}
 
 for a in agents:
     rng, init_rng = random.split(rng)
-    dummy         = jnp.zeros((1, *obs_shape), jnp.float32)
-    p             = ActorCritic(action_dim).init(init_rng, dummy)
-    optim         = optax.adam(LEARNING_RATE)
-    state         = optim.init(p)
-    params[a]     = p
+    dummy = jnp.zeros((1, *obs_shape), jnp.float32)
+    p = ActorCritic(action_dim).init(init_rng, dummy)
+    optim = optax.adam(LEARNING_RATE)
+    state = optim.init(p)
+    params[a] = p
     optim_states[a] = state
-    rngs[a]       = init_rng
+    rngs[a] = init_rng
+
 
 # utility: compute Gini coefficient
 def compute_gini(array):
@@ -92,17 +96,20 @@ def compute_gini(array):
         return 0.0
     arr = np.sort(arr)
     n = arr.size
-    index = np.arange(1, n+1)
-    return ((2*index - n - 1) * arr).sum() / (n * arr.sum())
+    index = np.arange(1, n + 1)
+    return ((2 * index - n - 1) * arr).sum() / (n * arr.sum())
+
 
 # 4) Trajectory collection with metrics
 def collect_batch(n_steps=STEPS_PER_UPDATE):
     global fire_zap_counts, death_zap_counts
-    buffer = {a: {"obs": [], "acts": [], "logps": [], "vals": [], "rews": []} for a in agents}
+    buffer = {
+        a: {"obs": [], "acts": [], "logps": [], "vals": [], "rews": []} for a in agents
+    }
     # TODO: not sure about this stock var, look it up when I'm doing plots
     stock_hist = []
-    harvests   = {a: [] for a in agents}
-    positions  = {a: [] for a in agents}
+    harvests = {a: [] for a in agents}
+    positions = {a: [] for a in agents}
 
     obs_dict, _ = env.reset()
     steps = 0
@@ -113,12 +120,12 @@ def collect_batch(n_steps=STEPS_PER_UPDATE):
 
         actions = {}
         for a, obs in obs_dict.items():
-            img = jnp.array(obs["RGB"], jnp.float32).transpose(2,0,1)[None]
-            logits, v   = ActorCritic(action_dim).apply(params[a], img)
-            dist        = distrax.Categorical(logits=logits[0])
+            img = jnp.array(obs["RGB"], jnp.float32).transpose(2, 0, 1)[None]
+            logits, v = ActorCritic(action_dim).apply(params[a], img)
+            dist = distrax.Categorical(logits=logits[0])
             rngs[a], sk = random.split(rngs[a])
-            act         = dist.sample(seed=sk)
-            actions[a]  = int(act)
+            act = dist.sample(seed=sk)
+            actions[a] = int(act)
 
             # stash policy rollout data
             buffer[a]["obs"].append(img[0])
@@ -136,27 +143,26 @@ def collect_batch(n_steps=STEPS_PER_UPDATE):
             r = float(rewards.get(a, 0.0))
             buffer[a]["rews"].append(r)
             harvests[a].append(r)
-            pos = obs_dict[a].get('position') if 'position' in obs_dict[a] else None
+            pos = obs_dict[a].get("position") if "position" in obs_dict[a] else None
             positions[a].append(pos)
 
         # pull out the zap matrices from the *next* observation
         # they come back as part of each agent’s obs under the same keys,
         # so we can pick any agent (here, primary_agent) to grab them.
-        world_obs    = nxt[primary_agent]
+        world_obs = nxt[primary_agent]
         # fetch, but default to zeros if missing
-        fire_mat  = world_obs.get("WORLD.WHO_ZAPPED_WHO")
+        fire_mat = world_obs.get("WORLD.WHO_ZAPPED_WHO")
         death_mat = world_obs.get("WORLD.WHO_DEATH_ZAPPED_WHO")
 
         # convert to int-arrays, defaulting to zeros of shape [num_agents, num_agents]
         zeros = np.zeros((num_agents, num_agents), dtype=int)
 
-        fire_arr  = np.array(fire_mat,  dtype=int) if fire_mat  is not None else zeros
+        fire_arr = np.array(fire_mat, dtype=int) if fire_mat is not None else zeros
         death_arr = np.array(death_mat, dtype=int) if death_mat is not None else zeros
 
         # mutate the outer arrays in place
-        fire_zap_counts[:]  += fire_arr
+        fire_zap_counts[:] += fire_arr
         death_zap_counts[:] += death_arr
-
 
         steps += 1
 
@@ -167,7 +173,8 @@ def collect_batch(n_steps=STEPS_PER_UPDATE):
 
     # compute returns
     for a in agents:
-        G = 0.0; returns = []
+        G = 0.0
+        returns = []
         for r in reversed(buffer[a]["rews"]):
             G = r + DISCOUNT_FACTOR * G
             returns.insert(0, G)
@@ -175,30 +182,35 @@ def collect_batch(n_steps=STEPS_PER_UPDATE):
 
     return buffer, stock_hist, harvests, positions
 
+
 # 5) PPO loss and update
 def ppo_loss(params, obs, acts, old_logp, old_val, returns):
     logits, vals = ActorCritic(action_dim).apply(params, obs)
-    dist   = distrax.Categorical(logits=logits)
-    logp   = dist.log_prob(acts)
-    ratio  = jnp.exp(logp - old_logp)
-    adv    = returns - old_val
-    adv    = (adv - adv.mean()) / (adv.std() + 1e-8)
-    unclp  = ratio * adv
-    clp    = jnp.clip(ratio, 1-PPO_CLIP_EPSILON, 1+PPO_CLIP_EPSILON) * adv
-    pol_l  = -jnp.mean(jnp.minimum(unclp, clp))
-    val_l  = jnp.mean((returns - vals)**2)
+    dist = distrax.Categorical(logits=logits)
+    logp = dist.log_prob(acts)
+    ratio = jnp.exp(logp - old_logp)
+    adv = returns - old_val
+    adv = (adv - adv.mean()) / (adv.std() + 1e-8)
+    unclp = ratio * adv
+    clp = jnp.clip(ratio, 1 - PPO_CLIP_EPSILON, 1 + PPO_CLIP_EPSILON) * adv
+    pol_l = -jnp.mean(jnp.minimum(unclp, clp))
+    val_l = jnp.mean((returns - vals) ** 2)
     return pol_l + 0.5 * val_l
+
 
 @jit
 def update_step(params, optim_state, obs, acts, old_logp, old_val, returns):
-    loss, grads = value_and_grad(ppo_loss)(params, obs, acts, old_logp, old_val, returns)
+    loss, grads = value_and_grad(ppo_loss)(
+        params, obs, acts, old_logp, old_val, returns
+    )
     updates, new_state = optax.adam(LEARNING_RATE).update(grads, optim_state, params)
     new_params = optax.apply_updates(params, updates)
     return new_params, new_state, loss
 
+
 # 6) Training loop with KL-based early stopping, metrics, and progress bar
-kl_counter    = {a: 0 for a in agents}
-run_id        = datetime.now().strftime("%Y%m%d_%H%M%S")
+kl_counter = {a: 0 for a in agents}
+run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
 checkpoint_dir = pathlib.Path("checkpoints")
 checkpoint_dir.mkdir(parents=True, exist_ok=True)
 
@@ -217,11 +229,11 @@ for update in trange(TOTAL_UPDATES, desc="PPO updates"):
     gini_history.append(compute_gini(cum_returns))
 
     for a in agents:
-        o       = jnp.stack(batch[a]["obs"])
-        ac      = jnp.stack(batch[a]["acts"])
-        old_lp  = jnp.stack(batch[a]["logps"])
+        o = jnp.stack(batch[a]["obs"])
+        ac = jnp.stack(batch[a]["acts"])
+        old_lp = jnp.stack(batch[a]["logps"])
         old_val = jnp.stack(batch[a]["vals"])
-        rets    = jnp.stack(batch[a]["rets"])
+        rets = jnp.stack(batch[a]["rets"])
 
         old_params = params[a]
         p, s = params[a], optim_states[a]
@@ -243,7 +255,9 @@ for update in trange(TOTAL_UPDATES, desc="PPO updates"):
         print(f"Agent {a} update {update}: mean KL={kl:.6f}, patience={kl_counter[a]}")
 
     if all(count >= KL_PATIENCE for count in kl_counter.values()):
-        print(f"Early stopping at update {update}: KL < {KL_THRESHOLD} for {KL_PATIENCE} updates.")
+        print(
+            f"Early stopping at update {update}: KL < {KL_THRESHOLD} for {KL_PATIENCE} updates."
+        )
         break
 
 # 7) Save model and raw data
@@ -253,21 +267,25 @@ for a, p in params.items():
         f.write(serialization.to_bytes(p))
 
 # Export CSVs
-df_stock = pd.DataFrame({'resource_stock': resource_stock_hist})
-df_stock.to_csv(checkpoint_dir / f"{run_id}_resource_stock.csv", index_label='step')
+df_stock = pd.DataFrame({"resource_stock": resource_stock_hist})
+df_stock.to_csv(checkpoint_dir / f"{run_id}_resource_stock.csv", index_label="step")
 
 df_harvest = pd.DataFrame(harvest_rate_hist)
-df_harvest.to_csv(checkpoint_dir / f"{run_id}_harvest_events.csv", index_label='step')
+df_harvest.to_csv(checkpoint_dir / f"{run_id}_harvest_events.csv", index_label="step")
 
 for a in agents:
-    df_pos = pd.DataFrame(spatial_pos_hist[a], columns=['x','y'])
-    df_pos.to_csv(checkpoint_dir / f"{run_id}_positions_agent_{a}.csv", index_label='step')
+    df_pos = pd.DataFrame(spatial_pos_hist[a], columns=["x", "y"])
+    df_pos.to_csv(
+        checkpoint_dir / f"{run_id}_positions_agent_{a}.csv", index_label="step"
+    )
 
 # DataFrames with agent-on-agent rows/cols
-df_fire  = pd.DataFrame(fire_zap_counts,  index=agents, columns=agents)
+df_fire = pd.DataFrame(fire_zap_counts, index=agents, columns=agents)
 df_death = pd.DataFrame(death_zap_counts, index=agents, columns=agents)
 
-df_fire.to_csv(checkpoint_dir / f"{run_id}_fire_zap_matrix.csv",
-               index_label="zapped→zapper")
-df_death.to_csv(checkpoint_dir / f"{run_id}_death_zap_matrix.csv",
-                index_label="zapped→zapper")
+df_fire.to_csv(
+    checkpoint_dir / f"{run_id}_fire_zap_matrix.csv", index_label="zapped→zapper"
+)
+df_death.to_csv(
+    checkpoint_dir / f"{run_id}_death_zap_matrix.csv", index_label="zapped→zapper"
+)

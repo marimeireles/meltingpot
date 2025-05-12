@@ -15,21 +15,21 @@
 
 from unittest import mock
 
-from absl.testing import absltest
-from absl.testing import parameterized
+from absl.testing import absltest, parameterized
+
 from meltingpot.testing import puppeteers
 from meltingpot.utils.puppeteers import fixed_goal
 
 
 class FixedGoalTest(parameterized.TestCase):
 
-  def test_goal_sequence(self):
-    puppeteer = fixed_goal.FixedGoal(mock.sentinel.goal)
-    observations = [{}] * 3
-    expected = [mock.sentinel.goal] * 3
-    actual, _ = puppeteers.goals_from_observations(puppeteer, observations)
-    self.assertSequenceEqual(actual, expected)
+    def test_goal_sequence(self):
+        puppeteer = fixed_goal.FixedGoal(mock.sentinel.goal)
+        observations = [{}] * 3
+        expected = [mock.sentinel.goal] * 3
+        actual, _ = puppeteers.goals_from_observations(puppeteer, observations)
+        self.assertSequenceEqual(actual, expected)
 
 
 if __name__ == "__main__":
-  absltest.main()
+    absltest.main()

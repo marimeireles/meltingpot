@@ -16,27 +16,38 @@
 import dataclasses
 import functools
 import os
-from typing import AbstractSet, Callable, Iterable, Literal, Mapping, Optional, Sequence
+from typing import (
+    AbstractSet,
+    Callable,
+    Iterable,
+    Literal,
+    Mapping,
+    Optional,
+    Sequence,
+)
 
 import immutabledict
-from meltingpot.utils.puppeteers import allelopathic_harvest
-from meltingpot.utils.puppeteers import alternator
-from meltingpot.utils.puppeteers import clean_up
-from meltingpot.utils.puppeteers import coins
-from meltingpot.utils.puppeteers import coordination_in_the_matrix
-from meltingpot.utils.puppeteers import fixed_goal
-from meltingpot.utils.puppeteers import gift_refinements
-from meltingpot.utils.puppeteers import in_the_matrix
-from meltingpot.utils.puppeteers import puppeteer
-from meltingpot.utils.puppeteers import running_with_scissors_in_the_matrix
+
+from meltingpot.utils.puppeteers import (
+    allelopathic_harvest,
+    alternator,
+    clean_up,
+    coins,
+    coordination_in_the_matrix,
+    fixed_goal,
+    gift_refinements,
+    in_the_matrix,
+    puppeteer,
+    running_with_scissors_in_the_matrix,
+)
 
 
 def _find_models_root() -> str:
-  import re  # pylint: disable=g-import-not-at-top
+    import re  # pylint: disable=g-import-not-at-top
 
-  return re.sub(
-      "^(.*)/meltingpot/.*?$", r"\1/meltingpot/assets/saved_models/", __file__
-  )
+    return re.sub(
+        "^(.*)/meltingpot/.*?$", r"\1/meltingpot/assets/saved_models/", __file__
+    )
 
 
 MODELS_ROOT = _find_models_root()
@@ -46,572 +57,648 @@ MODELS_ROOT = _find_models_root()
 # Ordered puppet goals must match the order used in bot training.
 _PUPPET_GOALS = immutabledict.immutabledict(
     # keep-sorted start numeric=yes block=yes
-    allelopathic_harvest__open=puppeteer.puppet_goals([
-        "CONSUME_ANY",
-        "PREFER_RED",
-        "PREFER_GREEN",
-        "FREERIDE_RED",
-        "FREERIDE_GREEN",
-        "ZAP_OTHERS",
-    ]),
-    bach_or_stravinsky_in_the_matrix__arena=puppeteer.puppet_goals([
-        "COLLECT_BACH",
-        "COLLECT_STRAVINSKY",
-        "INTERACT_PLAYING_BACH",
-        "INTERACT_PLAYING_STRAVINSKY",
-    ]),
-    bach_or_stravinsky_in_the_matrix__repeated=puppeteer.puppet_goals([
-        "COLLECT_BACH",
-        "COLLECT_STRAVINSKY",
-        "INTERACT_PLAYING_BACH",
-        "INTERACT_PLAYING_STRAVINSKY",
-    ]),
-    chicken_in_the_matrix__arena=puppeteer.puppet_goals([
-        "COLLECT_DOVE",
-        "COLLECT_HAWK",
-        "INTERACT_PLAYING_DOVE",
-        "INTERACT_PLAYING_HAWK",
-    ]),
-    chicken_in_the_matrix__repeated=puppeteer.puppet_goals([
-        "COLLECT_DOVE",
-        "COLLECT_HAWK",
-        "INTERACT_PLAYING_DOVE",
-        "INTERACT_PLAYING_HAWK",
-    ]),
-    clean_up=puppeteer.puppet_goals([
-        "EAT",
-        "CLEAN",
-    ]),
-    clean_up_3_goals=puppeteer.puppet_goals([
-        "EAT",
-        "CLEAN",
-        "SANCTION",
-    ]),
-    coins=puppeteer.puppet_goals([
-        "COOPERATE",
-        "DEFECT",
-        "SPITE",
-    ]),
-    coop_mining=puppeteer.puppet_goals([
-        "EXTRACT_IRON",
-        "MINE_GOLD",
-        "EXTRACT_GOLD",
-        "EXTRACT_ALL",
-    ]),
-    externality_mushrooms__dense=puppeteer.puppet_goals([
-        "COLLECT_MUSHROOM_HIHE",
-        "COLLECT_MUSHROOM_FIZE",
-        "COLLECT_MUSHROOM_ZIFE",
-        "COLLECT_MUSHROOM_NINE",
-        "DESTROY_MUSHROOM_HIHE",
-        "DESTROY_MUSHROOM_FIZE",
-        "DESTROY_MUSHROOM_ZIFE",
-    ]),
-    gift_refinements=puppeteer.puppet_goals([
-        "COLLECT_TOKENS",
-        "GIFT",
-        "CONSUME_SIMPLE_TOKENS",
-        "CONSUME_TOKENS",
-        "FORAGE",
-    ]),
-    prisoners_dilemma_in_the_matrix__arena=puppeteer.puppet_goals([
-        "COLLECT_COOPERATE",
-        "COLLECT_DEFECT",
-        "INTERACT_COOPERATE",
-        "INTERACT_DEFECT",
-    ]),
-    prisoners_dilemma_in_the_matrix__repeated=puppeteer.puppet_goals([
-        "COLLECT_COOPERATE",
-        "COLLECT_DEFECT",
-        "INTERACT_COOPERATE",
-        "INTERACT_DEFECT",
-    ]),
-    pure_coordination_in_the_matrix__arena=puppeteer.puppet_goals([
-        "COLLECT_RED",
-        "COLLECT_GREEN",
-        "COLLECT_BLUE",
-        "INTERACT_PLAYING_RED",
-        "INTERACT_PLAYING_GREEN",
-        "INTERACT_PLAYING_BLUE",
-        "COLLECT_RED_IGNORING_OTHER_CONSIDERATIONS",
-        "COLLECT_GREEN_IGNORING_OTHER_CONSIDERATIONS",
-        "COLLECT_BLUE_IGNORING_OTHER_CONSIDERATIONS",
-    ]),
-    pure_coordination_in_the_matrix__repeated=puppeteer.puppet_goals([
-        "COLLECT_RED",
-        "COLLECT_GREEN",
-        "COLLECT_BLUE",
-        "INTERACT_PLAYING_RED",
-        "INTERACT_PLAYING_GREEN",
-        "INTERACT_PLAYING_BLUE",
-        "COLLECT_RED_IGNORING_OTHER_CONSIDERATIONS",
-        "COLLECT_GREEN_IGNORING_OTHER_CONSIDERATIONS",
-        "COLLECT_BLUE_IGNORING_OTHER_CONSIDERATIONS",
-    ]),
-    rationalizable_coordination_in_the_matrix__arena=puppeteer.puppet_goals([
-        "COLLECT_YELLOW",
-        "COLLECT_VIOLET",
-        "COLLECT_CYAN",
-        "INTERACT_PLAYING_YELLOW",
-        "INTERACT_PLAYING_VIOLET",
-        "INTERACT_PLAYING_CYAN",
-        "COLLECT_YELLOW_IGNORING_OTHER_CONSIDERATIONS",
-        "COLLECT_VIOLET_IGNORING_OTHER_CONSIDERATIONS",
-        "COLLECT_CYAN_IGNORING_OTHER_CONSIDERATIONS",
-    ]),
-    rationalizable_coordination_in_the_matrix__repeated=puppeteer.puppet_goals([
-        "COLLECT_YELLOW",
-        "COLLECT_VIOLET",
-        "COLLECT_CYAN",
-        "INTERACT_PLAYING_YELLOW",
-        "INTERACT_PLAYING_VIOLET",
-        "INTERACT_PLAYING_CYAN",
-        "COLLECT_YELLOW_IGNORING_OTHER_CONSIDERATIONS",
-        "COLLECT_VIOLET_IGNORING_OTHER_CONSIDERATIONS",
-        "COLLECT_CYAN_IGNORING_OTHER_CONSIDERATIONS",
-    ]),
-    running_with_scissors_in_the_matrix__arena=puppeteer.puppet_goals([
-        "COLLECT_ROCK",
-        "COLLECT_PAPER",
-        "COLLECT_SCISSORS",
-        "INTERACT_PLAYING_ROCK",
-        "INTERACT_PLAYING_PAPER",
-        "INTERACT_PLAYING_SCISSORS",
-        "COLLECT_ROCK_IGNORING_OTHER_CONSIDERATIONS",
-        "COLLECT_PAPER_IGNORING_OTHER_CONSIDERATIONS",
-        "COLLECT_SCISSORS_IGNORING_OTHER_CONSIDERATIONS",
-    ]),
-    running_with_scissors_in_the_matrix__one_shot=puppeteer.puppet_goals([
-        "COLLECT_ROCK",
-        "COLLECT_PAPER",
-        "COLLECT_SCISSORS",
-        "INTERACT_PLAYING_ROCK",
-        "INTERACT_PLAYING_PAPER",
-        "INTERACT_PLAYING_SCISSORS",
-        "COLLECT_ROCK_IGNORING_OTHER_CONSIDERATIONS",
-        "COLLECT_PAPER_IGNORING_OTHER_CONSIDERATIONS",
-        "COLLECT_SCISSORS_IGNORING_OTHER_CONSIDERATIONS",
-    ]),
-    running_with_scissors_in_the_matrix__repeated=puppeteer.puppet_goals([
-        "COLLECT_ROCK",
-        "COLLECT_PAPER",
-        "COLLECT_SCISSORS",
-        "INTERACT_PLAYING_ROCK",
-        "INTERACT_PLAYING_PAPER",
-        "INTERACT_PLAYING_SCISSORS",
-        "COLLECT_ROCK_IGNORING_OTHER_CONSIDERATIONS",
-        "COLLECT_PAPER_IGNORING_OTHER_CONSIDERATIONS",
-        "COLLECT_SCISSORS_IGNORING_OTHER_CONSIDERATIONS",
-    ]),
-    stag_hunt_in_the_matrix__arena=puppeteer.puppet_goals([
-        "COLLECT_STAG",
-        "COLLECT_HARE",
-        "INTERACT_PLAYING_STAG",
-        "INTERACT_PLAYING_HARE",
-    ]),
-    stag_hunt_in_the_matrix__repeated=puppeteer.puppet_goals([
-        "COLLECT_STAG",
-        "COLLECT_HARE",
-        "INTERACT_PLAYING_STAG",
-        "INTERACT_PLAYING_HARE",
-    ]),
-    territory__rooms=puppeteer.puppet_goals([
-        "CLAIM_NEAR",
-        "CLAIM_FAR",
-        "DESTROY_RESOURCE",
-        "ZAP_OTHERS",
-    ]),
+    allelopathic_harvest__open=puppeteer.puppet_goals(
+        [
+            "CONSUME_ANY",
+            "PREFER_RED",
+            "PREFER_GREEN",
+            "FREERIDE_RED",
+            "FREERIDE_GREEN",
+            "ZAP_OTHERS",
+        ]
+    ),
+    bach_or_stravinsky_in_the_matrix__arena=puppeteer.puppet_goals(
+        [
+            "COLLECT_BACH",
+            "COLLECT_STRAVINSKY",
+            "INTERACT_PLAYING_BACH",
+            "INTERACT_PLAYING_STRAVINSKY",
+        ]
+    ),
+    bach_or_stravinsky_in_the_matrix__repeated=puppeteer.puppet_goals(
+        [
+            "COLLECT_BACH",
+            "COLLECT_STRAVINSKY",
+            "INTERACT_PLAYING_BACH",
+            "INTERACT_PLAYING_STRAVINSKY",
+        ]
+    ),
+    chicken_in_the_matrix__arena=puppeteer.puppet_goals(
+        [
+            "COLLECT_DOVE",
+            "COLLECT_HAWK",
+            "INTERACT_PLAYING_DOVE",
+            "INTERACT_PLAYING_HAWK",
+        ]
+    ),
+    chicken_in_the_matrix__repeated=puppeteer.puppet_goals(
+        [
+            "COLLECT_DOVE",
+            "COLLECT_HAWK",
+            "INTERACT_PLAYING_DOVE",
+            "INTERACT_PLAYING_HAWK",
+        ]
+    ),
+    clean_up=puppeteer.puppet_goals(
+        [
+            "EAT",
+            "CLEAN",
+        ]
+    ),
+    clean_up_3_goals=puppeteer.puppet_goals(
+        [
+            "EAT",
+            "CLEAN",
+            "SANCTION",
+        ]
+    ),
+    coins=puppeteer.puppet_goals(
+        [
+            "COOPERATE",
+            "DEFECT",
+            "SPITE",
+        ]
+    ),
+    coop_mining=puppeteer.puppet_goals(
+        [
+            "EXTRACT_IRON",
+            "MINE_GOLD",
+            "EXTRACT_GOLD",
+            "EXTRACT_ALL",
+        ]
+    ),
+    externality_mushrooms__dense=puppeteer.puppet_goals(
+        [
+            "COLLECT_MUSHROOM_HIHE",
+            "COLLECT_MUSHROOM_FIZE",
+            "COLLECT_MUSHROOM_ZIFE",
+            "COLLECT_MUSHROOM_NINE",
+            "DESTROY_MUSHROOM_HIHE",
+            "DESTROY_MUSHROOM_FIZE",
+            "DESTROY_MUSHROOM_ZIFE",
+        ]
+    ),
+    gift_refinements=puppeteer.puppet_goals(
+        [
+            "COLLECT_TOKENS",
+            "GIFT",
+            "CONSUME_SIMPLE_TOKENS",
+            "CONSUME_TOKENS",
+            "FORAGE",
+        ]
+    ),
+    prisoners_dilemma_in_the_matrix__arena=puppeteer.puppet_goals(
+        [
+            "COLLECT_COOPERATE",
+            "COLLECT_DEFECT",
+            "INTERACT_COOPERATE",
+            "INTERACT_DEFECT",
+        ]
+    ),
+    prisoners_dilemma_in_the_matrix__repeated=puppeteer.puppet_goals(
+        [
+            "COLLECT_COOPERATE",
+            "COLLECT_DEFECT",
+            "INTERACT_COOPERATE",
+            "INTERACT_DEFECT",
+        ]
+    ),
+    pure_coordination_in_the_matrix__arena=puppeteer.puppet_goals(
+        [
+            "COLLECT_RED",
+            "COLLECT_GREEN",
+            "COLLECT_BLUE",
+            "INTERACT_PLAYING_RED",
+            "INTERACT_PLAYING_GREEN",
+            "INTERACT_PLAYING_BLUE",
+            "COLLECT_RED_IGNORING_OTHER_CONSIDERATIONS",
+            "COLLECT_GREEN_IGNORING_OTHER_CONSIDERATIONS",
+            "COLLECT_BLUE_IGNORING_OTHER_CONSIDERATIONS",
+        ]
+    ),
+    pure_coordination_in_the_matrix__repeated=puppeteer.puppet_goals(
+        [
+            "COLLECT_RED",
+            "COLLECT_GREEN",
+            "COLLECT_BLUE",
+            "INTERACT_PLAYING_RED",
+            "INTERACT_PLAYING_GREEN",
+            "INTERACT_PLAYING_BLUE",
+            "COLLECT_RED_IGNORING_OTHER_CONSIDERATIONS",
+            "COLLECT_GREEN_IGNORING_OTHER_CONSIDERATIONS",
+            "COLLECT_BLUE_IGNORING_OTHER_CONSIDERATIONS",
+        ]
+    ),
+    rationalizable_coordination_in_the_matrix__arena=puppeteer.puppet_goals(
+        [
+            "COLLECT_YELLOW",
+            "COLLECT_VIOLET",
+            "COLLECT_CYAN",
+            "INTERACT_PLAYING_YELLOW",
+            "INTERACT_PLAYING_VIOLET",
+            "INTERACT_PLAYING_CYAN",
+            "COLLECT_YELLOW_IGNORING_OTHER_CONSIDERATIONS",
+            "COLLECT_VIOLET_IGNORING_OTHER_CONSIDERATIONS",
+            "COLLECT_CYAN_IGNORING_OTHER_CONSIDERATIONS",
+        ]
+    ),
+    rationalizable_coordination_in_the_matrix__repeated=puppeteer.puppet_goals(
+        [
+            "COLLECT_YELLOW",
+            "COLLECT_VIOLET",
+            "COLLECT_CYAN",
+            "INTERACT_PLAYING_YELLOW",
+            "INTERACT_PLAYING_VIOLET",
+            "INTERACT_PLAYING_CYAN",
+            "COLLECT_YELLOW_IGNORING_OTHER_CONSIDERATIONS",
+            "COLLECT_VIOLET_IGNORING_OTHER_CONSIDERATIONS",
+            "COLLECT_CYAN_IGNORING_OTHER_CONSIDERATIONS",
+        ]
+    ),
+    running_with_scissors_in_the_matrix__arena=puppeteer.puppet_goals(
+        [
+            "COLLECT_ROCK",
+            "COLLECT_PAPER",
+            "COLLECT_SCISSORS",
+            "INTERACT_PLAYING_ROCK",
+            "INTERACT_PLAYING_PAPER",
+            "INTERACT_PLAYING_SCISSORS",
+            "COLLECT_ROCK_IGNORING_OTHER_CONSIDERATIONS",
+            "COLLECT_PAPER_IGNORING_OTHER_CONSIDERATIONS",
+            "COLLECT_SCISSORS_IGNORING_OTHER_CONSIDERATIONS",
+        ]
+    ),
+    running_with_scissors_in_the_matrix__one_shot=puppeteer.puppet_goals(
+        [
+            "COLLECT_ROCK",
+            "COLLECT_PAPER",
+            "COLLECT_SCISSORS",
+            "INTERACT_PLAYING_ROCK",
+            "INTERACT_PLAYING_PAPER",
+            "INTERACT_PLAYING_SCISSORS",
+            "COLLECT_ROCK_IGNORING_OTHER_CONSIDERATIONS",
+            "COLLECT_PAPER_IGNORING_OTHER_CONSIDERATIONS",
+            "COLLECT_SCISSORS_IGNORING_OTHER_CONSIDERATIONS",
+        ]
+    ),
+    running_with_scissors_in_the_matrix__repeated=puppeteer.puppet_goals(
+        [
+            "COLLECT_ROCK",
+            "COLLECT_PAPER",
+            "COLLECT_SCISSORS",
+            "INTERACT_PLAYING_ROCK",
+            "INTERACT_PLAYING_PAPER",
+            "INTERACT_PLAYING_SCISSORS",
+            "COLLECT_ROCK_IGNORING_OTHER_CONSIDERATIONS",
+            "COLLECT_PAPER_IGNORING_OTHER_CONSIDERATIONS",
+            "COLLECT_SCISSORS_IGNORING_OTHER_CONSIDERATIONS",
+        ]
+    ),
+    stag_hunt_in_the_matrix__arena=puppeteer.puppet_goals(
+        [
+            "COLLECT_STAG",
+            "COLLECT_HARE",
+            "INTERACT_PLAYING_STAG",
+            "INTERACT_PLAYING_HARE",
+        ]
+    ),
+    stag_hunt_in_the_matrix__repeated=puppeteer.puppet_goals(
+        [
+            "COLLECT_STAG",
+            "COLLECT_HARE",
+            "INTERACT_PLAYING_STAG",
+            "INTERACT_PLAYING_HARE",
+        ]
+    ),
+    territory__rooms=puppeteer.puppet_goals(
+        [
+            "CLAIM_NEAR",
+            "CLAIM_FAR",
+            "DESTROY_RESOURCE",
+            "ZAP_OTHERS",
+        ]
+    ),
     # keep-sorted end
 )
 
 _RESOURCES = immutabledict.immutabledict(
     # keep-sorted start numeric=yes block=yes
-    bach_or_stravinsky_in_the_matrix__arena=immutabledict.immutabledict({
-        "BACH": in_the_matrix.Resource(
-            index=0,
-            collect_goal=_PUPPET_GOALS[
-                "bach_or_stravinsky_in_the_matrix__arena"
-            ]["COLLECT_BACH"],
-            interact_goal=_PUPPET_GOALS[
-                "bach_or_stravinsky_in_the_matrix__arena"
-            ]["INTERACT_PLAYING_BACH"],
-        ),
-        "STRAVINSKY": in_the_matrix.Resource(
-            index=1,
-            collect_goal=_PUPPET_GOALS[
-                "bach_or_stravinsky_in_the_matrix__arena"
-            ]["COLLECT_STRAVINSKY"],
-            interact_goal=_PUPPET_GOALS[
-                "bach_or_stravinsky_in_the_matrix__arena"
-            ]["INTERACT_PLAYING_STRAVINSKY"],
-        ),
-    }),
-    bach_or_stravinsky_in_the_matrix__repeated=immutabledict.immutabledict({
-        "BACH": in_the_matrix.Resource(
-            index=0,
-            collect_goal=_PUPPET_GOALS[
-                "bach_or_stravinsky_in_the_matrix__repeated"
-            ]["COLLECT_BACH"],
-            interact_goal=_PUPPET_GOALS[
-                "bach_or_stravinsky_in_the_matrix__repeated"
-            ]["INTERACT_PLAYING_BACH"],
-        ),
-        "STRAVINSKY": in_the_matrix.Resource(
-            index=1,
-            collect_goal=_PUPPET_GOALS[
-                "bach_or_stravinsky_in_the_matrix__repeated"
-            ]["COLLECT_STRAVINSKY"],
-            interact_goal=_PUPPET_GOALS[
-                "bach_or_stravinsky_in_the_matrix__repeated"
-            ]["INTERACT_PLAYING_STRAVINSKY"],
-        ),
-    }),
-    chicken_in_the_matrix__arena=immutabledict.immutabledict({
-        "DOVE": in_the_matrix.Resource(
-            index=0,
-            collect_goal=_PUPPET_GOALS["chicken_in_the_matrix__arena"][
-                "COLLECT_DOVE"
-            ],
-            interact_goal=_PUPPET_GOALS["chicken_in_the_matrix__arena"][
-                "INTERACT_PLAYING_DOVE"
-            ],
-        ),
-        "HAWK": in_the_matrix.Resource(
-            index=1,
-            collect_goal=_PUPPET_GOALS["chicken_in_the_matrix__arena"][
-                "COLLECT_HAWK"
-            ],
-            interact_goal=_PUPPET_GOALS["chicken_in_the_matrix__arena"][
-                "INTERACT_PLAYING_HAWK"
-            ],
-        ),
-    }),
-    chicken_in_the_matrix__repeated=immutabledict.immutabledict({
-        "DOVE": in_the_matrix.Resource(
-            index=0,
-            collect_goal=_PUPPET_GOALS["chicken_in_the_matrix__repeated"][
-                "COLLECT_DOVE"
-            ],
-            interact_goal=_PUPPET_GOALS["chicken_in_the_matrix__repeated"][
-                "INTERACT_PLAYING_DOVE"
-            ],
-        ),
-        "HAWK": in_the_matrix.Resource(
-            index=1,
-            collect_goal=_PUPPET_GOALS["chicken_in_the_matrix__repeated"][
-                "COLLECT_HAWK"
-            ],
-            interact_goal=_PUPPET_GOALS["chicken_in_the_matrix__repeated"][
-                "INTERACT_PLAYING_HAWK"
-            ],
-        ),
-    }),
-    prisoners_dilemma_in_the_matrix__arena=immutabledict.immutabledict({
-        "COOPERATE": in_the_matrix.Resource(
-            index=0,
-            collect_goal=_PUPPET_GOALS[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["COLLECT_COOPERATE"],
-            interact_goal=_PUPPET_GOALS[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["INTERACT_COOPERATE"],
-        ),
-        "DEFECT": in_the_matrix.Resource(
-            index=1,
-            collect_goal=_PUPPET_GOALS[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["COLLECT_DEFECT"],
-            interact_goal=_PUPPET_GOALS[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["INTERACT_DEFECT"],
-        ),
-    }),
-    prisoners_dilemma_in_the_matrix__repeated=immutabledict.immutabledict({
-        "COOPERATE": in_the_matrix.Resource(
-            index=0,
-            collect_goal=_PUPPET_GOALS[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["COLLECT_COOPERATE"],
-            interact_goal=_PUPPET_GOALS[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["INTERACT_COOPERATE"],
-        ),
-        "DEFECT": in_the_matrix.Resource(
-            index=1,
-            collect_goal=_PUPPET_GOALS[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["COLLECT_DEFECT"],
-            interact_goal=_PUPPET_GOALS[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["INTERACT_DEFECT"],
-        ),
-    }),
-    pure_coordination_in_the_matrix__arena=immutabledict.immutabledict({
-        "RED": in_the_matrix.Resource(
-            index=0,
-            collect_goal=_PUPPET_GOALS[
-                "pure_coordination_in_the_matrix__arena"
-            ]["COLLECT_RED"],
-            interact_goal=_PUPPET_GOALS[
-                "pure_coordination_in_the_matrix__arena"
-            ]["INTERACT_PLAYING_RED"],
-        ),
-        "GREEN": in_the_matrix.Resource(
-            index=1,
-            collect_goal=_PUPPET_GOALS[
-                "pure_coordination_in_the_matrix__arena"
-            ]["COLLECT_GREEN"],
-            interact_goal=_PUPPET_GOALS[
-                "pure_coordination_in_the_matrix__arena"
-            ]["INTERACT_PLAYING_GREEN"],
-        ),
-        "BLUE": in_the_matrix.Resource(
-            index=2,
-            collect_goal=_PUPPET_GOALS[
-                "pure_coordination_in_the_matrix__arena"
-            ]["COLLECT_BLUE"],
-            interact_goal=_PUPPET_GOALS[
-                "pure_coordination_in_the_matrix__arena"
-            ]["INTERACT_PLAYING_BLUE"],
-        ),
-    }),
-    pure_coordination_in_the_matrix__repeated=immutabledict.immutabledict({
-        "RED": in_the_matrix.Resource(
-            index=0,
-            collect_goal=_PUPPET_GOALS[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["COLLECT_RED"],
-            interact_goal=_PUPPET_GOALS[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["INTERACT_PLAYING_RED"],
-        ),
-        "GREEN": in_the_matrix.Resource(
-            index=1,
-            collect_goal=_PUPPET_GOALS[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["COLLECT_GREEN"],
-            interact_goal=_PUPPET_GOALS[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["INTERACT_PLAYING_GREEN"],
-        ),
-        "BLUE": in_the_matrix.Resource(
-            index=2,
-            collect_goal=_PUPPET_GOALS[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["COLLECT_BLUE"],
-            interact_goal=_PUPPET_GOALS[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["INTERACT_PLAYING_BLUE"],
-        ),
-    }),
-    rationalizable_coordination_in_the_matrix__arena=immutabledict.immutabledict({
-        "YELLOW": in_the_matrix.Resource(
-            index=0,
-            collect_goal=_PUPPET_GOALS[
-                "rationalizable_coordination_in_the_matrix__arena"
-            ]["COLLECT_YELLOW"],
-            interact_goal=_PUPPET_GOALS[
-                "rationalizable_coordination_in_the_matrix__arena"
-            ]["INTERACT_PLAYING_YELLOW"],
-        ),
-        "VIOLET": in_the_matrix.Resource(
-            index=1,
-            collect_goal=_PUPPET_GOALS[
-                "rationalizable_coordination_in_the_matrix__arena"
-            ]["COLLECT_VIOLET"],
-            interact_goal=_PUPPET_GOALS[
-                "rationalizable_coordination_in_the_matrix__arena"
-            ]["INTERACT_PLAYING_VIOLET"],
-        ),
-        "CYAN": in_the_matrix.Resource(
-            index=2,
-            collect_goal=_PUPPET_GOALS[
-                "rationalizable_coordination_in_the_matrix__arena"
-            ]["COLLECT_CYAN"],
-            interact_goal=_PUPPET_GOALS[
-                "rationalizable_coordination_in_the_matrix__arena"
-            ]["INTERACT_PLAYING_CYAN"],
-        ),
-    }),
-    rationalizable_coordination_in_the_matrix__repeated=immutabledict.immutabledict({
-        "YELLOW": in_the_matrix.Resource(
-            index=0,
-            collect_goal=_PUPPET_GOALS[
-                "rationalizable_coordination_in_the_matrix__repeated"
-            ]["COLLECT_YELLOW"],
-            interact_goal=_PUPPET_GOALS[
-                "rationalizable_coordination_in_the_matrix__repeated"
-            ]["INTERACT_PLAYING_YELLOW"],
-        ),
-        "VIOLET": in_the_matrix.Resource(
-            index=1,
-            collect_goal=_PUPPET_GOALS[
-                "rationalizable_coordination_in_the_matrix__repeated"
-            ]["COLLECT_VIOLET"],
-            interact_goal=_PUPPET_GOALS[
-                "rationalizable_coordination_in_the_matrix__repeated"
-            ]["INTERACT_PLAYING_VIOLET"],
-        ),
-        "CYAN": in_the_matrix.Resource(
-            index=2,
-            collect_goal=_PUPPET_GOALS[
-                "rationalizable_coordination_in_the_matrix__repeated"
-            ]["COLLECT_CYAN"],
-            interact_goal=_PUPPET_GOALS[
-                "rationalizable_coordination_in_the_matrix__repeated"
-            ]["INTERACT_PLAYING_CYAN"],
-        ),
-    }),
-    running_with_scissors_in_the_matrix__arena=immutabledict.immutabledict({
-        "ROCK": in_the_matrix.Resource(
-            index=0,
-            collect_goal=_PUPPET_GOALS[
-                "running_with_scissors_in_the_matrix__arena"
-            ]["COLLECT_ROCK"],
-            interact_goal=_PUPPET_GOALS[
-                "running_with_scissors_in_the_matrix__arena"
-            ]["INTERACT_PLAYING_ROCK"],
-        ),
-        "PAPER": in_the_matrix.Resource(
-            index=1,
-            collect_goal=_PUPPET_GOALS[
-                "running_with_scissors_in_the_matrix__arena"
-            ]["COLLECT_PAPER"],
-            interact_goal=_PUPPET_GOALS[
-                "running_with_scissors_in_the_matrix__arena"
-            ]["INTERACT_PLAYING_PAPER"],
-        ),
-        "SCISSORS": in_the_matrix.Resource(
-            index=2,
-            collect_goal=_PUPPET_GOALS[
-                "running_with_scissors_in_the_matrix__arena"
-            ]["COLLECT_SCISSORS"],
-            interact_goal=_PUPPET_GOALS[
-                "running_with_scissors_in_the_matrix__arena"
-            ]["INTERACT_PLAYING_SCISSORS"],
-        ),
-    }),
-    running_with_scissors_in_the_matrix__one_shot=immutabledict.immutabledict({
-        "ROCK": in_the_matrix.Resource(
-            index=0,
-            collect_goal=_PUPPET_GOALS[
-                "running_with_scissors_in_the_matrix__one_shot"
-            ]["COLLECT_ROCK"],
-            interact_goal=_PUPPET_GOALS[
-                "running_with_scissors_in_the_matrix__one_shot"
-            ]["INTERACT_PLAYING_ROCK"],
-        ),
-        "PAPER": in_the_matrix.Resource(
-            index=1,
-            collect_goal=_PUPPET_GOALS[
-                "running_with_scissors_in_the_matrix__one_shot"
-            ]["COLLECT_PAPER"],
-            interact_goal=_PUPPET_GOALS[
-                "running_with_scissors_in_the_matrix__one_shot"
-            ]["INTERACT_PLAYING_PAPER"],
-        ),
-        "SCISSORS": in_the_matrix.Resource(
-            index=2,
-            collect_goal=_PUPPET_GOALS[
-                "running_with_scissors_in_the_matrix__one_shot"
-            ]["COLLECT_SCISSORS"],
-            interact_goal=_PUPPET_GOALS[
-                "running_with_scissors_in_the_matrix__one_shot"
-            ]["INTERACT_PLAYING_SCISSORS"],
-        ),
-    }),
-    running_with_scissors_in_the_matrix__repeated=immutabledict.immutabledict({
-        "ROCK": in_the_matrix.Resource(
-            index=0,
-            collect_goal=_PUPPET_GOALS[
-                "running_with_scissors_in_the_matrix__repeated"
-            ]["COLLECT_ROCK"],
-            interact_goal=_PUPPET_GOALS[
-                "running_with_scissors_in_the_matrix__repeated"
-            ]["INTERACT_PLAYING_ROCK"],
-        ),
-        "PAPER": in_the_matrix.Resource(
-            index=1,
-            collect_goal=_PUPPET_GOALS[
-                "running_with_scissors_in_the_matrix__repeated"
-            ]["COLLECT_PAPER"],
-            interact_goal=_PUPPET_GOALS[
-                "running_with_scissors_in_the_matrix__repeated"
-            ]["INTERACT_PLAYING_PAPER"],
-        ),
-        "SCISSORS": in_the_matrix.Resource(
-            index=2,
-            collect_goal=_PUPPET_GOALS[
-                "running_with_scissors_in_the_matrix__repeated"
-            ]["COLLECT_SCISSORS"],
-            interact_goal=_PUPPET_GOALS[
-                "running_with_scissors_in_the_matrix__repeated"
-            ]["INTERACT_PLAYING_SCISSORS"],
-        ),
-    }),
-    stag_hunt_in_the_matrix__arena=immutabledict.immutabledict({
-        "STAG": in_the_matrix.Resource(
-            index=0,
-            collect_goal=_PUPPET_GOALS["stag_hunt_in_the_matrix__arena"][
-                "COLLECT_STAG"
-            ],
-            interact_goal=_PUPPET_GOALS["stag_hunt_in_the_matrix__arena"][
-                "INTERACT_PLAYING_STAG"
-            ],
-        ),
-        "HARE": in_the_matrix.Resource(
-            index=1,
-            collect_goal=_PUPPET_GOALS["stag_hunt_in_the_matrix__arena"][
-                "COLLECT_HARE"
-            ],
-            interact_goal=_PUPPET_GOALS["stag_hunt_in_the_matrix__arena"][
-                "INTERACT_PLAYING_HARE"
-            ],
-        ),
-    }),
-    stag_hunt_in_the_matrix__repeated=immutabledict.immutabledict({
-        "STAG": in_the_matrix.Resource(
-            index=0,
-            collect_goal=_PUPPET_GOALS["stag_hunt_in_the_matrix__repeated"][
-                "COLLECT_STAG"
-            ],
-            interact_goal=_PUPPET_GOALS["stag_hunt_in_the_matrix__repeated"][
-                "INTERACT_PLAYING_STAG"
-            ],
-        ),
-        "HARE": in_the_matrix.Resource(
-            index=1,
-            collect_goal=_PUPPET_GOALS["stag_hunt_in_the_matrix__repeated"][
-                "COLLECT_HARE"
-            ],
-            interact_goal=_PUPPET_GOALS["stag_hunt_in_the_matrix__repeated"][
-                "INTERACT_PLAYING_HARE"
-            ],
-        ),
-    }),
+    bach_or_stravinsky_in_the_matrix__arena=immutabledict.immutabledict(
+        {
+            "BACH": in_the_matrix.Resource(
+                index=0,
+                collect_goal=_PUPPET_GOALS["bach_or_stravinsky_in_the_matrix__arena"][
+                    "COLLECT_BACH"
+                ],
+                interact_goal=_PUPPET_GOALS["bach_or_stravinsky_in_the_matrix__arena"][
+                    "INTERACT_PLAYING_BACH"
+                ],
+            ),
+            "STRAVINSKY": in_the_matrix.Resource(
+                index=1,
+                collect_goal=_PUPPET_GOALS["bach_or_stravinsky_in_the_matrix__arena"][
+                    "COLLECT_STRAVINSKY"
+                ],
+                interact_goal=_PUPPET_GOALS["bach_or_stravinsky_in_the_matrix__arena"][
+                    "INTERACT_PLAYING_STRAVINSKY"
+                ],
+            ),
+        }
+    ),
+    bach_or_stravinsky_in_the_matrix__repeated=immutabledict.immutabledict(
+        {
+            "BACH": in_the_matrix.Resource(
+                index=0,
+                collect_goal=_PUPPET_GOALS[
+                    "bach_or_stravinsky_in_the_matrix__repeated"
+                ]["COLLECT_BACH"],
+                interact_goal=_PUPPET_GOALS[
+                    "bach_or_stravinsky_in_the_matrix__repeated"
+                ]["INTERACT_PLAYING_BACH"],
+            ),
+            "STRAVINSKY": in_the_matrix.Resource(
+                index=1,
+                collect_goal=_PUPPET_GOALS[
+                    "bach_or_stravinsky_in_the_matrix__repeated"
+                ]["COLLECT_STRAVINSKY"],
+                interact_goal=_PUPPET_GOALS[
+                    "bach_or_stravinsky_in_the_matrix__repeated"
+                ]["INTERACT_PLAYING_STRAVINSKY"],
+            ),
+        }
+    ),
+    chicken_in_the_matrix__arena=immutabledict.immutabledict(
+        {
+            "DOVE": in_the_matrix.Resource(
+                index=0,
+                collect_goal=_PUPPET_GOALS["chicken_in_the_matrix__arena"][
+                    "COLLECT_DOVE"
+                ],
+                interact_goal=_PUPPET_GOALS["chicken_in_the_matrix__arena"][
+                    "INTERACT_PLAYING_DOVE"
+                ],
+            ),
+            "HAWK": in_the_matrix.Resource(
+                index=1,
+                collect_goal=_PUPPET_GOALS["chicken_in_the_matrix__arena"][
+                    "COLLECT_HAWK"
+                ],
+                interact_goal=_PUPPET_GOALS["chicken_in_the_matrix__arena"][
+                    "INTERACT_PLAYING_HAWK"
+                ],
+            ),
+        }
+    ),
+    chicken_in_the_matrix__repeated=immutabledict.immutabledict(
+        {
+            "DOVE": in_the_matrix.Resource(
+                index=0,
+                collect_goal=_PUPPET_GOALS["chicken_in_the_matrix__repeated"][
+                    "COLLECT_DOVE"
+                ],
+                interact_goal=_PUPPET_GOALS["chicken_in_the_matrix__repeated"][
+                    "INTERACT_PLAYING_DOVE"
+                ],
+            ),
+            "HAWK": in_the_matrix.Resource(
+                index=1,
+                collect_goal=_PUPPET_GOALS["chicken_in_the_matrix__repeated"][
+                    "COLLECT_HAWK"
+                ],
+                interact_goal=_PUPPET_GOALS["chicken_in_the_matrix__repeated"][
+                    "INTERACT_PLAYING_HAWK"
+                ],
+            ),
+        }
+    ),
+    prisoners_dilemma_in_the_matrix__arena=immutabledict.immutabledict(
+        {
+            "COOPERATE": in_the_matrix.Resource(
+                index=0,
+                collect_goal=_PUPPET_GOALS["prisoners_dilemma_in_the_matrix__arena"][
+                    "COLLECT_COOPERATE"
+                ],
+                interact_goal=_PUPPET_GOALS["prisoners_dilemma_in_the_matrix__arena"][
+                    "INTERACT_COOPERATE"
+                ],
+            ),
+            "DEFECT": in_the_matrix.Resource(
+                index=1,
+                collect_goal=_PUPPET_GOALS["prisoners_dilemma_in_the_matrix__arena"][
+                    "COLLECT_DEFECT"
+                ],
+                interact_goal=_PUPPET_GOALS["prisoners_dilemma_in_the_matrix__arena"][
+                    "INTERACT_DEFECT"
+                ],
+            ),
+        }
+    ),
+    prisoners_dilemma_in_the_matrix__repeated=immutabledict.immutabledict(
+        {
+            "COOPERATE": in_the_matrix.Resource(
+                index=0,
+                collect_goal=_PUPPET_GOALS["prisoners_dilemma_in_the_matrix__repeated"][
+                    "COLLECT_COOPERATE"
+                ],
+                interact_goal=_PUPPET_GOALS[
+                    "prisoners_dilemma_in_the_matrix__repeated"
+                ]["INTERACT_COOPERATE"],
+            ),
+            "DEFECT": in_the_matrix.Resource(
+                index=1,
+                collect_goal=_PUPPET_GOALS["prisoners_dilemma_in_the_matrix__repeated"][
+                    "COLLECT_DEFECT"
+                ],
+                interact_goal=_PUPPET_GOALS[
+                    "prisoners_dilemma_in_the_matrix__repeated"
+                ]["INTERACT_DEFECT"],
+            ),
+        }
+    ),
+    pure_coordination_in_the_matrix__arena=immutabledict.immutabledict(
+        {
+            "RED": in_the_matrix.Resource(
+                index=0,
+                collect_goal=_PUPPET_GOALS["pure_coordination_in_the_matrix__arena"][
+                    "COLLECT_RED"
+                ],
+                interact_goal=_PUPPET_GOALS["pure_coordination_in_the_matrix__arena"][
+                    "INTERACT_PLAYING_RED"
+                ],
+            ),
+            "GREEN": in_the_matrix.Resource(
+                index=1,
+                collect_goal=_PUPPET_GOALS["pure_coordination_in_the_matrix__arena"][
+                    "COLLECT_GREEN"
+                ],
+                interact_goal=_PUPPET_GOALS["pure_coordination_in_the_matrix__arena"][
+                    "INTERACT_PLAYING_GREEN"
+                ],
+            ),
+            "BLUE": in_the_matrix.Resource(
+                index=2,
+                collect_goal=_PUPPET_GOALS["pure_coordination_in_the_matrix__arena"][
+                    "COLLECT_BLUE"
+                ],
+                interact_goal=_PUPPET_GOALS["pure_coordination_in_the_matrix__arena"][
+                    "INTERACT_PLAYING_BLUE"
+                ],
+            ),
+        }
+    ),
+    pure_coordination_in_the_matrix__repeated=immutabledict.immutabledict(
+        {
+            "RED": in_the_matrix.Resource(
+                index=0,
+                collect_goal=_PUPPET_GOALS["pure_coordination_in_the_matrix__repeated"][
+                    "COLLECT_RED"
+                ],
+                interact_goal=_PUPPET_GOALS[
+                    "pure_coordination_in_the_matrix__repeated"
+                ]["INTERACT_PLAYING_RED"],
+            ),
+            "GREEN": in_the_matrix.Resource(
+                index=1,
+                collect_goal=_PUPPET_GOALS["pure_coordination_in_the_matrix__repeated"][
+                    "COLLECT_GREEN"
+                ],
+                interact_goal=_PUPPET_GOALS[
+                    "pure_coordination_in_the_matrix__repeated"
+                ]["INTERACT_PLAYING_GREEN"],
+            ),
+            "BLUE": in_the_matrix.Resource(
+                index=2,
+                collect_goal=_PUPPET_GOALS["pure_coordination_in_the_matrix__repeated"][
+                    "COLLECT_BLUE"
+                ],
+                interact_goal=_PUPPET_GOALS[
+                    "pure_coordination_in_the_matrix__repeated"
+                ]["INTERACT_PLAYING_BLUE"],
+            ),
+        }
+    ),
+    rationalizable_coordination_in_the_matrix__arena=immutabledict.immutabledict(
+        {
+            "YELLOW": in_the_matrix.Resource(
+                index=0,
+                collect_goal=_PUPPET_GOALS[
+                    "rationalizable_coordination_in_the_matrix__arena"
+                ]["COLLECT_YELLOW"],
+                interact_goal=_PUPPET_GOALS[
+                    "rationalizable_coordination_in_the_matrix__arena"
+                ]["INTERACT_PLAYING_YELLOW"],
+            ),
+            "VIOLET": in_the_matrix.Resource(
+                index=1,
+                collect_goal=_PUPPET_GOALS[
+                    "rationalizable_coordination_in_the_matrix__arena"
+                ]["COLLECT_VIOLET"],
+                interact_goal=_PUPPET_GOALS[
+                    "rationalizable_coordination_in_the_matrix__arena"
+                ]["INTERACT_PLAYING_VIOLET"],
+            ),
+            "CYAN": in_the_matrix.Resource(
+                index=2,
+                collect_goal=_PUPPET_GOALS[
+                    "rationalizable_coordination_in_the_matrix__arena"
+                ]["COLLECT_CYAN"],
+                interact_goal=_PUPPET_GOALS[
+                    "rationalizable_coordination_in_the_matrix__arena"
+                ]["INTERACT_PLAYING_CYAN"],
+            ),
+        }
+    ),
+    rationalizable_coordination_in_the_matrix__repeated=immutabledict.immutabledict(
+        {
+            "YELLOW": in_the_matrix.Resource(
+                index=0,
+                collect_goal=_PUPPET_GOALS[
+                    "rationalizable_coordination_in_the_matrix__repeated"
+                ]["COLLECT_YELLOW"],
+                interact_goal=_PUPPET_GOALS[
+                    "rationalizable_coordination_in_the_matrix__repeated"
+                ]["INTERACT_PLAYING_YELLOW"],
+            ),
+            "VIOLET": in_the_matrix.Resource(
+                index=1,
+                collect_goal=_PUPPET_GOALS[
+                    "rationalizable_coordination_in_the_matrix__repeated"
+                ]["COLLECT_VIOLET"],
+                interact_goal=_PUPPET_GOALS[
+                    "rationalizable_coordination_in_the_matrix__repeated"
+                ]["INTERACT_PLAYING_VIOLET"],
+            ),
+            "CYAN": in_the_matrix.Resource(
+                index=2,
+                collect_goal=_PUPPET_GOALS[
+                    "rationalizable_coordination_in_the_matrix__repeated"
+                ]["COLLECT_CYAN"],
+                interact_goal=_PUPPET_GOALS[
+                    "rationalizable_coordination_in_the_matrix__repeated"
+                ]["INTERACT_PLAYING_CYAN"],
+            ),
+        }
+    ),
+    running_with_scissors_in_the_matrix__arena=immutabledict.immutabledict(
+        {
+            "ROCK": in_the_matrix.Resource(
+                index=0,
+                collect_goal=_PUPPET_GOALS[
+                    "running_with_scissors_in_the_matrix__arena"
+                ]["COLLECT_ROCK"],
+                interact_goal=_PUPPET_GOALS[
+                    "running_with_scissors_in_the_matrix__arena"
+                ]["INTERACT_PLAYING_ROCK"],
+            ),
+            "PAPER": in_the_matrix.Resource(
+                index=1,
+                collect_goal=_PUPPET_GOALS[
+                    "running_with_scissors_in_the_matrix__arena"
+                ]["COLLECT_PAPER"],
+                interact_goal=_PUPPET_GOALS[
+                    "running_with_scissors_in_the_matrix__arena"
+                ]["INTERACT_PLAYING_PAPER"],
+            ),
+            "SCISSORS": in_the_matrix.Resource(
+                index=2,
+                collect_goal=_PUPPET_GOALS[
+                    "running_with_scissors_in_the_matrix__arena"
+                ]["COLLECT_SCISSORS"],
+                interact_goal=_PUPPET_GOALS[
+                    "running_with_scissors_in_the_matrix__arena"
+                ]["INTERACT_PLAYING_SCISSORS"],
+            ),
+        }
+    ),
+    running_with_scissors_in_the_matrix__one_shot=immutabledict.immutabledict(
+        {
+            "ROCK": in_the_matrix.Resource(
+                index=0,
+                collect_goal=_PUPPET_GOALS[
+                    "running_with_scissors_in_the_matrix__one_shot"
+                ]["COLLECT_ROCK"],
+                interact_goal=_PUPPET_GOALS[
+                    "running_with_scissors_in_the_matrix__one_shot"
+                ]["INTERACT_PLAYING_ROCK"],
+            ),
+            "PAPER": in_the_matrix.Resource(
+                index=1,
+                collect_goal=_PUPPET_GOALS[
+                    "running_with_scissors_in_the_matrix__one_shot"
+                ]["COLLECT_PAPER"],
+                interact_goal=_PUPPET_GOALS[
+                    "running_with_scissors_in_the_matrix__one_shot"
+                ]["INTERACT_PLAYING_PAPER"],
+            ),
+            "SCISSORS": in_the_matrix.Resource(
+                index=2,
+                collect_goal=_PUPPET_GOALS[
+                    "running_with_scissors_in_the_matrix__one_shot"
+                ]["COLLECT_SCISSORS"],
+                interact_goal=_PUPPET_GOALS[
+                    "running_with_scissors_in_the_matrix__one_shot"
+                ]["INTERACT_PLAYING_SCISSORS"],
+            ),
+        }
+    ),
+    running_with_scissors_in_the_matrix__repeated=immutabledict.immutabledict(
+        {
+            "ROCK": in_the_matrix.Resource(
+                index=0,
+                collect_goal=_PUPPET_GOALS[
+                    "running_with_scissors_in_the_matrix__repeated"
+                ]["COLLECT_ROCK"],
+                interact_goal=_PUPPET_GOALS[
+                    "running_with_scissors_in_the_matrix__repeated"
+                ]["INTERACT_PLAYING_ROCK"],
+            ),
+            "PAPER": in_the_matrix.Resource(
+                index=1,
+                collect_goal=_PUPPET_GOALS[
+                    "running_with_scissors_in_the_matrix__repeated"
+                ]["COLLECT_PAPER"],
+                interact_goal=_PUPPET_GOALS[
+                    "running_with_scissors_in_the_matrix__repeated"
+                ]["INTERACT_PLAYING_PAPER"],
+            ),
+            "SCISSORS": in_the_matrix.Resource(
+                index=2,
+                collect_goal=_PUPPET_GOALS[
+                    "running_with_scissors_in_the_matrix__repeated"
+                ]["COLLECT_SCISSORS"],
+                interact_goal=_PUPPET_GOALS[
+                    "running_with_scissors_in_the_matrix__repeated"
+                ]["INTERACT_PLAYING_SCISSORS"],
+            ),
+        }
+    ),
+    stag_hunt_in_the_matrix__arena=immutabledict.immutabledict(
+        {
+            "STAG": in_the_matrix.Resource(
+                index=0,
+                collect_goal=_PUPPET_GOALS["stag_hunt_in_the_matrix__arena"][
+                    "COLLECT_STAG"
+                ],
+                interact_goal=_PUPPET_GOALS["stag_hunt_in_the_matrix__arena"][
+                    "INTERACT_PLAYING_STAG"
+                ],
+            ),
+            "HARE": in_the_matrix.Resource(
+                index=1,
+                collect_goal=_PUPPET_GOALS["stag_hunt_in_the_matrix__arena"][
+                    "COLLECT_HARE"
+                ],
+                interact_goal=_PUPPET_GOALS["stag_hunt_in_the_matrix__arena"][
+                    "INTERACT_PLAYING_HARE"
+                ],
+            ),
+        }
+    ),
+    stag_hunt_in_the_matrix__repeated=immutabledict.immutabledict(
+        {
+            "STAG": in_the_matrix.Resource(
+                index=0,
+                collect_goal=_PUPPET_GOALS["stag_hunt_in_the_matrix__repeated"][
+                    "COLLECT_STAG"
+                ],
+                interact_goal=_PUPPET_GOALS["stag_hunt_in_the_matrix__repeated"][
+                    "INTERACT_PLAYING_STAG"
+                ],
+            ),
+            "HARE": in_the_matrix.Resource(
+                index=1,
+                collect_goal=_PUPPET_GOALS["stag_hunt_in_the_matrix__repeated"][
+                    "COLLECT_HARE"
+                ],
+                interact_goal=_PUPPET_GOALS["stag_hunt_in_the_matrix__repeated"][
+                    "INTERACT_PLAYING_HARE"
+                ],
+            ),
+        }
+    ),
     # keep-sorted end
 )
 
 
 @dataclasses.dataclass(frozen=True)
 class BotConfig:
-  """Bot config.
+    """Bot config.
 
-  Attributes:
-    substrate: the substrate the bot was trained for.
-    roles: the roles the bot was trained for.
-    model_path: the path to the bot's saved model.
-    model_version: whether the bot is a "1.0" bot or a new "1.1" bot.
-    puppeteer_builder: returns the puppeteer used to control the bot.
-  """
+    Attributes:
+      substrate: the substrate the bot was trained for.
+      roles: the roles the bot was trained for.
+      model_path: the path to the bot's saved model.
+      model_version: whether the bot is a "1.0" bot or a new "1.1" bot.
+      puppeteer_builder: returns the puppeteer used to control the bot.
+    """
 
-  substrate: str
-  roles: AbstractSet[str]
-  model_path: str
-  puppeteer_builder: Optional[Callable[[], puppeteer.Puppeteer]]
+    substrate: str
+    roles: AbstractSet[str]
+    model_path: str
+    puppeteer_builder: Optional[Callable[[], puppeteer.Puppeteer]]
 
-  def __post_init__(self):
-    object.__setattr__(self, "roles", frozenset(self.roles))
+    def __post_init__(self):
+        object.__setattr__(self, "roles", frozenset(self.roles))
 
 
 def saved_model(
@@ -621,21 +708,21 @@ def saved_model(
     model: str,
     models_root: str = MODELS_ROOT
 ) -> BotConfig:
-  """Returns the config for a saved model bot.
+    """Returns the config for a saved model bot.
 
-  Args:
-    substrate: the substrate on which the bot was trained.
-    roles: the roles the bot was trained for.
-    model: the name of the model.
-    models_root: The path to the directory containing the saved_models.
-  """
-  model_path = os.path.join(models_root, substrate, model)
-  return BotConfig(
-      substrate=substrate,
-      roles=frozenset(roles),
-      model_path=model_path,
-      puppeteer_builder=None,
-  )
+    Args:
+      substrate: the substrate on which the bot was trained.
+      roles: the roles the bot was trained for.
+      model: the name of the model.
+      models_root: The path to the directory containing the saved_models.
+    """
+    model_path = os.path.join(models_root, substrate, model)
+    return BotConfig(
+        substrate=substrate,
+        roles=frozenset(roles),
+        model_path=model_path,
+        puppeteer_builder=None,
+    )
 
 
 def puppet(
@@ -646,22 +733,22 @@ def puppet(
     puppeteer_builder: Callable[[], puppeteer.Puppeteer],
     models_root: str = MODELS_ROOT
 ) -> BotConfig:
-  """Returns the config for a puppet bot.
+    """Returns the config for a puppet bot.
 
-  Args:
-    substrate: the substrate on which the bot was trained.
-    roles: the roles the bot was trained for.
-    model: the name of the model.
-    puppeteer_builder: returns the puppeteer used to control the bot.
-    models_root: the path to the directory containing the saved_models.
-  """
-  puppet_path = os.path.join(models_root, substrate, model)
-  return BotConfig(
-      substrate=substrate,
-      roles=frozenset(roles),
-      model_path=puppet_path,
-      puppeteer_builder=puppeteer_builder,
-  )
+    Args:
+      substrate: the substrate on which the bot was trained.
+      roles: the roles the bot was trained for.
+      model: the name of the model.
+      puppeteer_builder: returns the puppeteer used to control the bot.
+      models_root: the path to the directory containing the saved_models.
+    """
+    puppet_path = os.path.join(models_root, substrate, model)
+    return BotConfig(
+        substrate=substrate,
+        roles=frozenset(roles),
+        model_path=puppet_path,
+        puppeteer_builder=puppeteer_builder,
+    )
 
 
 BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
@@ -748,9 +835,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         ),
         puppeteer_builder=functools.partial(
             allelopathic_harvest.ConventionFollower,
-            initial_goal=(
-                _PUPPET_GOALS["allelopathic_harvest__open"]["CONSUME_ANY"]
-            ),
+            initial_goal=(_PUPPET_GOALS["allelopathic_harvest__open"]["CONSUME_ANY"]),
             preference_goals=(
                 _PUPPET_GOALS["allelopathic_harvest__open"]["PREFER_RED"],
                 _PUPPET_GOALS["allelopathic_harvest__open"]["PREFER_GREEN"],
@@ -770,9 +855,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         ),
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["bach_or_stravinsky_in_the_matrix__arena"][
-                "BACH"
-            ],
+            target=_RESOURCES["bach_or_stravinsky_in_the_matrix__arena"]["BACH"],
             margin=3,
         ),
     ),
@@ -786,9 +869,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         ),
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["bach_or_stravinsky_in_the_matrix__arena"][
-                "STRAVINSKY"
-            ],
+            target=_RESOURCES["bach_or_stravinsky_in_the_matrix__arena"]["STRAVINSKY"],
             margin=3,
         ),
     ),
@@ -804,9 +885,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
             in_the_matrix.AlternatingSpecialist,
             targets=[
                 _RESOURCES["bach_or_stravinsky_in_the_matrix__arena"]["BACH"],
-                _RESOURCES["bach_or_stravinsky_in_the_matrix__arena"][
-                    "STRAVINSKY"
-                ],
+                _RESOURCES["bach_or_stravinsky_in_the_matrix__arena"]["STRAVINSKY"],
             ],
             interactions_per_target=2,
             margin=2,
@@ -823,9 +902,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.AlternatingSpecialist,
             targets=[
-                _RESOURCES["bach_or_stravinsky_in_the_matrix__arena"][
-                    "STRAVINSKY"
-                ],
+                _RESOURCES["bach_or_stravinsky_in_the_matrix__arena"]["STRAVINSKY"],
                 _RESOURCES["bach_or_stravinsky_in_the_matrix__arena"]["BACH"],
             ],
             interactions_per_target=2,
@@ -842,9 +919,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         ),
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"][
-                "BACH"
-            ],
+            target=_RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"]["BACH"],
             margin=5,
         ),
     ),
@@ -858,12 +933,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         ),
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES[
-                "bach_or_stravinsky_in_the_matrix__repeated"
-            ]["BACH"],
-            defect_resource=_RESOURCES[
-                "bach_or_stravinsky_in_the_matrix__repeated"
-            ]["STRAVINSKY"],
+            cooperate_resource=_RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"][
+                "BACH"
+            ],
+            defect_resource=_RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"][
+                "STRAVINSKY"
+            ],
             tremble_probability=0,
             margin=5,
         ),
@@ -878,12 +953,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         ),
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES[
-                "bach_or_stravinsky_in_the_matrix__repeated"
-            ]["BACH"],
-            defect_resource=_RESOURCES[
-                "bach_or_stravinsky_in_the_matrix__repeated"
-            ]["STRAVINSKY"],
+            cooperate_resource=_RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"][
+                "BACH"
+            ],
+            defect_resource=_RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"][
+                "STRAVINSKY"
+            ],
             tremble_probability=0.25,
             margin=5,
         ),
@@ -914,12 +989,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         ),
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES[
-                "bach_or_stravinsky_in_the_matrix__repeated"
-            ]["STRAVINSKY"],
-            defect_resource=_RESOURCES[
-                "bach_or_stravinsky_in_the_matrix__repeated"
-            ]["BACH"],
+            cooperate_resource=_RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"][
+                "STRAVINSKY"
+            ],
+            defect_resource=_RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"][
+                "BACH"
+            ],
             tremble_probability=0,
             margin=5,
         ),
@@ -934,12 +1009,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         ),
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES[
-                "bach_or_stravinsky_in_the_matrix__repeated"
-            ]["STRAVINSKY"],
-            defect_resource=_RESOURCES[
-                "bach_or_stravinsky_in_the_matrix__repeated"
-            ]["BACH"],
+            cooperate_resource=_RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"][
+                "STRAVINSKY"
+            ],
+            defect_resource=_RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"][
+                "BACH"
+            ],
             tremble_probability=0.25,
             margin=5,
         ),
@@ -955,12 +1030,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.AlternatingSpecialist,
             targets=[
-                _RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"][
-                    "BACH"
-                ],
-                _RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"][
-                    "STRAVINSKY"
-                ],
+                _RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"]["BACH"],
+                _RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"]["STRAVINSKY"],
             ],
             interactions_per_target=1,
             margin=5,
@@ -977,12 +1048,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.AlternatingSpecialist,
             targets=[
-                _RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"][
-                    "BACH"
-                ],
-                _RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"][
-                    "STRAVINSKY"
-                ],
+                _RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"]["BACH"],
+                _RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"]["STRAVINSKY"],
             ],
             interactions_per_target=3,
             margin=5,
@@ -999,12 +1066,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.AlternatingSpecialist,
             targets=[
-                _RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"][
-                    "STRAVINSKY"
-                ],
-                _RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"][
-                    "BACH"
-                ],
+                _RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"]["STRAVINSKY"],
+                _RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"]["BACH"],
             ],
             interactions_per_target=1,
             margin=5,
@@ -1021,12 +1084,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.AlternatingSpecialist,
             targets=[
-                _RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"][
-                    "STRAVINSKY"
-                ],
-                _RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"][
-                    "BACH"
-                ],
+                _RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"]["STRAVINSKY"],
+                _RESOURCES["bach_or_stravinsky_in_the_matrix__repeated"]["BACH"],
             ],
             interactions_per_target=3,
             margin=5,
@@ -1055,21 +1114,15 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="yellow_0",
     ),
     chemistry__three_metabolic_cycles_with_plentiful_distractors__blue_0=saved_model(
-        substrate=(
-            "chemistry__three_metabolic_cycles_with_plentiful_distractors"
-        ),
+        substrate=("chemistry__three_metabolic_cycles_with_plentiful_distractors"),
         model="blue_0",
     ),
     chemistry__three_metabolic_cycles_with_plentiful_distractors__green_0=saved_model(
-        substrate=(
-            "chemistry__three_metabolic_cycles_with_plentiful_distractors"
-        ),
+        substrate=("chemistry__three_metabolic_cycles_with_plentiful_distractors"),
         model="green_0",
     ),
     chemistry__three_metabolic_cycles_with_plentiful_distractors__yellow_0=saved_model(
-        substrate=(
-            "chemistry__three_metabolic_cycles_with_plentiful_distractors"
-        ),
+        substrate=("chemistry__three_metabolic_cycles_with_plentiful_distractors"),
         model="yellow_0",
     ),
     chemistry__two_metabolic_cycles__blue_0=saved_model(
@@ -1111,9 +1164,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES["chicken_in_the_matrix__arena"][
-                "DOVE"
-            ],
+            cooperate_resource=_RESOURCES["chicken_in_the_matrix__arena"]["DOVE"],
             defect_resource=_RESOURCES["chicken_in_the_matrix__arena"]["HAWK"],
             threshold=1,
             margin=1,
@@ -1124,9 +1175,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES["chicken_in_the_matrix__arena"][
-                "DOVE"
-            ],
+            cooperate_resource=_RESOURCES["chicken_in_the_matrix__arena"]["DOVE"],
             defect_resource=_RESOURCES["chicken_in_the_matrix__arena"]["HAWK"],
             threshold=1,
             margin=5,
@@ -1137,9 +1186,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES["chicken_in_the_matrix__arena"][
-                "DOVE"
-            ],
+            cooperate_resource=_RESOURCES["chicken_in_the_matrix__arena"]["DOVE"],
             defect_resource=_RESOURCES["chicken_in_the_matrix__arena"]["HAWK"],
             threshold=3,
             margin=1,
@@ -1150,9 +1197,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES["chicken_in_the_matrix__arena"][
-                "DOVE"
-            ],
+            cooperate_resource=_RESOURCES["chicken_in_the_matrix__arena"]["DOVE"],
             defect_resource=_RESOURCES["chicken_in_the_matrix__arena"]["HAWK"],
             threshold=3,
             margin=5,
@@ -1163,9 +1208,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES["chicken_in_the_matrix__arena"][
-                "DOVE"
-            ],
+            cooperate_resource=_RESOURCES["chicken_in_the_matrix__arena"]["DOVE"],
             defect_resource=_RESOURCES["chicken_in_the_matrix__arena"]["HAWK"],
             threshold=2,
             margin=1,
@@ -1176,9 +1219,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES["chicken_in_the_matrix__arena"][
-                "DOVE"
-            ],
+            cooperate_resource=_RESOURCES["chicken_in_the_matrix__arena"]["DOVE"],
             defect_resource=_RESOURCES["chicken_in_the_matrix__arena"]["HAWK"],
             threshold=2,
             margin=5,
@@ -1207,12 +1248,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Corrigible,
-            cooperate_resource=_RESOURCES["chicken_in_the_matrix__repeated"][
-                "DOVE"
-            ],
-            defect_resource=_RESOURCES["chicken_in_the_matrix__repeated"][
-                "HAWK"
-            ],
+            cooperate_resource=_RESOURCES["chicken_in_the_matrix__repeated"]["DOVE"],
+            defect_resource=_RESOURCES["chicken_in_the_matrix__repeated"]["HAWK"],
             threshold=3,
             margin=5,
             tremble_probability=0,
@@ -1223,12 +1260,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Corrigible,
-            cooperate_resource=_RESOURCES["chicken_in_the_matrix__repeated"][
-                "DOVE"
-            ],
-            defect_resource=_RESOURCES["chicken_in_the_matrix__repeated"][
-                "HAWK"
-            ],
+            cooperate_resource=_RESOURCES["chicken_in_the_matrix__repeated"]["DOVE"],
+            defect_resource=_RESOURCES["chicken_in_the_matrix__repeated"]["HAWK"],
             threshold=3,
             margin=5,
             tremble_probability=0.15,
@@ -1257,9 +1290,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
-            initial_target=_RESOURCES["chicken_in_the_matrix__repeated"][
-                "DOVE"
-            ],
+            initial_target=_RESOURCES["chicken_in_the_matrix__repeated"]["DOVE"],
             final_target=_RESOURCES["chicken_in_the_matrix__repeated"]["HAWK"],
             threshold=3,
             initial_margin=1,
@@ -1271,12 +1302,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES["chicken_in_the_matrix__repeated"][
-                "DOVE"
-            ],
-            defect_resource=_RESOURCES["chicken_in_the_matrix__repeated"][
-                "HAWK"
-            ],
+            cooperate_resource=_RESOURCES["chicken_in_the_matrix__repeated"]["DOVE"],
+            defect_resource=_RESOURCES["chicken_in_the_matrix__repeated"]["HAWK"],
             threshold=1,
             margin=5,
         ),
@@ -1286,12 +1313,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES["chicken_in_the_matrix__repeated"][
-                "DOVE"
-            ],
-            defect_resource=_RESOURCES["chicken_in_the_matrix__repeated"][
-                "HAWK"
-            ],
+            cooperate_resource=_RESOURCES["chicken_in_the_matrix__repeated"]["DOVE"],
+            defect_resource=_RESOURCES["chicken_in_the_matrix__repeated"]["HAWK"],
             threshold=1,
             margin=7,
         ),
@@ -1301,12 +1324,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES["chicken_in_the_matrix__repeated"][
-                "DOVE"
-            ],
-            defect_resource=_RESOURCES["chicken_in_the_matrix__repeated"][
-                "HAWK"
-            ],
+            cooperate_resource=_RESOURCES["chicken_in_the_matrix__repeated"]["DOVE"],
+            defect_resource=_RESOURCES["chicken_in_the_matrix__repeated"]["HAWK"],
             threshold=2,
             margin=5,
         ),
@@ -1316,12 +1335,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES["chicken_in_the_matrix__repeated"][
-                "DOVE"
-            ],
-            defect_resource=_RESOURCES["chicken_in_the_matrix__repeated"][
-                "HAWK"
-            ],
+            cooperate_resource=_RESOURCES["chicken_in_the_matrix__repeated"]["DOVE"],
+            defect_resource=_RESOURCES["chicken_in_the_matrix__repeated"]["HAWK"],
             threshold=2,
             margin=7,
         ),
@@ -1349,12 +1364,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES["chicken_in_the_matrix__repeated"][
-                "DOVE"
-            ],
-            defect_resource=_RESOURCES["chicken_in_the_matrix__repeated"][
-                "HAWK"
-            ],
+            cooperate_resource=_RESOURCES["chicken_in_the_matrix__repeated"]["DOVE"],
+            defect_resource=_RESOURCES["chicken_in_the_matrix__repeated"]["HAWK"],
             tremble_probability=0,
             margin=5,
         ),
@@ -1364,12 +1375,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES["chicken_in_the_matrix__repeated"][
-                "DOVE"
-            ],
-            defect_resource=_RESOURCES["chicken_in_the_matrix__repeated"][
-                "HAWK"
-            ],
+            cooperate_resource=_RESOURCES["chicken_in_the_matrix__repeated"]["DOVE"],
+            defect_resource=_RESOURCES["chicken_in_the_matrix__repeated"]["HAWK"],
             tremble_probability=0,
             margin=7,
         ),
@@ -1379,12 +1386,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES["chicken_in_the_matrix__repeated"][
-                "DOVE"
-            ],
-            defect_resource=_RESOURCES["chicken_in_the_matrix__repeated"][
-                "HAWK"
-            ],
+            cooperate_resource=_RESOURCES["chicken_in_the_matrix__repeated"]["DOVE"],
+            defect_resource=_RESOURCES["chicken_in_the_matrix__repeated"]["HAWK"],
             tremble_probability=0.15,
             margin=5,
         ),
@@ -1394,12 +1397,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES["chicken_in_the_matrix__repeated"][
-                "DOVE"
-            ],
-            defect_resource=_RESOURCES["chicken_in_the_matrix__repeated"][
-                "HAWK"
-            ],
+            cooperate_resource=_RESOURCES["chicken_in_the_matrix__repeated"]["DOVE"],
+            defect_resource=_RESOURCES["chicken_in_the_matrix__repeated"]["HAWK"],
             tremble_probability=0.15,
             margin=7,
         ),
@@ -1915,11 +1914,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         roles=("default",),
         puppeteer_builder=functools.partial(
             fixed_goal.FixedGoal,
-            (
-                _PUPPET_GOALS["externality_mushrooms__dense"][
-                    "COLLECT_MUSHROOM_FIZE"
-                ]
-            ),
+            (_PUPPET_GOALS["externality_mushrooms__dense"]["COLLECT_MUSHROOM_FIZE"]),
         ),
     ),
     externality_mushrooms__dense__puppet_hihe_0=puppet(
@@ -1928,11 +1923,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         roles=("default",),
         puppeteer_builder=functools.partial(
             fixed_goal.FixedGoal,
-            (
-                _PUPPET_GOALS["externality_mushrooms__dense"][
-                    "COLLECT_MUSHROOM_HIHE"
-                ]
-            ),
+            (_PUPPET_GOALS["externality_mushrooms__dense"]["COLLECT_MUSHROOM_HIHE"]),
         ),
     ),
     factory_commons__either_or__sustainable_0=saved_model(
@@ -2271,9 +2262,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
-                "COOPERATE"
-            ],
+            target=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"]["COOPERATE"],
             margin=1,
         ),
     ),
@@ -2282,9 +2271,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
-                "COOPERATE"
-            ],
+            target=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"]["COOPERATE"],
             margin=5,
         ),
     ),
@@ -2293,12 +2280,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_3",
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "DEFECT"
+            ],
             margin=5,
             tremble_probability=0,
         ),
@@ -2308,12 +2295,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_3",
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "DEFECT"
+            ],
             margin=3,
             tremble_probability=0.15,
         ),
@@ -2323,9 +2310,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
-                "DEFECT"
-            ],
+            target=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"]["DEFECT"],
             margin=1,
         ),
     ),
@@ -2334,9 +2319,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
-                "DEFECT"
-            ],
+            target=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"]["DEFECT"],
             margin=5,
         ),
     ),
@@ -2345,12 +2328,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "DEFECT"
+            ],
             threshold=1,
             margin=1,
         ),
@@ -2360,12 +2343,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "DEFECT"
+            ],
             threshold=1,
             margin=5,
         ),
@@ -2375,12 +2358,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "DEFECT"
+            ],
             threshold=3,
             margin=1,
         ),
@@ -2390,12 +2373,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "DEFECT"
+            ],
             threshold=3,
             margin=5,
         ),
@@ -2405,12 +2388,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "DEFECT"
+            ],
             threshold=2,
             margin=1,
         ),
@@ -2420,12 +2403,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "DEFECT"
+            ],
             threshold=2,
             margin=5,
         ),
@@ -2435,12 +2418,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_3",
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "DEFECT"
+            ],
             tremble_probability=0,
             margin=3,
         ),
@@ -2450,12 +2433,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_3",
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "DEFECT"
+            ],
             tremble_probability=0,
             margin=5,
         ),
@@ -2465,12 +2448,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_3",
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "DEFECT"
+            ],
             tremble_probability=0,
             margin=10,
         ),
@@ -2480,12 +2463,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_3",
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "DEFECT"
+            ],
             tremble_probability=0.15,
             margin=3,
         ),
@@ -2495,12 +2478,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_3",
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "DEFECT"
+            ],
             tremble_probability=0.15,
             margin=5,
         ),
@@ -2510,12 +2493,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_3",
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__arena"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__arena"][
+                "DEFECT"
+            ],
             tremble_probability=0.15,
             margin=10,
         ),
@@ -2525,9 +2508,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
-                "COOPERATE"
-            ],
+            target=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"]["COOPERATE"],
             margin=5,
         ),
     ),
@@ -2536,9 +2517,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
-                "COOPERATE"
-            ],
+            target=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"]["COOPERATE"],
             margin=7,
         ),
     ),
@@ -2547,12 +2526,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Corrigible,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "DEFECT"
+            ],
             threshold=3,
             margin=5,
             tremble_probability=0,
@@ -2563,12 +2542,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Corrigible,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "DEFECT"
+            ],
             threshold=3,
             margin=5,
             tremble_probability=0.15,
@@ -2579,9 +2558,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
-                "DEFECT"
-            ],
+            target=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"]["DEFECT"],
             margin=5,
         ),
     ),
@@ -2590,9 +2567,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
-                "DEFECT"
-            ],
+            target=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"]["DEFECT"],
             margin=7,
         ),
     ),
@@ -2601,12 +2576,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
-            initial_target=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["COOPERATE"],
-            final_target=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["DEFECT"],
+            initial_target=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "COOPERATE"
+            ],
+            final_target=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "DEFECT"
+            ],
             threshold=3,
             initial_margin=1,
             final_margin=5,
@@ -2617,12 +2592,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "DEFECT"
+            ],
             threshold=1,
             margin=5,
         ),
@@ -2632,12 +2607,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "DEFECT"
+            ],
             threshold=1,
             margin=7,
         ),
@@ -2647,12 +2622,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "DEFECT"
+            ],
             threshold=2,
             margin=5,
         ),
@@ -2662,12 +2637,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "DEFECT"
+            ],
             threshold=2,
             margin=7,
         ),
@@ -2677,12 +2652,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "DEFECT"
+            ],
             tremble_probability=0,
             margin=5,
         ),
@@ -2692,12 +2667,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "DEFECT"
+            ],
             tremble_probability=0,
             margin=7,
         ),
@@ -2707,12 +2682,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "DEFECT"
+            ],
             tremble_probability=0.15,
             margin=5,
         ),
@@ -2722,12 +2697,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["COOPERATE"],
-            defect_resource=_RESOURCES[
-                "prisoners_dilemma_in_the_matrix__repeated"
-            ]["DEFECT"],
+            cooperate_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "COOPERATE"
+            ],
+            defect_resource=_RESOURCES["prisoners_dilemma_in_the_matrix__repeated"][
+                "DEFECT"
+            ],
             tremble_probability=0.15,
             margin=7,
         ),
@@ -2738,12 +2713,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=5,
-            initial_target=_RESOURCES["pure_coordination_in_the_matrix__arena"][
-                "RED"
-            ],
-            final_target=_RESOURCES["pure_coordination_in_the_matrix__arena"][
-                "GREEN"
-            ],
+            initial_target=_RESOURCES["pure_coordination_in_the_matrix__arena"]["RED"],
+            final_target=_RESOURCES["pure_coordination_in_the_matrix__arena"]["GREEN"],
             initial_margin=1,
             final_margin=1,
         ),
@@ -2754,12 +2725,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=5,
-            initial_target=_RESOURCES["pure_coordination_in_the_matrix__arena"][
-                "RED"
-            ],
-            final_target=_RESOURCES["pure_coordination_in_the_matrix__arena"][
-                "BLUE"
-            ],
+            initial_target=_RESOURCES["pure_coordination_in_the_matrix__arena"]["RED"],
+            final_target=_RESOURCES["pure_coordination_in_the_matrix__arena"]["BLUE"],
             initial_margin=1,
             final_margin=1,
         ),
@@ -2773,9 +2740,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
             initial_target=_RESOURCES["pure_coordination_in_the_matrix__arena"][
                 "GREEN"
             ],
-            final_target=_RESOURCES["pure_coordination_in_the_matrix__arena"][
-                "RED"
-            ],
+            final_target=_RESOURCES["pure_coordination_in_the_matrix__arena"]["RED"],
             initial_margin=1,
             final_margin=1,
         ),
@@ -2789,9 +2754,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
             initial_target=_RESOURCES["pure_coordination_in_the_matrix__arena"][
                 "GREEN"
             ],
-            final_target=_RESOURCES["pure_coordination_in_the_matrix__arena"][
-                "BLUE"
-            ],
+            final_target=_RESOURCES["pure_coordination_in_the_matrix__arena"]["BLUE"],
             initial_margin=1,
             final_margin=1,
         ),
@@ -2802,12 +2765,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=5,
-            initial_target=_RESOURCES["pure_coordination_in_the_matrix__arena"][
-                "BLUE"
-            ],
-            final_target=_RESOURCES["pure_coordination_in_the_matrix__arena"][
-                "RED"
-            ],
+            initial_target=_RESOURCES["pure_coordination_in_the_matrix__arena"]["BLUE"],
+            final_target=_RESOURCES["pure_coordination_in_the_matrix__arena"]["RED"],
             initial_margin=1,
             final_margin=1,
         ),
@@ -2818,12 +2777,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=5,
-            initial_target=_RESOURCES["pure_coordination_in_the_matrix__arena"][
-                "BLUE"
-            ],
-            final_target=_RESOURCES["pure_coordination_in_the_matrix__arena"][
-                "GREEN"
-            ],
+            initial_target=_RESOURCES["pure_coordination_in_the_matrix__arena"]["BLUE"],
+            final_target=_RESOURCES["pure_coordination_in_the_matrix__arena"]["GREEN"],
             initial_margin=1,
             final_margin=1,
         ),
@@ -2842,9 +2797,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_0",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["pure_coordination_in_the_matrix__arena"][
-                "GREEN"
-            ],
+            target=_RESOURCES["pure_coordination_in_the_matrix__arena"]["GREEN"],
             margin=1,
         ),
     ),
@@ -2871,9 +2824,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_0",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["pure_coordination_in_the_matrix__arena"][
-                "GREEN"
-            ],
+            target=_RESOURCES["pure_coordination_in_the_matrix__arena"]["GREEN"],
             margin=6,
         ),
     ),
@@ -2918,12 +2869,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=4,
-            initial_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["RED"],
-            final_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["GREEN"],
+            initial_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
+                "RED"
+            ],
+            final_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
+                "GREEN"
+            ],
             initial_margin=5,
             final_margin=5,
         ),
@@ -2934,12 +2885,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=12,
-            initial_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["RED"],
-            final_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["GREEN"],
+            initial_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
+                "RED"
+            ],
+            final_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
+                "GREEN"
+            ],
             initial_margin=5,
             final_margin=5,
         ),
@@ -2950,12 +2901,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=4,
-            initial_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["RED"],
-            final_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["BLUE"],
+            initial_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
+                "RED"
+            ],
+            final_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
+                "BLUE"
+            ],
             initial_margin=5,
             final_margin=5,
         ),
@@ -2966,12 +2917,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=12,
-            initial_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["RED"],
-            final_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["BLUE"],
+            initial_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
+                "RED"
+            ],
+            final_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
+                "BLUE"
+            ],
             initial_margin=5,
             final_margin=5,
         ),
@@ -2982,12 +2933,10 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=4,
-            initial_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["GREEN"],
-            final_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["RED"],
+            initial_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
+                "GREEN"
+            ],
+            final_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"]["RED"],
             initial_margin=5,
             final_margin=5,
         ),
@@ -2998,12 +2947,10 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=12,
-            initial_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["GREEN"],
-            final_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["RED"],
+            initial_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
+                "GREEN"
+            ],
+            final_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"]["RED"],
             initial_margin=5,
             final_margin=5,
         ),
@@ -3014,12 +2961,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=4,
-            initial_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["GREEN"],
-            final_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["BLUE"],
+            initial_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
+                "GREEN"
+            ],
+            final_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
+                "BLUE"
+            ],
             initial_margin=5,
             final_margin=5,
         ),
@@ -3030,12 +2977,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=12,
-            initial_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["GREEN"],
-            final_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["BLUE"],
+            initial_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
+                "GREEN"
+            ],
+            final_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
+                "BLUE"
+            ],
             initial_margin=5,
             final_margin=5,
         ),
@@ -3046,12 +2993,10 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=4,
-            initial_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["BLUE"],
-            final_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["RED"],
+            initial_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
+                "BLUE"
+            ],
+            final_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"]["RED"],
             initial_margin=5,
             final_margin=5,
         ),
@@ -3062,12 +3007,10 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=12,
-            initial_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["BLUE"],
-            final_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["RED"],
+            initial_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
+                "BLUE"
+            ],
+            final_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"]["RED"],
             initial_margin=5,
             final_margin=5,
         ),
@@ -3078,12 +3021,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=4,
-            initial_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["BLUE"],
-            final_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["GREEN"],
+            initial_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
+                "BLUE"
+            ],
+            final_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
+                "GREEN"
+            ],
             initial_margin=5,
             final_margin=5,
         ),
@@ -3094,12 +3037,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=12,
-            initial_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["BLUE"],
-            final_target=_RESOURCES[
-                "pure_coordination_in_the_matrix__repeated"
-            ]["GREEN"],
+            initial_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
+                "BLUE"
+            ],
+            final_target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
+                "GREEN"
+            ],
             initial_margin=5,
             final_margin=5,
         ),
@@ -3109,9 +3052,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
-                "RED"
-            ],
+            target=_RESOURCES["pure_coordination_in_the_matrix__repeated"]["RED"],
             margin=5,
         ),
     ),
@@ -3120,9 +3061,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
-                "GREEN"
-            ],
+            target=_RESOURCES["pure_coordination_in_the_matrix__repeated"]["GREEN"],
             margin=5,
         ),
     ),
@@ -3131,9 +3070,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["pure_coordination_in_the_matrix__repeated"][
-                "BLUE"
-            ],
+            target=_RESOURCES["pure_coordination_in_the_matrix__repeated"]["BLUE"],
             margin=5,
         ),
     ),
@@ -3144,9 +3081,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
             coordination_in_the_matrix.CoordinateWithPrevious,
             resources=(
                 _RESOURCES["pure_coordination_in_the_matrix__repeated"]["RED"],
-                _RESOURCES["pure_coordination_in_the_matrix__repeated"][
-                    "GREEN"
-                ],
+                _RESOURCES["pure_coordination_in_the_matrix__repeated"]["GREEN"],
                 _RESOURCES["pure_coordination_in_the_matrix__repeated"]["BLUE"],
             ),
             margin=5,
@@ -3161,9 +3096,9 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
             initial_target=_RESOURCES[
                 "rationalizable_coordination_in_the_matrix__arena"
             ]["YELLOW"],
-            final_target=_RESOURCES[
-                "rationalizable_coordination_in_the_matrix__arena"
-            ]["VIOLET"],
+            final_target=_RESOURCES["rationalizable_coordination_in_the_matrix__arena"][
+                "VIOLET"
+            ],
             initial_margin=1,
             final_margin=1,
         ),
@@ -3177,9 +3112,9 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
             initial_target=_RESOURCES[
                 "rationalizable_coordination_in_the_matrix__arena"
             ]["YELLOW"],
-            final_target=_RESOURCES[
-                "rationalizable_coordination_in_the_matrix__arena"
-            ]["CYAN"],
+            final_target=_RESOURCES["rationalizable_coordination_in_the_matrix__arena"][
+                "CYAN"
+            ],
             initial_margin=1,
             final_margin=1,
         ),
@@ -3193,9 +3128,9 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
             initial_target=_RESOURCES[
                 "rationalizable_coordination_in_the_matrix__arena"
             ]["VIOLET"],
-            final_target=_RESOURCES[
-                "rationalizable_coordination_in_the_matrix__arena"
-            ]["YELLOW"],
+            final_target=_RESOURCES["rationalizable_coordination_in_the_matrix__arena"][
+                "YELLOW"
+            ],
             initial_margin=1,
             final_margin=1,
         ),
@@ -3209,9 +3144,9 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
             initial_target=_RESOURCES[
                 "rationalizable_coordination_in_the_matrix__arena"
             ]["VIOLET"],
-            final_target=_RESOURCES[
-                "rationalizable_coordination_in_the_matrix__arena"
-            ]["CYAN"],
+            final_target=_RESOURCES["rationalizable_coordination_in_the_matrix__arena"][
+                "CYAN"
+            ],
             initial_margin=1,
             final_margin=1,
         ),
@@ -3225,9 +3160,9 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
             initial_target=_RESOURCES[
                 "rationalizable_coordination_in_the_matrix__arena"
             ]["CYAN"],
-            final_target=_RESOURCES[
-                "rationalizable_coordination_in_the_matrix__arena"
-            ]["YELLOW"],
+            final_target=_RESOURCES["rationalizable_coordination_in_the_matrix__arena"][
+                "YELLOW"
+            ],
             initial_margin=1,
             final_margin=1,
         ),
@@ -3241,9 +3176,9 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
             initial_target=_RESOURCES[
                 "rationalizable_coordination_in_the_matrix__arena"
             ]["CYAN"],
-            final_target=_RESOURCES[
-                "rationalizable_coordination_in_the_matrix__arena"
-            ]["VIOLET"],
+            final_target=_RESOURCES["rationalizable_coordination_in_the_matrix__arena"][
+                "VIOLET"
+            ],
             initial_margin=1,
             final_margin=1,
         ),
@@ -3253,9 +3188,9 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_0",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES[
-                "rationalizable_coordination_in_the_matrix__arena"
-            ]["YELLOW"],
+            target=_RESOURCES["rationalizable_coordination_in_the_matrix__arena"][
+                "YELLOW"
+            ],
             margin=1,
         ),
     ),
@@ -3264,9 +3199,9 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_0",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES[
-                "rationalizable_coordination_in_the_matrix__arena"
-            ]["VIOLET"],
+            target=_RESOURCES["rationalizable_coordination_in_the_matrix__arena"][
+                "VIOLET"
+            ],
             margin=1,
         ),
     ),
@@ -3275,9 +3210,9 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_0",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES[
-                "rationalizable_coordination_in_the_matrix__arena"
-            ]["CYAN"],
+            target=_RESOURCES["rationalizable_coordination_in_the_matrix__arena"][
+                "CYAN"
+            ],
             margin=1,
         ),
     ),
@@ -3286,9 +3221,9 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_0",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES[
-                "rationalizable_coordination_in_the_matrix__arena"
-            ]["YELLOW"],
+            target=_RESOURCES["rationalizable_coordination_in_the_matrix__arena"][
+                "YELLOW"
+            ],
             margin=6,
         ),
     ),
@@ -3297,9 +3232,9 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_0",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES[
-                "rationalizable_coordination_in_the_matrix__arena"
-            ]["VIOLET"],
+            target=_RESOURCES["rationalizable_coordination_in_the_matrix__arena"][
+                "VIOLET"
+            ],
             margin=6,
         ),
     ),
@@ -3308,9 +3243,9 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_0",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES[
-                "rationalizable_coordination_in_the_matrix__arena"
-            ]["CYAN"],
+            target=_RESOURCES["rationalizable_coordination_in_the_matrix__arena"][
+                "CYAN"
+            ],
             margin=6,
         ),
     ),
@@ -3326,9 +3261,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
                 _RESOURCES["rationalizable_coordination_in_the_matrix__arena"][
                     "VIOLET"
                 ],
-                _RESOURCES["rationalizable_coordination_in_the_matrix__arena"][
-                    "CYAN"
-                ],
+                _RESOURCES["rationalizable_coordination_in_the_matrix__arena"]["CYAN"],
             ),
             margin=1,
         ),
@@ -3345,9 +3278,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
                 _RESOURCES["rationalizable_coordination_in_the_matrix__arena"][
                     "VIOLET"
                 ],
-                _RESOURCES["rationalizable_coordination_in_the_matrix__arena"][
-                    "CYAN"
-                ],
+                _RESOURCES["rationalizable_coordination_in_the_matrix__arena"]["CYAN"],
             ),
             margin=6,
         ),
@@ -3549,9 +3480,9 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES[
-                "rationalizable_coordination_in_the_matrix__repeated"
-            ]["YELLOW"],
+            target=_RESOURCES["rationalizable_coordination_in_the_matrix__repeated"][
+                "YELLOW"
+            ],
             margin=5,
         ),
     ),
@@ -3560,9 +3491,9 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES[
-                "rationalizable_coordination_in_the_matrix__repeated"
-            ]["VIOLET"],
+            target=_RESOURCES["rationalizable_coordination_in_the_matrix__repeated"][
+                "VIOLET"
+            ],
             margin=5,
         ),
     ),
@@ -3571,9 +3502,9 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES[
-                "rationalizable_coordination_in_the_matrix__repeated"
-            ]["CYAN"],
+            target=_RESOURCES["rationalizable_coordination_in_the_matrix__repeated"][
+                "CYAN"
+            ],
             margin=5,
         ),
     ),
@@ -3583,15 +3514,15 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             coordination_in_the_matrix.CoordinateWithPrevious,
             resources=(
-                _RESOURCES[
-                    "rationalizable_coordination_in_the_matrix__repeated"
-                ]["YELLOW"],
-                _RESOURCES[
-                    "rationalizable_coordination_in_the_matrix__repeated"
-                ]["VIOLET"],
-                _RESOURCES[
-                    "rationalizable_coordination_in_the_matrix__repeated"
-                ]["CYAN"],
+                _RESOURCES["rationalizable_coordination_in_the_matrix__repeated"][
+                    "YELLOW"
+                ],
+                _RESOURCES["rationalizable_coordination_in_the_matrix__repeated"][
+                    "VIOLET"
+                ],
+                _RESOURCES["rationalizable_coordination_in_the_matrix__repeated"][
+                    "CYAN"
+                ],
             ),
             margin=5,
         ),
@@ -3602,12 +3533,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=3,
-            initial_target=_RESOURCES[
-                "running_with_scissors_in_the_matrix__arena"
-            ]["PAPER"],
-            final_target=_RESOURCES[
-                "running_with_scissors_in_the_matrix__arena"
-            ]["SCISSORS"],
+            initial_target=_RESOURCES["running_with_scissors_in_the_matrix__arena"][
+                "PAPER"
+            ],
+            final_target=_RESOURCES["running_with_scissors_in_the_matrix__arena"][
+                "SCISSORS"
+            ],
             initial_margin=1,
             final_margin=5,
         ),
@@ -3618,12 +3549,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=3,
-            initial_target=_RESOURCES[
-                "running_with_scissors_in_the_matrix__arena"
-            ]["ROCK"],
-            final_target=_RESOURCES[
-                "running_with_scissors_in_the_matrix__arena"
-            ]["SCISSORS"],
+            initial_target=_RESOURCES["running_with_scissors_in_the_matrix__arena"][
+                "ROCK"
+            ],
+            final_target=_RESOURCES["running_with_scissors_in_the_matrix__arena"][
+                "SCISSORS"
+            ],
             initial_margin=1,
             final_margin=5,
         ),
@@ -3634,12 +3565,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=3,
-            initial_target=_RESOURCES[
-                "running_with_scissors_in_the_matrix__arena"
-            ]["SCISSORS"],
-            final_target=_RESOURCES[
-                "running_with_scissors_in_the_matrix__arena"
-            ]["PAPER"],
+            initial_target=_RESOURCES["running_with_scissors_in_the_matrix__arena"][
+                "SCISSORS"
+            ],
+            final_target=_RESOURCES["running_with_scissors_in_the_matrix__arena"][
+                "PAPER"
+            ],
             initial_margin=1,
             final_margin=5,
         ),
@@ -3653,9 +3584,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["running_with_scissors_in_the_matrix__arena"][
-                "PAPER"
-            ],
+            target=_RESOURCES["running_with_scissors_in_the_matrix__arena"]["PAPER"],
             margin=3,
         ),
     ),
@@ -3664,9 +3593,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["running_with_scissors_in_the_matrix__arena"][
-                "PAPER"
-            ],
+            target=_RESOURCES["running_with_scissors_in_the_matrix__arena"]["PAPER"],
             margin=5,
         ),
     ),
@@ -3675,9 +3602,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["running_with_scissors_in_the_matrix__arena"][
-                "ROCK"
-            ],
+            target=_RESOURCES["running_with_scissors_in_the_matrix__arena"]["ROCK"],
             margin=3,
         ),
     ),
@@ -3686,9 +3611,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["running_with_scissors_in_the_matrix__arena"][
-                "ROCK"
-            ],
+            target=_RESOURCES["running_with_scissors_in_the_matrix__arena"]["ROCK"],
             margin=5,
         ),
     ),
@@ -3697,9 +3620,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["running_with_scissors_in_the_matrix__arena"][
-                "SCISSORS"
-            ],
+            target=_RESOURCES["running_with_scissors_in_the_matrix__arena"]["SCISSORS"],
             margin=3,
         ),
     ),
@@ -3708,9 +3629,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["running_with_scissors_in_the_matrix__arena"][
-                "SCISSORS"
-            ],
+            target=_RESOURCES["running_with_scissors_in_the_matrix__arena"]["SCISSORS"],
             margin=5,
         ),
     ),
@@ -3719,9 +3638,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_0",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["running_with_scissors_in_the_matrix__one_shot"][
-                "PAPER"
-            ],
+            target=_RESOURCES["running_with_scissors_in_the_matrix__one_shot"]["PAPER"],
             margin=3,
         ),
     ),
@@ -3730,9 +3647,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_0",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["running_with_scissors_in_the_matrix__one_shot"][
-                "ROCK"
-            ],
+            target=_RESOURCES["running_with_scissors_in_the_matrix__one_shot"]["ROCK"],
             margin=3,
         ),
     ),
@@ -3753,12 +3668,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=3,
-            initial_target=_RESOURCES[
-                "running_with_scissors_in_the_matrix__repeated"
-            ]["PAPER"],
-            final_target=_RESOURCES[
-                "running_with_scissors_in_the_matrix__repeated"
-            ]["ROCK"],
+            initial_target=_RESOURCES["running_with_scissors_in_the_matrix__repeated"][
+                "PAPER"
+            ],
+            final_target=_RESOURCES["running_with_scissors_in_the_matrix__repeated"][
+                "ROCK"
+            ],
             initial_margin=1,
             final_margin=5,
         ),
@@ -3769,12 +3684,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=2,
-            initial_target=_RESOURCES[
-                "running_with_scissors_in_the_matrix__repeated"
-            ]["PAPER"],
-            final_target=_RESOURCES[
-                "running_with_scissors_in_the_matrix__repeated"
-            ]["ROCK"],
+            initial_target=_RESOURCES["running_with_scissors_in_the_matrix__repeated"][
+                "PAPER"
+            ],
+            final_target=_RESOURCES["running_with_scissors_in_the_matrix__repeated"][
+                "ROCK"
+            ],
             initial_margin=5,
             final_margin=5,
         ),
@@ -3785,12 +3700,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=3,
-            initial_target=_RESOURCES[
-                "running_with_scissors_in_the_matrix__repeated"
-            ]["ROCK"],
-            final_target=_RESOURCES[
-                "running_with_scissors_in_the_matrix__repeated"
-            ]["SCISSORS"],
+            initial_target=_RESOURCES["running_with_scissors_in_the_matrix__repeated"][
+                "ROCK"
+            ],
+            final_target=_RESOURCES["running_with_scissors_in_the_matrix__repeated"][
+                "SCISSORS"
+            ],
             initial_margin=1,
             final_margin=5,
         ),
@@ -3801,12 +3716,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=2,
-            initial_target=_RESOURCES[
-                "running_with_scissors_in_the_matrix__repeated"
-            ]["ROCK"],
-            final_target=_RESOURCES[
-                "running_with_scissors_in_the_matrix__repeated"
-            ]["SCISSORS"],
+            initial_target=_RESOURCES["running_with_scissors_in_the_matrix__repeated"][
+                "ROCK"
+            ],
+            final_target=_RESOURCES["running_with_scissors_in_the_matrix__repeated"][
+                "SCISSORS"
+            ],
             initial_margin=5,
             final_margin=5,
         ),
@@ -3817,12 +3732,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=3,
-            initial_target=_RESOURCES[
-                "running_with_scissors_in_the_matrix__repeated"
-            ]["SCISSORS"],
-            final_target=_RESOURCES[
-                "running_with_scissors_in_the_matrix__repeated"
-            ]["PAPER"],
+            initial_target=_RESOURCES["running_with_scissors_in_the_matrix__repeated"][
+                "SCISSORS"
+            ],
+            final_target=_RESOURCES["running_with_scissors_in_the_matrix__repeated"][
+                "PAPER"
+            ],
             initial_margin=1,
             final_margin=5,
         ),
@@ -3833,12 +3748,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
             threshold=2,
-            initial_target=_RESOURCES[
-                "running_with_scissors_in_the_matrix__repeated"
-            ]["SCISSORS"],
-            final_target=_RESOURCES[
-                "running_with_scissors_in_the_matrix__repeated"
-            ]["PAPER"],
+            initial_target=_RESOURCES["running_with_scissors_in_the_matrix__repeated"][
+                "SCISSORS"
+            ],
+            final_target=_RESOURCES["running_with_scissors_in_the_matrix__repeated"][
+                "PAPER"
+            ],
             initial_margin=5,
             final_margin=5,
         ),
@@ -3852,9 +3767,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["running_with_scissors_in_the_matrix__repeated"][
-                "PAPER"
-            ],
+            target=_RESOURCES["running_with_scissors_in_the_matrix__repeated"]["PAPER"],
             margin=1,
         ),
     ),
@@ -3863,9 +3776,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["running_with_scissors_in_the_matrix__repeated"][
-                "PAPER"
-            ],
+            target=_RESOURCES["running_with_scissors_in_the_matrix__repeated"]["PAPER"],
             margin=5,
         ),
     ),
@@ -3874,12 +3785,12 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             running_with_scissors_in_the_matrix.CounterPrevious,
-            rock_resource=_RESOURCES[
-                "running_with_scissors_in_the_matrix__repeated"
-            ]["ROCK"],
-            paper_resource=_RESOURCES[
-                "running_with_scissors_in_the_matrix__repeated"
-            ]["PAPER"],
+            rock_resource=_RESOURCES["running_with_scissors_in_the_matrix__repeated"][
+                "ROCK"
+            ],
+            paper_resource=_RESOURCES["running_with_scissors_in_the_matrix__repeated"][
+                "PAPER"
+            ],
             scissors_resource=_RESOURCES[
                 "running_with_scissors_in_the_matrix__repeated"
             ]["SCISSORS"],
@@ -3891,9 +3802,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["running_with_scissors_in_the_matrix__repeated"][
-                "ROCK"
-            ],
+            target=_RESOURCES["running_with_scissors_in_the_matrix__repeated"]["ROCK"],
             margin=1,
         ),
     ),
@@ -3902,9 +3811,7 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Specialist,
-            target=_RESOURCES["running_with_scissors_in_the_matrix__repeated"][
-                "ROCK"
-            ],
+            target=_RESOURCES["running_with_scissors_in_the_matrix__repeated"]["ROCK"],
             margin=5,
         ),
     ),
@@ -3935,12 +3842,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"][
-                "STAG"
-            ],
-            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"][
-                "HARE"
-            ],
+            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"]["STAG"],
+            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"]["HARE"],
             threshold=1,
             margin=1,
         ),
@@ -3950,12 +3853,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"][
-                "STAG"
-            ],
-            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"][
-                "HARE"
-            ],
+            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"]["STAG"],
+            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"]["HARE"],
             threshold=1,
             margin=5,
         ),
@@ -3965,12 +3864,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"][
-                "STAG"
-            ],
-            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"][
-                "HARE"
-            ],
+            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"]["STAG"],
+            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"]["HARE"],
             threshold=3,
             margin=1,
         ),
@@ -3980,12 +3875,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"][
-                "STAG"
-            ],
-            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"][
-                "HARE"
-            ],
+            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"]["STAG"],
+            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"]["HARE"],
             threshold=3,
             margin=5,
         ),
@@ -3995,12 +3886,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"][
-                "STAG"
-            ],
-            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"][
-                "HARE"
-            ],
+            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"]["STAG"],
+            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"]["HARE"],
             threshold=2,
             margin=1,
         ),
@@ -4010,12 +3897,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"][
-                "STAG"
-            ],
-            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"][
-                "HARE"
-            ],
+            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"]["STAG"],
+            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__arena"]["HARE"],
             threshold=2,
             margin=5,
         ),
@@ -4061,12 +3944,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Corrigible,
-            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "STAG"
-            ],
-            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "HARE"
-            ],
+            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["STAG"],
+            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["HARE"],
             threshold=3,
             margin=5,
             tremble_probability=0,
@@ -4077,12 +3956,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.Corrigible,
-            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "STAG"
-            ],
-            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "HARE"
-            ],
+            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["STAG"],
+            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["HARE"],
             threshold=3,
             margin=5,
             tremble_probability=0.15,
@@ -4093,12 +3968,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.ScheduledFlip,
-            initial_target=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "STAG"
-            ],
-            final_target=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "HARE"
-            ],
+            initial_target=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["STAG"],
+            final_target=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["HARE"],
             threshold=3,
             initial_margin=1,
             final_margin=5,
@@ -4109,12 +3980,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "STAG"
-            ],
-            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "HARE"
-            ],
+            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["STAG"],
+            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["HARE"],
             threshold=1,
             margin=5,
         ),
@@ -4124,12 +3991,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "STAG"
-            ],
-            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "HARE"
-            ],
+            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["STAG"],
+            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["HARE"],
             threshold=1,
             margin=7,
         ),
@@ -4139,12 +4002,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "STAG"
-            ],
-            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "HARE"
-            ],
+            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["STAG"],
+            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["HARE"],
             threshold=2,
             margin=5,
         ),
@@ -4154,12 +4013,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.GrimTrigger,
-            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "STAG"
-            ],
-            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "HARE"
-            ],
+            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["STAG"],
+            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["HARE"],
             threshold=2,
             margin=7,
         ),
@@ -4205,12 +4060,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "STAG"
-            ],
-            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "HARE"
-            ],
+            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["STAG"],
+            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["HARE"],
             tremble_probability=0,
             margin=5,
         ),
@@ -4220,12 +4071,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "STAG"
-            ],
-            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "HARE"
-            ],
+            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["STAG"],
+            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["HARE"],
             tremble_probability=0,
             margin=7,
         ),
@@ -4235,12 +4082,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "STAG"
-            ],
-            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "HARE"
-            ],
+            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["STAG"],
+            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["HARE"],
             tremble_probability=0.15,
             margin=5,
         ),
@@ -4250,12 +4093,8 @@ BOT_CONFIGS: Mapping[str, BotConfig] = immutabledict.immutabledict(
         model="puppet_1",
         puppeteer_builder=functools.partial(
             in_the_matrix.TitForTat,
-            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "STAG"
-            ],
-            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"][
-                "HARE"
-            ],
+            cooperate_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["STAG"],
+            defect_resource=_RESOURCES["stag_hunt_in_the_matrix__repeated"]["HARE"],
             tremble_probability=0.15,
             margin=7,
         ),

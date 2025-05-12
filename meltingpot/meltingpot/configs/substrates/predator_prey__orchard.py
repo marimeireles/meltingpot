@@ -26,9 +26,10 @@ strategy since they are relatively close to the safe tall grass. They can easily
 be collected and brought back to safety for consumption.
 """
 
+from ml_collections import config_dict
+
 from meltingpot.configs.substrates import predator_prey as base_config
 from meltingpot.utils.substrates import specs
-from ml_collections import config_dict
 
 build = base_config.build
 
@@ -89,23 +90,25 @@ CHAR_PREFAB_MAP = {
 
 
 def get_config():
-  """Default configuration."""
-  config = base_config.get_config()
+    """Default configuration."""
+    config = base_config.get_config()
 
-  # Override the map layout settings.
-  config.layout = config_dict.ConfigDict()
-  config.layout.ascii_map = ASCII_MAP
-  config.layout.char_prefab_map = CHAR_PREFAB_MAP
+    # Override the map layout settings.
+    config.layout = config_dict.ConfigDict()
+    config.layout.ascii_map = ASCII_MAP
+    config.layout.char_prefab_map = CHAR_PREFAB_MAP
 
-  # The specs of the environment (from a single-agent perspective).
-  config.timestep_spec = specs.timestep({
-      "RGB": specs.OBSERVATION["RGB"],
-      "STAMINA": specs.float64(),
-      # Debug only (do not use the following observations in policies).
-      "WORLD.RGB": specs.rgb(152, 184),
-  })
+    # The specs of the environment (from a single-agent perspective).
+    config.timestep_spec = specs.timestep(
+        {
+            "RGB": specs.OBSERVATION["RGB"],
+            "STAMINA": specs.float64(),
+            # Debug only (do not use the following observations in policies).
+            "WORLD.RGB": specs.rgb(152, 184),
+        }
+    )
 
-  # The roles assigned to each player.
-  config.default_player_roles = ("predator",) * 5 + ("prey",) * 8
+    # The roles assigned to each player.
+    config.default_player_roles = ("predator",) * 5 + ("prey",) * 8
 
-  return config
+    return config

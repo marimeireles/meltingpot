@@ -22,45 +22,43 @@ State = TypeVar("State")
 
 
 class Policy(Generic[State], metaclass=abc.ABCMeta):
-  """Abstract base class for a policy.
+    """Abstract base class for a policy.
 
-  Must not possess any mutable state not in `initial_state`.
-  """
-
-  @abc.abstractmethod
-  def initial_state(self) -> State:
-    """Returns the initial state of the agent.
-
-    Must not have any side effects.
+    Must not possess any mutable state not in `initial_state`.
     """
-    raise NotImplementedError()
 
-  @abc.abstractmethod
-  def step(
-      self, timestep: dm_env.TimeStep, prev_state: State
-  ) -> Tuple[int, State]:
-    """Steps the agent.
+    @abc.abstractmethod
+    def initial_state(self) -> State:
+        """Returns the initial state of the agent.
 
-    Must not have any side effects.
+        Must not have any side effects.
+        """
+        raise NotImplementedError()
 
-    Args:
-      timestep: information from the environment
-      prev_state: the previous state of the agent.
+    @abc.abstractmethod
+    def step(self, timestep: dm_env.TimeStep, prev_state: State) -> Tuple[int, State]:
+        """Steps the agent.
 
-    Returns:
-      action: the action to send to the environment.
-      next_state: the state for the next step call.
-    """
-    raise NotImplementedError()
+        Must not have any side effects.
 
-  @abc.abstractmethod
-  def close(self) -> None:
-    """Closes the policy."""
-    raise NotImplementedError()
+        Args:
+          timestep: information from the environment
+          prev_state: the previous state of the agent.
 
-  def __enter__(self):
-    return self
+        Returns:
+          action: the action to send to the environment.
+          next_state: the state for the next step call.
+        """
+        raise NotImplementedError()
 
-  def __exit__(self, *args, **kwargs):
-    del args, kwargs
-    self.close()
+    @abc.abstractmethod
+    def close(self) -> None:
+        """Closes the policy."""
+        raise NotImplementedError()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args, **kwargs):
+        del args, kwargs
+        self.close()

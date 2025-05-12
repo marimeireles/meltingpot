@@ -13,42 +13,41 @@
 # limitations under the License.
 
 
-from absl.testing import absltest
 import dm_env
-from meltingpot.utils.evaluation import return_subject
 import numpy as np
+from absl.testing import absltest
+
+from meltingpot.utils.evaluation import return_subject
 
 
 def _send_timesteps_to_subject(subject, timesteps):
-  results = []
-  subject.subscribe(on_next=results.append)
+    results = []
+    subject.subscribe(on_next=results.append)
 
-  for n, timestep in enumerate(timesteps):
-    subject.on_next(timestep)
-    if results:
-      return n, results.pop()
-  return None, None
+    for n, timestep in enumerate(timesteps):
+        subject.on_next(timestep)
+        if results:
+            return n, results.pop()
+    return None, None
 
 
 class ReturnSubjectTest(absltest.TestCase):
 
-  def test(self):
-    timesteps = [
-        dm_env.restart(observation=[{}])._replace(reward=[0, 0]),
-        dm_env.transition(observation=[{}], reward=[2, 4]),
-        dm_env.termination(observation=[{}], reward=[1, 3]),
-    ]
-    subject = return_subject.ReturnSubject()
-    step_written, episode_returns = _send_timesteps_to_subject(
-        subject, timesteps
-    )
+    def test(self):
+        timesteps = [
+            dm_env.restart(observation=[{}])._replace(reward=[0, 0]),
+            dm_env.transition(observation=[{}], reward=[2, 4]),
+            dm_env.termination(observation=[{}], reward=[1, 3]),
+        ]
+        subject = return_subject.ReturnSubject()
+        step_written, episode_returns = _send_timesteps_to_subject(subject, timesteps)
 
-    with self.subTest("written_on_final_step"):
-      self.assertEqual(step_written, 2)
+        with self.subTest("written_on_final_step"):
+            self.assertEqual(step_written, 2)
 
-    with self.subTest("returns"):
-      np.testing.assert_equal(episode_returns, [3, 7])
+        with self.subTest("returns"):
+            np.testing.assert_equal(episode_returns, [3, 7])
 
 
 if __name__ == "__main__":
-  absltest.main()
+    absltest.main()

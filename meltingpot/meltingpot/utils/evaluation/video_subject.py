@@ -23,76 +23,76 @@ from reactivex import subject
 
 
 class VideoSubject(subject.Subject):
-  """Subject that emits a video at the end of each episode."""
+    """Subject that emits a video at the end of each episode."""
 
-  def __init__(
-      self,
-      root: str,
-      *,
-      extension: str = "webm",
-      codec: str = "vp90",
-      fps: int = 30,
-  ) -> None:
-    """Initializes the instance.
+    def __init__(
+        self,
+        root: str,
+        *,
+        extension: str = "webm",
+        codec: str = "vp90",
+        fps: int = 30,
+    ) -> None:
+        """Initializes the instance.
 
-    Args:
-      root: directory to write videos in.
-      extension: file extention of file.
-      codec: codex to write with.
-      fps: frames-per-second for videos.
+        Args:
+          root: directory to write videos in.
+          extension: file extention of file.
+          codec: codex to write with.
+          fps: frames-per-second for videos.
 
-    Raises:
-      FileNotFoundError: if the root directory does not exist.
-    """
-    super().__init__()
-    self._root = root
-    if not os.path.exists(root):
-      raise FileNotFoundError(f"Video root {root!r} does not exist.")
-    self._extension = extension
-    self._codec = codec
-    self._fps = fps
-    self._path = None
-    self._writer = None
+        Raises:
+          FileNotFoundError: if the root directory does not exist.
+        """
+        super().__init__()
+        self._root = root
+        if not os.path.exists(root):
+            raise FileNotFoundError(f"Video root {root!r} does not exist.")
+        self._extension = extension
+        self._codec = codec
+        self._fps = fps
+        self._path = None
+        self._writer = None
 
-  def on_next(self, timestep: dm_env.TimeStep) -> None:
-    """Called on each timestep.
+    def on_next(self, timestep: dm_env.TimeStep) -> None:
+        """Called on each timestep.
 
-    Args:
-      timestep: the most recent timestep.
-    """
-    rgb_frame = timestep.observation[0]["WORLD.RGB"]
-    height, width, colors = rgb_frame.shape
-    if colors != 3:
-      raise ValueError("WORLD.RGB is not RGB.")
-    if rgb_frame.dtype != np.uint8:
-      raise ValueError("WORLD.RGB is not uint8.")
-    if rgb_frame.min() < 0 or rgb_frame.max() > 255:
-      raise ValueError("WORLD.RGB is not in [0, 255].")
+        Args:
+          timestep: the most recent timestep.
+        """
+        rgb_frame = timestep.observation[0]["WORLD.RGB"]
+        height, width, colors = rgb_frame.shape
+        if colors != 3:
+            raise ValueError("WORLD.RGB is not RGB.")
+        if rgb_frame.dtype != np.uint8:
+            raise ValueError("WORLD.RGB is not uint8.")
+        if rgb_frame.min() < 0 or rgb_frame.max() > 255:
+            raise ValueError("WORLD.RGB is not in [0, 255].")
 
-    if timestep.step_type.first():
-      self._path = os.path.join(
-          self._root, f"{uuid.uuid4().hex}.{self._extension}"
-      )
-      self._writer = cv2.VideoWriter(
-          filename=self._path,
-          fourcc=cv2.VideoWriter_fourcc(*self._codec),
-          fps=self._fps,
-          frameSize=(width, height),
-          isColor=True,
-      )
-    elif self._writer is None:
-      raise ValueError("First timestep must be StepType.FIRST.")
-    bgr_frame = cv2.cvtColor(rgb_frame, cv2.COLOR_RGB2BGR)
-    assert self._writer.isOpened()  # Catches any cv2 usage errors.
-    self._writer.write(bgr_frame)
-    if timestep.step_type.last():
-      self._writer.release()
-      super().on_next(self._path)
-      self._path = None
-      self._writer = None
+        if timestep.step_type.first():
+            self._path = os.path.join(
+                self._root, f"{uuid.uuid4().hex}.{self._extension}"
+            )
+            self._writer = cv2.VideoWriter(
+                filename=self._path,
+                fourcc=cv2.VideoWriter_fourcc(*self._codec),
+                fps=self._fps,
+                frameSize=(width, height),
+                isColor=True,
+            )
+        elif self._writer is None:
+            raise ValueError("First timestep must be StepType.FIRST.")
+        bgr_frame = cv2.cvtColor(rgb_frame, cv2.COLOR_RGB2BGR)
+        assert self._writer.isOpened()  # Catches any cv2 usage errors.
+        self._writer.write(bgr_frame)
+        if timestep.step_type.last():
+            self._writer.release()
+            super().on_next(self._path)
+            self._path = None
+            self._writer = None
 
-  def dispose(self):
-    """See base class."""
-    if self._writer is not None:
-      self._writer.release()
-    super().dispose()
+    def dispose(self):
+        """See base class."""
+        if self._writer is not None:
+            self._writer.release()
+        super().dispose()
