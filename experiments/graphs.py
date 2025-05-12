@@ -105,7 +105,7 @@ def plot_cumulative_reward_per_step(
 
     # X axis: 1, 2, 3, ..., total_steps
     total_steps = len(rewards_list[0])
-    steps = list(range(1, total_steps + 1))
+    steps = list(range(total_steps))
 
     plt.figure(figsize=(8, 5))
     for idx, cumulative in enumerate(rewards_list, start=1):
