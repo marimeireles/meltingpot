@@ -4,10 +4,7 @@ import json
 import pathlib
 
 import distrax
-import dm_env
-import dmlab2d
 import flax.linen as nn
-import jax
 import jax.numpy as jnp
 import numpy as np
 import optax
@@ -18,7 +15,6 @@ from ml_collections import config_dict
 
 import meltingpot.human_players.level_playing_utils as level_playing_utils
 from meltingpot.configs.substrates import commons_harvest__open
-from meltingpot.human_players.level_playing_utils import _get_rewards
 from meltingpot.utils.substrates import builder
 
 # ── Hyperparameters ─────────────────────────────────────────────────────────────
