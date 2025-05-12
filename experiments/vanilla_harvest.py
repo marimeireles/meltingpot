@@ -11,6 +11,8 @@ import optax
 import pandas as pd
 from flax import serialization
 from jax import jit, random, value_and_grad
+import jax
+from jax.lib import xla_bridge
 from ml_collections import config_dict
 
 import meltingpot.human_players.level_playing_utils as level_playing_utils
@@ -103,6 +105,18 @@ def configure_logging(level: str) -> None:
     if level != "COMPLETE":
         for noisy in ("absl", "jaxlib", "jax"):
             logging.getLogger(noisy).setLevel(logging.WARNING)
+
+def log_jax_devices():
+    """Log available JAX backend and devices."""
+    logger = logging.getLogger(__name__)
+    backend = xla_bridge.get_backend()
+    logger.info("JAX XLA backend platform: %s", backend.platform)
+    devices = jax.devices()
+    for dev in devices:
+        logger.info(
+            "  Device: %s (id=%d, process_index=%d)",
+            dev.device_kind, dev.id, dev.process_index
+        )
 
 
 # Define convolutional actor-critic network
@@ -365,6 +379,7 @@ def main():
     from concurrent.futures import ProcessPoolExecutor
     pool = ProcessPoolExecutor(max_workers=args.num_workers)
     logger = logging.getLogger("train")
+    log_jax_devices()
 
     # Define PPO loss and update functions that will be used in training
     # action_dimension required in ActorCriticNetwork can't be passed as
