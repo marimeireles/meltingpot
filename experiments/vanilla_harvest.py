@@ -227,35 +227,6 @@ def collect_trajectory_batch_per_agent(
     return buffer
 
 
-# Define PPO loss and update functions that will be used in training
-# -------------------------------------------------------------------
-def compute_ppo_loss(params, obs, acts, old_logp, old_val, rets):
-    logits, vals = ActorCriticNetwork(action_dimension).apply(params, obs)
-    dist = distrax.Categorical(logits=logits)
-    logp = dist.log_prob(acts)
-    ratio = jnp.exp(logp - old_logp)
-
-    adv = rets - old_val
-    adv = (adv - adv.mean()) / (adv.std() + 1e-8)
-
-    unclipped = ratio * adv
-    clipped = jnp.clip(ratio, 1 - PPO_CLIP_EPSILON, 1 + PPO_CLIP_EPSILON) * adv
-
-    policy_loss = -jnp.mean(jnp.minimum(unclipped, clipped))
-    value_loss = jnp.mean((rets - vals) ** 2)
-    return policy_loss + 0.5 * value_loss
-
-
-@jit
-def ppo_update_step(params, opt_state, obs, acts, old_logp, old_val, rets):
-    loss, grads = value_and_grad(compute_ppo_loss)(
-        params, obs, acts, old_logp, old_val, rets
-    )
-    updates, new_opt_state = optax.adam(LEARNING_RATE).update(grads, opt_state, params)
-    new_params = optax.apply_updates(params, updates)
-    return new_params, new_opt_state, loss
-
-
 def main():
     # 1) Build the MeltingPot environment and initialize params
     # -------------------------------------------------------------------
@@ -303,6 +274,9 @@ def main():
     all_zaps = []
     all_deaths = []
 
+    reward_history = {agent: [] for agent in agent_list}
+    cum_reward     = {agent: 0.0 for agent in agent_list}
+
     # Defines human mode for debugging
     if args.mode == "human":
         _ACTION_MAP = {
@@ -344,7 +318,35 @@ def main():
     # -------------------------------------------------------------------
     logger = logging.getLogger("train")
 
-    reward_history = {agent: [] for agent in agent_list}
+    # Define PPO loss and update functions that will be used in training
+    # action_dimension required in ActorCriticNetwork can't be passed as
+    # as argument due to @jax.jit restrictions, it has to come from
+    # context
+    # -------------------------------------------------------------------
+    def compute_ppo_loss(params, obs, acts, old_logp, old_val, rets):
+        logits, vals = ActorCriticNetwork(action_dimension).apply(params, obs)
+        dist = distrax.Categorical(logits=logits)
+        logp = dist.log_prob(acts)
+        ratio = jnp.exp(logp - old_logp)
+
+        adv = rets - old_val
+        adv = (adv - adv.mean()) / (adv.std() + 1e-8)
+
+        unclipped = ratio * adv
+        clipped = jnp.clip(ratio, 1 - PPO_CLIP_EPSILON, 1 + PPO_CLIP_EPSILON) * adv
+
+        policy_loss = -jnp.mean(jnp.minimum(unclipped, clipped))
+        value_loss = jnp.mean((rets - vals) ** 2)
+        return policy_loss + 0.5 * value_loss
+
+    @jit
+    def ppo_update_step(params, opt_state, obs, acts, old_logp, old_val, rets):
+        loss, grads = value_and_grad(compute_ppo_loss)(
+            params, obs, acts, old_logp, old_val, rets
+        )
+        updates, new_opt_state = optax.adam(LEARNING_RATE).update(grads, opt_state, params)
+        new_params = optax.apply_updates(params, updates)
+        return new_params, new_opt_state, loss
 
     for update_idx in range(TOTAL_TRAINING_UPDATES):
         traj = collect_trajectory_batch_per_agent(
@@ -361,21 +363,27 @@ def main():
             len(traj[primary_agent_id]["observations"] * (update_idx + 1)),
         )
 
-        #  per-agent cumulative reward
+        # collect per-agent cumulative reward
         for agent in agent_list:
-            cum_r = float(jnp.sum(jnp.stack(traj[agent]["rewards"])))
-            reward_history[agent].append(cum_r)
+            # traj[agent]['rewards'] is a list of length BATCH_SIZE
+            for step_idx, raw_r in enumerate(traj[agent]["rewards"]):
+                # convert to float
+                r = float(raw_r)
 
+                # update running total
+                cum_reward[agent] += r
+
+                # append the _running_ total at this step
+                reward_history[agent].append(cum_reward[agent])
+
+        # collect all agents zapping data
         batch_zaps = np.stack(traj[primary_agent_id]["zapped"])
         batch_deaths = np.stack(traj[primary_agent_id]["death_zapped"])
-
         all_zaps.append(batch_zaps)
         all_deaths.append(batch_deaths)
 
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug("Training iteration: %d", update_idx)
-            logger.debug("zap matrix:\n%s", zap_matrix)
-            logger.debug("death_zap matrix:\n%s", death_zap_matrix)
 
         # PPO updates
         for agent in agent_list:
@@ -415,13 +423,12 @@ def main():
             optimizer_states[agent] = opt_state
 
     # TOTAL_TRAINING_UPDATES is done and all steps can be processed
-    all_zaps = jnp.array(all_zaps)
     all_zaps = np.concatenate(all_zaps, axis=0)
     zap_through_time = jnp.cumsum(all_zaps, axis=0)
-    zap_matrix = np.sum(zap_through_time[-1], axis=0)
-    all_deaths = jnp.array(all_deaths)
+    zap_matrix = zap_through_time[-1]
+    all_deaths = np.concatenate(all_deaths, axis=0)
     death_zap_through_time = jnp.cumsum(all_deaths, axis=0)
-    death_zap_matrix = np.sum(death_zap_through_time[-1], axis=0)
+    death_zap_matrix = death_zap_through_time[-1]
 
     # 3) Save checkpoints
     # -------------------------------------------------------------------
@@ -442,7 +449,7 @@ def main():
     # reward_history: dict[str, list[float]] → DataFrame with one column per agent
     df_rewards = pd.DataFrame(reward_history)
     rewards_path = run_dir / "reward_history.csv"
-    df_rewards.to_csv(rewards_path, index=False)
+    df_rewards.to_csv(rewards_path, index=False, header=False)
     logger.info("Saved reward history to %s", rewards_path)
 
     # zap_matrix and death_zap_matrix: both are 2D arrays of shape [n_players, n_players]

@@ -49,9 +49,9 @@ def load_data(stats_dir: Path) -> Tuple[int, List[List[float]]]:
         raise FileNotFoundError(f"Missing file(s): {missing}")
 
     # Load reward history: DataFrame of shape (n_updates, n_players)
-    df_rewards = pd.read_csv(reward_path)
-    df_total_zap = pd.read_csv(total_zap_path)
-    df_death_total_zap = pd.read_csv(total_death_zap_path)
+    df_rewards = pd.read_csv(reward_path, header=None)
+    df_total_zap = pd.read_csv(total_zap_path, header=None)
+    df_death_total_zap = pd.read_csv(total_death_zap_path, header=None)
     rewards_list = [df_rewards[col].tolist() for col in df_rewards.columns]
 
     # Load zap arrays
@@ -77,34 +77,45 @@ def load_data(stats_dir: Path) -> Tuple[int, List[List[float]]]:
     )
 
 
-def plot_cumulative_reward(
+def plot_cumulative_reward_per_step(
     rewards_list: List[List[float]],
-    batch_size: int,
     save_dir: Path,
-    title: str = "Cumulative Reward Through Time",
+    title: str = "Cumulative Reward Through Time (Per Step)",
 ) -> None:
     """
-    Plot and save cumulative reward as a function of environment steps.
+    Plot and save cumulative reward as a function of environment steps,
+    at per-step granularity.
 
     Parameters
     ----------
     rewards_list : List[List[float]]
-        A list of reward sequences, one per player.
-    batch_size : int
-        Number of environment steps per update.
+        A list of cumulative‐reward sequences, one list per agent,
+        each of length = total environment steps.
     save_dir : Path
-        Directory where plots will be saved.
+        Directory where the figure will be saved.
     title : str
         Title of the plot.
     """
     logger = logging.getLogger(__name__)
-    n_updates = len(rewards_list[0])
-    steps = [(i + 1) * batch_size for i in range(n_updates)]
+
+    # Ensure we have at least one agent
+    if not rewards_list or not rewards_list[0]:
+        logger.error("No reward data to plot.")
+        return
+
+    # X axis: 1, 2, 3, ..., total_steps
+    total_steps = len(rewards_list[0])
+    steps = list(range(1, total_steps + 1))
 
     plt.figure(figsize=(8, 5))
-    for idx, rewards in enumerate(rewards_list, start=1):
-        cumulative = np.cumsum(rewards)
-        plt.plot(steps, cumulative, marker="o", label=f"Player {idx}")
+    for idx, cumulative in enumerate(rewards_list, start=1):
+        if len(cumulative) != total_steps:
+            logger.warning(
+                "Agent %d has %d steps of data (expected %d); skipping.",
+                idx, len(cumulative), total_steps
+            )
+            continue
+        plt.plot(steps, cumulative, marker=".", markevery=max(1, total_steps // 20), label=f"Agent {idx}")
 
     plt.xlabel("Environment Step")
     plt.ylabel("Cumulative Reward")
@@ -113,9 +124,9 @@ def plot_cumulative_reward(
     plt.tight_layout()
 
     # Save figure
-    save_path = save_dir / "cumulative_reward.png"
+    save_path = save_dir / "cumulative_reward_per_step.png"
     plt.savefig(save_path)
-    logger.info("Saved cumulative reward plot to %s", save_path)
+    logger.info("Saved per-step cumulative reward plot to %s", save_path)
 
 
 def plot_zapping_through_time(
@@ -197,7 +208,7 @@ def plot_interaction_heatmap(
         Any matplotlib colormap; default is "viridis".
     """
     logger = logging.getLogger(__name__)
-    plt.figure(figsize=(8, 6))
+    plt.figure()
     sns.heatmap(
         df_matrix, annot=True, fmt="g", cmap=cmap, cbar_kws={"label": "Number of Kills"}
     )
@@ -232,7 +243,16 @@ def main() -> None:
     logger = logging.getLogger(__name__)
     logger.debug("Arguments: %s", args)
 
-    # Load step count and reward streams
+    # read hyperparameters from CSV
+    hyper_path = args.stats_dir / "hyperparameters.csv"
+    df_hparams = pd.read_csv(hyper_path)
+    try:
+        n_updates = int(df_hparams["TOTAL_TRAINING_UPDATES"].iloc[0])
+        batch_size = int(df_hparams["BATCH_SIZE"].iloc[0])
+    except (KeyError, IndexError, ValueError) as e:
+        logger.error("Failed to read TOTAL_TRAINING_UPDATES or BATCH_SIZE from %s: %s", hyper_path, e)
+        return
+
     (
         total_steps,
         rewards_list,
@@ -249,20 +269,7 @@ def main() -> None:
     plot_interaction_heatmap(total_zap, args.stats_dir, "zap_matrix")
     plot_interaction_heatmap(total_death_zap, args.stats_dir, "death_zap_matrix")
 
-    # Compute batch size: how many env steps per update
-    n_updates = len(rewards_list[0])
-    if n_updates == 0:
-        logger.error("No updates found in reward_history.csv")
-        return
-
-    batch_size = total_steps // n_updates
-    if batch_size <= 0:
-        logger.error(
-            "Invalid batch size (total_steps=%d, updates=%d)", total_steps, n_updates
-        )
-        return
-
-    plot_cumulative_reward(rewards_list, batch_size, args.stats_dir)
+    plot_cumulative_reward_per_step(rewards_list, args.stats_dir)
 
 
 if __name__ == "__main__":
