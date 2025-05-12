@@ -20,6 +20,16 @@ Install the rest of the dependencies:
 uv pip install tqdm matplotlib shimmy gymnasium flax distrax
 ```
 
+Linting the repository:
+
+```bash
+uv pip install pyink isort
+```
+
+```bash
+pyink . && isort .
+```
+
 ---
 
 *Mongol General: Hao! Dai ye! We won again! This is good, but what is best in life?*
