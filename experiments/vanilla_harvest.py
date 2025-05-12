@@ -30,8 +30,8 @@ DISCOUNT_FACTOR        = 0.99
 LEARNING_RATE          = 3e-4
 PPO_CLIP_EPSILON       = 0.2
 BATCH_SIZE             = 128
-PPO_EPOCHS             = 30
-TOTAL_TRAINING_UPDATES = 50
+PPO_EPOCHS             = 3
+TOTAL_TRAINING_UPDATES = 1
 KL_THRESHOLD           = 1e-2
 # ────────────────────────────────────────────────────────────────────────────────
 
@@ -207,6 +207,38 @@ def collect_trajectory_batch_per_agent(agent_list, env, primary_agent_id, action
 
     return buffer
 
+    # TODO: see todo below (ppo_update_step)
+    # 5) Define PPO loss and update functions that will be used in training
+    # -------------------------------------------------------------------
+    def compute_ppo_loss(params, obs, acts, old_logp, old_val, rets):
+        logits, vals = ActorCriticNetwork(action_dimension).apply(params, obs)
+        dist   = distrax.Categorical(logits=logits)
+        logp   = dist.log_prob(acts)
+        ratio  = jnp.exp(logp - old_logp)
+
+        adv    = rets - old_val
+        adv    = (adv - adv.mean()) / (adv.std() + 1e-8)
+
+        unclipped = ratio * adv
+        clipped   = jnp.clip(ratio, 1-PPO_CLIP_EPSILON, 1+PPO_CLIP_EPSILON) * adv
+
+        policy_loss = -jnp.mean(jnp.minimum(unclipped, clipped))
+        value_loss  = jnp.mean((rets - vals)**2)
+        return policy_loss + 0.5 * value_loss
+
+    # TODO: not sure why this function is not being recognized when it's defined outside of my main
+    @jit
+    def ppo_update_step(params, opt_state, obs, acts, old_logp, old_val, rets):
+        loss, grads = value_and_grad(compute_ppo_loss)(
+            params, obs, acts, old_logp, old_val, rets
+        )
+        updates, new_opt_state = optax.adam(LEARNING_RATE).update(
+            grads, opt_state, params
+        )
+        new_params = optax.apply_updates(params, updates)
+        return new_params, new_opt_state, loss
+
+
 
 # 1) Build the MeltingPot environment directly via DM Lab2D
 # -------------------------------------------------------------------
@@ -252,6 +284,8 @@ def main():
     death_increment = jnp.zeros((n_players, n_players), dtype=jnp.int32)
     zap_through_time = jnp.zeros((1, n_players, n_players), dtype=jnp.int32)
     death_zap_through_time = jnp.zeros((1, n_players, n_players), dtype=jnp.int32)
+    all_zaps   = []
+    all_deaths = []
 
     # Defines human mode for debugging
     if args.mode == "human":
@@ -292,37 +326,6 @@ def main():
         optimizer_states[agent_id]   = opt_state
         rng_key_per_agent[agent_id]  = init_rng
 
-    # TODO: see todo below (ppo_update_step)
-    # 5) Define PPO loss and update functions that will be used in training
-    # -------------------------------------------------------------------
-    def compute_ppo_loss(params, obs, acts, old_logp, old_val, rets):
-        logits, vals = ActorCriticNetwork(action_dimension).apply(params, obs)
-        dist   = distrax.Categorical(logits=logits)
-        logp   = dist.log_prob(acts)
-        ratio  = jnp.exp(logp - old_logp)
-
-        adv    = rets - old_val
-        adv    = (adv - adv.mean()) / (adv.std() + 1e-8)
-
-        unclipped = ratio * adv
-        clipped   = jnp.clip(ratio, 1-PPO_CLIP_EPSILON, 1+PPO_CLIP_EPSILON) * adv
-
-        policy_loss = -jnp.mean(jnp.minimum(unclipped, clipped))
-        value_loss  = jnp.mean((rets - vals)**2)
-        return policy_loss + 0.5 * value_loss
-
-    # TODO: not sure why this function is not being recognized when it's defined outside of my main
-    @jit
-    def ppo_update_step(params, opt_state, obs, acts, old_logp, old_val, rets):
-        loss, grads = value_and_grad(compute_ppo_loss)(
-            params, obs, acts, old_logp, old_val, rets
-        )
-        updates, new_opt_state = optax.adam(LEARNING_RATE).update(
-            grads, opt_state, params
-        )
-        new_params = optax.apply_updates(params, updates)
-        return new_params, new_opt_state, loss
-
     # 6) Main training loop
     # -------------------------------------------------------------------
     logger = logging.getLogger("train")
@@ -341,12 +344,12 @@ def main():
             cum_r = float(jnp.sum(jnp.stack(traj[agent]["rewards"])))
             reward_history[agent].append(cum_r)
 
-        zaps = jnp.stack(traj[primary_agent_id]["zapped"])          # shape [steps, n_players, n_players]
-        zap_through_time = jnp.cumsum(zaps, axis=0)
-        zap_matrix = zap_through_time[-1]
-        deaths = jnp.stack(traj[primary_agent_id]["death_zapped"])  # shape [steps, n_players, n_players]
-        death_zap_through_time = jnp.cumsum(deaths, axis=0)
-        death_zap_matrix = death_zap_through_time[-1]
+
+        batch_zaps   = np.stack(traj[primary_agent_id]["zapped"])
+        batch_deaths = np.stack(traj[primary_agent_id]["death_zapped"])
+
+        all_zaps.append(batch_zaps)
+        all_deaths.append(batch_deaths)
 
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug("Training iteration: %d", update_idx)
@@ -387,6 +390,16 @@ def main():
 
             network_parameters[agent] = params
             optimizer_states[agent]   = opt_state
+
+    # TOTAL_TRAINING_UPDATES is done and all steps can be processed
+    all_zaps = jnp.array(all_zaps)
+    all_zaps = np.concatenate(all_zaps, axis=0)
+    zap_through_time = jnp.cumsum(all_zaps, axis=0)
+    zap_matrix = np.sum(zap_through_time[-1], axis=0)
+    all_deaths = jnp.array(all_deaths)
+    death_zap_through_time = jnp.cumsum(all_deaths, axis=0)
+    death_zap_matrix = np.sum(death_zap_through_time[-1], axis=0)
+    breakpoint()
 
     # 7) Save checkpoints
     # -------------------------------------------------------------------

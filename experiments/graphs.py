@@ -105,29 +105,70 @@ def plot_cumulative_reward(
     plt.savefig(save_path)
     logger.info("Saved cumulative reward plot to %s", save_path)
 
-def plot_zapping_through_time(zap_matrix, total_steps, save_dir, zap_kind='zap'):
-    logger = logging.getLogger(__name__)
-    n = zap_matrix.shape[1] # square matrix
-    matrix = np.zeros((total_steps, n))
-    for i in range(total_steps):
-        for active in range(n):
-            for passive in range(n):
-                matrix[i][active] = zap_matrix[i][active][passive]  # TODO: This has to be divided by 2 or smth see page 7 implementation
-    plt.figure(figsize=(12, 6))
-    for agent_id in range(n):
-        plt.plot(range(total_steps), matrix[:, agent_id], label=f'Agent {agent_id}')
+def plot_zapping_through_time(
+    zap_tt: np.ndarray,
+    save_dir: Path,
+    kind: str = "zap",
+    cumulative: bool = True
+) -> None:
+    """
+    Plot per-agent 'kind' given over every timestep.
 
-    plt.xlabel('Timestep')
-    plt.ylabel(zap_kind + 'Given')
-    plt.title(zap_kind + 'Given per Agent Over Time')
+    Parameters
+    ----------
+    zap_tt : np.ndarray
+        Either shape (T, N, N) or (U, S, N, N).
+    save_dir : Path
+    kind : str
+        "zap" or "death"
+    cumulative : bool
+        If True, plot the cumulative total up to each time;
+        otherwise plot per-step counts.
+    """
+    logger = logging.getLogger(__name__)
+
+    # 1) If 4-D (updates × steps × agents × agents), flatten into time
+    if zap_tt.ndim == 4:
+        U, S, N, _ = zap_tt.shape
+        T = U * S
+        zap_flat = zap_tt.reshape(T, N, N)
+    elif zap_tt.ndim == 3:
+        zap_flat = zap_tt
+        T, N, _ = zap_flat.shape
+    else:
+        raise ValueError(f"Expected 3D or 4D array, got shape {zap_tt.shape}")
+
+    # 2) Sum out the passive-agent axis → shape (T, N)
+    per_step = zap_flat.sum(axis=2)
+
+    # 3) Optionally make it cumulative over time
+    if cumulative:
+        data = np.cumsum(per_step, axis=0)
+        ylabel = f"Cumulative {kind.title()}s Given"
+        title   = f"Cumulative {kind.title()}s Given per Agent Over Time"
+    else:
+        data = per_step
+        ylabel = f"{kind.title()}s Given per Step"
+        title   = f"{kind.title()}s Given per Agent per Timestep"
+
+    # 4) Plot
+    plt.figure(figsize=(12, 6))
+    for agent_id in range(N):
+        plt.plot(np.arange(data.shape[0]),
+                 data[:, agent_id],
+                 label=f"Agent {agent_id}")
+    plt.xlabel("Timestep")
+    plt.ylabel(ylabel)
+    plt.title(title)
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
 
-    # Save figure
-    save_path = save_dir / (zap_kind + "zaps_given.png")
+    # 5) Save
+    filename = f"{kind}_{'cum' if cumulative else 'step'}_given.png"
+    save_path = save_dir / filename
     plt.savefig(save_path)
-    logger.info("Saved %s given plot to %s", zap_kind, save_path)
+    logger.info("Saved %s plot to %s", kind, save_path)
 
 def plot_interaction_heatmap(
     df_matrix: pd.DataFrame,
@@ -190,8 +231,8 @@ def main() -> None:
 
     # Load step count and reward streams
     total_steps, rewards_list, total_steps, zap_tt, death_zap_tt, total_zap, total_death_zap = load_data(args.stats_dir)
-    plot_zapping_through_time(zap_tt, total_steps, args.stats_dir)
-    plot_zapping_through_time(death_zap_tt, total_steps, args.stats_dir, 'death')
+    plot_zapping_through_time(zap_tt, args.stats_dir, kind="zap", cumulative=True)
+    plot_zapping_through_time(death_zap_tt, args.stats_dir, kind="death", cumulative=True)
     plot_interaction_heatmap(total_zap, args.stats_dir, "zap_matrix")
     plot_interaction_heatmap(total_death_zap, args.stats_dir, "death_zap_matrix")
 
