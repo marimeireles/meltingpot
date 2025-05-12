@@ -267,8 +267,6 @@ def main():
     # instantiate global variables within the main
     zap_matrix = jnp.zeros((n_players, n_players), dtype=jnp.int32)
     death_zap_matrix = jnp.zeros((n_players, n_players), dtype=jnp.int32)
-    zap_increment = jnp.zeros((n_players, n_players), dtype=jnp.int32)
-    death_increment = jnp.zeros((n_players, n_players), dtype=jnp.int32)
     zap_through_time = jnp.zeros((1, n_players, n_players), dtype=jnp.int32)
     death_zap_through_time = jnp.zeros((1, n_players, n_players), dtype=jnp.int32)
     all_zaps = []
@@ -366,7 +364,7 @@ def main():
         # collect per-agent cumulative reward
         for agent in agent_list:
             # traj[agent]['rewards'] is a list of length BATCH_SIZE
-            for step_idx, raw_r in enumerate(traj[agent]["rewards"]):
+            for _, raw_r in enumerate(traj[agent]["rewards"]):
                 # convert to float
                 r = float(raw_r)
 
