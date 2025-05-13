@@ -257,14 +257,6 @@ def collect_trajectory_batch_per_agent(
             rets.insert(0, G)
         buffer[agent]["returns"] = rets
 
-    # # normalization step
-    # for agent in agent_list:
-    #     R = jnp.array(buffer[agent]["returns"], dtype=jnp.float32)
-    #     mu, sigma = R.mean(), R.std() + 1e-8
-    #     R_norm = ((R - mu) / sigma).tolist()
-    #     buffer[agent]["returns"] = R_norm
-
-
     return buffer
 
 # Parallelization
@@ -609,7 +601,12 @@ def main():
             v = jnp.stack(traj[agent]["values"])
             R = jnp.stack(traj[agent]["returns"])
 
+            # prepare per‐agent metrics containers
+            epoch_losses = []
+            epoch_kls    = []
+
             for epoch_idx in range(config.ppo_epochs):
+                # ppo upddate step
                 new_params, new_opt_state, loss = ppo_update_step(
                     params, opt_state, o, a, lp, v, R
                 )
@@ -622,10 +619,12 @@ def main():
                         distrax.Categorical(logits=logits_new)
                     )
                 )
+                epoch_kls.append(avg_kl)
 
                 # **always capture the scalar** so it's in scope below
                 avg_kl_value = float(avg_kl.item())
 
+                # if KL exceeds threshold, stop early
                 if avg_kl > config.kl_threshold:
                     logger.info(
                         f"Stopping PPO epochs for agent {agent} at epoch {epoch_idx} "
@@ -640,13 +639,16 @@ def main():
         rewards = [float(r) for r in traj[primary_agent_id]["rewards"]]
         mean_reward = sum(rewards) / len(rewards)
 
+        # log per‐epoch metrics to W&B
         if not args.no_wandb:
-          wandb.log({
-              "update": update_idx,
-              "mean_reward": mean_reward,
-              "policy_loss": float(loss),     # from last epoch
-              "avg_kl": float(avg_kl_value),   # from your last KL check
-          }, step=update_idx)
+            # e.g. log the *last* epoch’s loss and avg_kl, plus some summary stats
+            wandb.log({
+                f"{agent}/ppo_loss_final": epoch_losses[-1],
+                f"{agent}/kl_final":        epoch_kls[-1],
+                f"{agent}/kl_max":          max(epoch_kls),
+                f"{agent}/kl_mean":         sum(epoch_kls) / len(epoch_kls),
+            }, step=update_idx)
+
 
     pool.shutdown(wait=True)
 
