@@ -1,4 +1,5 @@
 import argparse
+import copy
 import datetime
 import json
 import pathlib
@@ -22,12 +23,12 @@ from meltingpot.utils.substrates import builder
 
 # ── Hyperparameters ─────────────────────────────────────────────────────────────
 DISCOUNT_FACTOR = 0.99
-LEARNING_RATE = 3e-4
-PPO_CLIP_EPSILON = 0.2
-BATCH_SIZE = 128
+LEARNING_RATE = 0.000238534447933878 #3e-4
+PPO_CLIP_EPSILON = 0.1 #0.2
+BATCH_SIZE = 256 #128
 PPO_EPOCHS = 5
-TOTAL_TRAINING_UPDATES = 200
-KL_THRESHOLD = 1e-2
+TOTAL_TRAINING_UPDATES = 100
+KL_THRESHOLD = 0.04889358402136939 #1e-2
 # ────────────────────────────────────────────────────────────────────────────────
 
 # Utils
@@ -168,6 +169,8 @@ def get_multi_rewards(timestep):
                 rewards[prefix] = float(val)
     return rewards
 
+# Collects agent's trajectories
+# -------------------------------------------------------------------
 def collect_trajectory_batch_per_agent(
     agent_list,
     env,
@@ -201,6 +204,7 @@ def collect_trajectory_batch_per_agent(
 
         # for each agent: compute policy, sample, and store obs/action/logp/value
         for agent in agent_list:
+            # agent = int(agent)
             img = timestep.observation[f"{agent}.RGB"]
             x = jnp.asarray(img, jnp.float32).transpose(2, 0, 1)[None, ...]
 
@@ -253,34 +257,58 @@ def collect_trajectory_batch_per_agent(
             rets.insert(0, G)
         buffer[agent]["returns"] = rets
 
+    # # normalization step
+    # for agent in agent_list:
+    #     R = jnp.array(buffer[agent]["returns"], dtype=jnp.float32)
+    #     mu, sigma = R.mean(), R.std() + 1e-8
+    #     R_norm = ((R - mu) / sigma).tolist()
+    #     buffer[agent]["returns"] = R_norm
+
+
     return buffer
 
 # Parallelization
 # -------------------------------------------------------------------
-def actor_worker(worker_id, args, network_parameters, rng_key, env_config, ACTION_SET, discount_factor, batch_size):
-    """One actor: builds its own env+RNG, collects steps_per_worker trajectories."""
-    # 1) Reconstruct env & roles
+import jax.random as jr
+
+def actor_worker(
+    worker_id,
+    args,
+    network_parameters,      # dict[str → PyTree] of params, keyed by agent ID
+    worker_key,              # a single PRNGKey for this worker
+    env_config,
+    ACTION_SET,
+    discount_factor,
+    batch_size,
+):
+    # rebuild env
     with env_config.unlocked() as cfg:
         roles = cfg.default_player_roles
         cfg.lab2d_settings = commons_harvest__open.build(roles, cfg)
     env = builder.builder(**env_config)
 
-    # 2) Fold in worker_id so each stream is distinct
-    local_key = random.fold_in(rng_key, worker_id)
-    rngs = {agent: local_key for agent in network_parameters.keys()}
+    # optionally mix in the worker_id so keys differ across processes:
+    local_key = jr.fold_in(worker_key, worker_id)
 
-    # 3) Collect a smaller chunk
+    # split into one subkey per agent:
+    agent_ids = list(network_parameters.keys())    # e.g. ["1","2","3",...]
+    num_agents = len(agent_ids)
+    subkeys    = jr.split(local_key, num=num_agents)
+
+    # build the rngs dict
+    rngs = {agent_id: subkey for agent_id, subkey in zip(agent_ids, subkeys)}
+
     steps_per_worker = batch_size // args.num_workers
     return collect_trajectory_batch_per_agent(
-        list(network_parameters.keys()),  # agent_list
-        env,
-        list(network_parameters.keys())[0],  # primary_agent_id
-        len(ACTION_SET),
-        network_parameters,
-        rngs,
-        ACTION_SET,
-        steps_per_worker,
-        discount_factor,
+        agent_list         = agent_ids,
+        env                = env,
+        primary_agent_id   = agent_ids[0],
+        action_dimension   = len(ACTION_SET),
+        network_parameters = network_parameters,
+        rng_key_per_agent  = rngs,                # each agent has its own key now
+        ACTION_SET         = ACTION_SET,
+        steps_per_worker   = steps_per_worker,
+        discount_factor    = discount_factor,
     )
 
 def merge_trajs(worker_trajs):
@@ -426,6 +454,11 @@ def main():
         network_parameters[agent_id] = params
         optimizer_states[agent_id] = opt_state
 
+    # variable to auxiliate in normalizing return
+    running_mean   = {agent: 0.0    for agent in agent_list}
+    running_var    = {agent: 1.0    for agent in agent_list}
+    running_count  = {agent: 1e-4   for agent in agent_list}
+
     # 3) Main training loop
     # -------------------------------------------------------------------
     from concurrent.futures import ProcessPoolExecutor
@@ -469,28 +502,26 @@ def main():
         global_rng_key = subkeys[0]
         worker_keys    = subkeys[1:]  # a list of length num_workers
 
-      # make a one‐off, isolated copy of the current parameters
-      # in order to avoid race conditions and overwriting
-      # TODO: possibly changing this to 
-      # from flax.core import freeze
-      #     frozen_params = freeze(network_parameters)
-      # will make it faster?
-      network_params_snapshot = copy.deepcopy(network_parameters)
+        # make a one‐off, isolated copy of the current parameters
+        # in order to avoid race conditions and overwriting
+        # TODO: possibly changing this to 
+        # from flax.core import freeze
+        #     frozen_params = freeze(network_parameters)
+        # will make it faster?
+        network_params_snapshot = copy.deepcopy(network_parameters)
 
         futures = [
-                pool.submit(
-                    actor_worker,
-                    wid,
-                    args,
-                    network_params_snapshot,
-                    worker_keys[wid],
-                    env_config,
-                    ACTION_SET,
-                    config.discount_factor,
-                    config.batch_size,
-                )
-              for wid in range(args.num_workers)
-            ]
+            pool.submit(actor_worker,
+                        wid,
+                        args,
+                        network_params_snapshot,
+                        worker_keys[wid],  # ← one PRNGKey here
+                        env_config,
+                        ACTION_SET,
+                        config.discount_factor,
+                        config.batch_size)
+            for wid in range(args.num_workers)
+        ]
         worker_trajs = []
         for wid, fut in enumerate(futures):
             try:
@@ -501,6 +532,42 @@ def main():
                 #  - continue  # to skip this worker and merge the rest
                 raise
         traj = merge_trajs(worker_trajs)
+
+        # ——— Running‐moment update & normalization ——— #
+        for agent in agent_list:
+            # raw returns from the buffer (shape [BATCH_SIZE])
+            R = jnp.stack(traj[agent]["returns"])
+
+            # batch statistics
+            batch_mean  = float(R.mean())
+            batch_var   = float(R.var())
+            batch_count = R.shape[0]
+
+            # previous running stats
+            old_mean  = running_mean[agent]
+            old_var   = running_var[agent]
+            old_count = running_count[agent]
+
+            # Welford’s algorithm
+            delta = batch_mean - old_mean
+            tot   = old_count + batch_count
+            new_mean = old_mean + delta * batch_count / tot
+            m_a = old_var * old_count
+            m_b = batch_var * batch_count
+            M2 = m_a + m_b + delta**2 * old_count * batch_count / tot
+            new_var  = M2 / tot
+
+            # store updated running stats
+            running_mean[agent]  = new_mean
+            running_var[agent]   = new_var
+            running_count[agent] = tot
+
+            # normalize returns
+            R_norm = (R - new_mean) / (jnp.sqrt(new_var) + 1e-8)
+
+            # replace in the trajectory dict
+            traj[agent]["returns"] = R_norm
+        # ———————————————————————————————— #
 
         # debugger logging
         steps_this_iter = len(traj[primary_agent_id]["observations"])
