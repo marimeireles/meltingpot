@@ -1,7 +1,6 @@
 import argparse
 import copy
 import datetime
-import json
 import pathlib
 
 import distrax
@@ -23,15 +22,15 @@ from meltingpot.utils.substrates import builder
 
 # ── Hyperparameters ─────────────────────────────────────────────────────────────
 DISCOUNT_FACTOR = 0.99
-LEARNING_RATE = 0.000238534447933878  # 3e-4
+LEARNING_RATE = 0.00238534447933878  # 3e-4
 PPO_CLIP_EPSILON = 0.1  # 0.2
 BATCH_SIZE = 256  # 128
-PPO_EPOCHS = 5
+PPO_EPOCHS = 10
 TOTAL_TRAINING_UPDATES = 50
-KL_THRESHOLD = 0.04889358402136939  # 1e-2
+KL_THRESHOLD = 0.01089358402136939  # 1e-2
 # ────────────────────────────────────────────────────────────────────────────────
 
-# Utils
+# Utility Functions
 # -------------------------------------------------------------------
 
 import logging
@@ -39,6 +38,18 @@ import sys
 
 
 def parse_args():
+    """Parse command line arguments for training or human play modes.
+    
+    Returns:
+        argparse.Namespace: Parsed command line arguments including:
+            - mode: 'train' for PPO training or 'human' for interactive play
+            - level-name: Which MeltingPot level to load
+            - fps: Target framerate for rendering
+            - seed: Random seed
+            - log-level: Logging verbosity
+            - num-workers: Number of parallel data collection workers
+            - Various hyperparameters that can override defaults
+    """
     p = argparse.ArgumentParser(
         description="Train PPO on commons_harvest or play by hand"
     )
@@ -85,6 +96,7 @@ def parse_args():
         action="store_true",
         help="skip wandb.init and use hardcoded defaults",
     )
+    # Hyperparameter arguments that can override defaults
     p.add_argument("--learning_rate", type=float, default=LEARNING_RATE)
     p.add_argument("--batch_size", type=int, default=BATCH_SIZE)
     p.add_argument("--ppo_clip_epsilon", type=float, default=PPO_CLIP_EPSILON)
@@ -96,7 +108,11 @@ def parse_args():
 
 
 def configure_logging(level: str) -> None:
-    """Configure root and library loggers for reproducible output."""
+    """Configure root and library loggers for consistent output format.
+    
+    Args:
+        level: Logging level as string ('DEBUG', 'INFO', etc.)
+    """
     logging.basicConfig(
         stream=sys.stdout,
         level=getattr(logging, level),
@@ -105,7 +121,10 @@ def configure_logging(level: str) -> None:
     )
 
 def log_jax_devices():
-    """Log available JAX backend and devices."""
+    """Log available JAX backend and devices for debugging.
+    
+    Prints the XLA backend platform and details of each available device.
+    """
     logger = logging.getLogger(__name__)
     backend = xla_bridge.get_backend()
     logger.info("JAX XLA backend platform: %s", backend.platform)
@@ -217,7 +236,7 @@ def collect_trajectory_batch_per_agent(
         timestep = env.step(action_dict)
         current_ep_steps += 1
 
-        # extract all agents’ rewards once, then distribute
+        # extract all agents' rewards once, then distribute
         reward_dict = get_multi_rewards(timestep)
         for agent in agent_list:
             r = reward_dict.get(agent, 0.0)
@@ -262,24 +281,47 @@ def actor_worker(
     discount_factor,
     batch_size,
 ):
+    """Collect trajectory data in parallel using a worker process.
+    
+    This function rebuilds the environment and collects trajectories for a subset of the total
+    batch size. It's designed to be run in parallel across multiple workers.
+    
+    Args:
+        worker_id: Integer ID of this worker process
+        args: Parsed command line arguments
+        network_parameters: Dict mapping agent IDs to their neural network parameters
+        worker_key: JAX PRNGKey for this worker's random number generation
+        env_config: MeltingPot environment configuration
+        ACTION_SET: Set of possible actions in the environment
+        discount_factor: Gamma parameter for computing returns
+        batch_size: Total batch size (will be divided among workers)
+        
+    Returns:
+        dict: Collected trajectory data for each agent containing observations,
+             actions, rewards, etc.
+    """
     # rebuild env
     with env_config.unlocked() as cfg:
+        print('🔥🔥🔥🔥🔥🔥')
+        print(cfg.default_player_roles)
         cfg.default_player_roles = ["PLAYER_ROLE_HARVESTER"] * 7
         roles = cfg.default_player_roles
+        print(roles)
         cfg.lab2d_settings = commons_harvest__open.build(roles, cfg)
     env = builder.builder(**env_config)
 
-    # optionally mix in the worker_id so keys differ across processes:
+    # Create worker-specific random key
     local_key = jr.fold_in(worker_key, worker_id)
 
-    # split into one subkey per agent:
+    # Split into one subkey per agent
     agent_ids = list(network_parameters.keys())  # e.g. ["1","2","3",...]
     num_agents = len(agent_ids)
     subkeys = jr.split(local_key, num=num_agents)
 
-    # build the rngs dict
+    # Build the RNG dict for each agent
     rngs = {agent_id: subkey for agent_id, subkey in zip(agent_ids, subkeys)}
 
+    # Compute steps per worker based on total batch size
     steps_per_worker = batch_size // args.num_workers
     return collect_trajectory_batch_per_agent(
         agent_list=agent_ids,
@@ -295,7 +337,14 @@ def actor_worker(
 
 
 def merge_trajs(worker_trajs):
-    """Concatenate buffers from num_workers into one full batch."""
+    """Merge trajectory data from multiple workers into a single batch.
+    
+    Args:
+        worker_trajs: List of trajectory dictionaries from each worker
+        
+    Returns:
+        dict: Merged trajectory data with concatenated arrays for each field
+    """
     merged = {}
     agent_list = list(worker_trajs[0].keys())
 
@@ -315,14 +364,21 @@ def merge_trajs(worker_trajs):
 
 
 def main():
-
+    """Main training function implementing PPO algorithm for commons harvest.
+    
+    This function:
+    1. Initializes the environment and agents
+    2. Sets up logging and metrics tracking
+    3. Runs the main training loop collecting experience and updating policies
+    4. Saves checkpoints and metrics
+    """
     args = parse_args()
 
     # seed the global key
     global_rng_key = random.PRNGKey(0)
 
     # ─────────────────────────────────────────────────────────────────────────
-    # 1) Initialize Weights & Biases or hardcoded parameters
+    # 1) Initialize Weights & Biases for experiment tracking
     # -------------------------------------------------------------------
     if not args.no_wandb:
         wandb.init(
@@ -343,7 +399,7 @@ def main():
 
         config = wandb.config
     else:
-
+        # Use hardcoded defaults if not using W&B
         class C:
             pass
 
@@ -358,43 +414,37 @@ def main():
         config.num_workers = args.num_workers
 
     # ─────────────────────────────────────────────────────────────────────────
-    # 2) Build the MeltingPot environment and initialize params
+    # 2) Build the MeltingPot environment and initialize parameters
     # -------------------------------------------------------------------
     configure_logging(args.log_level)
     logger = logging.getLogger(__name__)
     logger.info("Launching in %s mode", args.mode)
 
-    # Load the substrate config
+    # Load and configure the environment
     env_config = commons_harvest__open.get_config()
-    # Build the `lab2d_settings` key
     with env_config.unlocked() as cfg:
+        # Set up 7 harvester agents
         cfg.default_player_roles = ["PLAYER_ROLE_HARVESTER"] * 7
         roles = cfg.default_player_roles
         cfg.lab2d_settings = commons_harvest__open.build(roles, cfg)
 
-    # instantiate the environment
+    # Create environment instance
     env = builder.builder(**env_config)  # returns a `dmlab2d.Environment`
 
-    # determine agents
+    # Set up agent IDs and action space
     agent_list = [str(i + 1) for i in range(len(roles))]
     n_players = len(agent_list)
     primary_agent_id = agent_list[0]
-
-    # All agents share the same discrete action set
-    # TODO: Should make these properly global
     ACTION_SET = commons_harvest__open.ACTION_SET
     action_dimension = len(ACTION_SET)
 
-    # Observation shape for the RGB channel
-    # We will extract per-agent obs via timestep.observation[f"{agent_id}.RGB"]
-    # and reshape into [C,H,W].
-    # all agents get the same RGB shape
+    # Get observation shape from a dummy environment reset
     dummy_timestep = env.reset()
     rgb = dummy_timestep.observation[f"{primary_agent_id}.RGB"]
     obs_height, obs_width, obs_channels = rgb.shape
     observation_shape = (obs_channels, obs_height, obs_width)
 
-    # instantiate global variables within the main
+    # Initialize metrics tracking matrices
     zap_matrix = jnp.zeros((n_players, n_players), dtype=jnp.int32)
     death_zap_matrix = jnp.zeros((n_players, n_players), dtype=jnp.int32)
     zap_through_time = jnp.zeros((1, n_players, n_players), dtype=jnp.int32)
@@ -402,13 +452,14 @@ def main():
     all_zaps = []
     all_deaths = []
 
+    # Initialize reward tracking
     reward_history = {agent: [] for agent in agent_list}
     cum_reward = {agent: 0.0 for agent in agent_list}
 
-    # instantiate optimizer
+    # Set up optimizer
     optimizer = optax.adam(config.learning_rate)
 
-    # Defines human mode for debugging
+    # Handle human play mode if specified
     if args.mode == "human":
         _ACTION_MAP = {
             "move": level_playing_utils.get_direction_pressed,
@@ -430,14 +481,13 @@ def main():
         )
         return
 
+    # Initialize network parameters and optimizer states for each agent
     network_parameters = {}
     optimizer_states = {}
-    rng_key_per_agent = {}
 
     for agent_id in agent_list:
-        _, init_rng = random.split(
-            global_rng_key
-        )  # throw away the dummy global_rng_key generated here
+        # Initialize network parameters with a dummy observation
+        _, init_rng = random.split(global_rng_key)
         dummy_obs = jnp.zeros((1, *observation_shape), jnp.float32)
         params = ActorCriticNetwork(action_dimension).init(init_rng, dummy_obs)
         opt_state = optimizer.init(params)
@@ -445,10 +495,11 @@ def main():
         network_parameters[agent_id] = params
         optimizer_states[agent_id] = opt_state
 
+    # ─────────────────────────────────────────────────────────────────────────
     # 3) Main training loop
     # -------------------------------------------------------------------
+    # Set up parallel workers for data collection
     from concurrent.futures import ProcessPoolExecutor
-
     pool = ProcessPoolExecutor(max_workers=args.num_workers)
     logger = logging.getLogger("train")
     log_jax_devices()
@@ -459,40 +510,85 @@ def main():
     # context
     # -------------------------------------------------------------------
     def compute_ppo_loss(params, obs, acts, old_logp, old_val, rets):
-        # forward pass
+        """Compute the PPO loss combining policy and value losses.
+        
+        This function implements the PPO-Clip objective, combining a clipped policy loss
+        with a value function loss. The clipping prevents too large policy updates.
+        
+        Args:
+            params: Neural network parameters
+            obs: Batch of observations
+            acts: Batch of actions taken
+            old_logp: Log probabilities of actions under old policy
+            old_val: Value estimates from old policy
+            rets: Discounted returns
+            
+        Returns:
+            float: Combined PPO loss (policy loss + value loss)
+        """
+        # Forward pass through network to get new policy and values
         logits, vals = ActorCriticNetwork(action_dimension).apply(params, obs)
         dist = distrax.Categorical(logits=logits)
 
+        # Compute log probabilities of actions under new policy
         logp = dist.log_prob(acts)
+        
+        # Compute importance sampling ratio
         ratio = jnp.exp(logp - old_logp)
 
-        # compute and normalize advantages
+        # Compute advantages and normalize them
         adv = rets - vals
         adv = (adv - adv.mean()) / (adv.std() + 1e-8)
 
-        # clipped surrogate objective
-        unclipped = ratio * adv
+        # Compute PPO clipped surrogate objective
+        unclipped = ratio * adv  # Unclipped surrogate
         clipped = (
             jnp.clip(ratio, 1 - config.ppo_clip_epsilon, 1 + config.ppo_clip_epsilon)
             * adv
-        )
+        )  # Clipped surrogate
         policy_loss = -jnp.mean(jnp.minimum(unclipped, clipped))
 
-        # value‐function loss on *raw* returns
+        # Compute value function loss on raw returns
         value_loss = jnp.mean((rets - vals) ** 2)
+        
+        # Return combined loss
         return policy_loss + 0.5 * value_loss
 
     @jit
     def ppo_update_step(params, opt_state, obs, acts, old_logp, old_val, rets):
+        """Perform one PPO update step using the provided batch of data.
+        
+        This function is JIT-compiled for efficiency. It computes the PPO loss and its
+        gradients, then applies the optimizer update.
+        
+        Args:
+            params: Current neural network parameters
+            opt_state: Current optimizer state
+            obs: Batch of observations
+            acts: Batch of actions
+            old_logp: Log probs of actions under old policy
+            old_val: Value estimates from old policy
+            rets: Discounted returns
+            
+        Returns:
+            tuple: (new_params, new_opt_state, loss)
+                - new_params: Updated neural network parameters
+                - new_opt_state: Updated optimizer state
+                - loss: The loss value for this update
+        """
+        # Compute loss and gradients
         loss, grads = value_and_grad(compute_ppo_loss)(
             params, obs, acts, old_logp, old_val, rets
         )
+        
+        # Apply optimizer update
         updates, new_opt_state = optimizer.update(grads, opt_state, params)
         new_params = optax.apply_updates(params, updates)
+        
         return new_params, new_opt_state, loss
 
     for update_idx in range(config.total_training_updates):
-        # num_workers+1 subkeys for different random initializations
+        # Generate new RNG keys for each worker
         subkeys = random.split(global_rng_key, num=args.num_workers + 1)
         global_rng_key = subkeys[0]
         worker_keys = subkeys[1:]  # a list of length num_workers
@@ -505,13 +601,14 @@ def main():
         # will make it faster?
         network_params_snapshot = copy.deepcopy(network_parameters)
 
+        # Collect trajectories in parallel
         futures = [
             pool.submit(
                 actor_worker,
                 wid,
                 args,
                 network_params_snapshot,
-                worker_keys[wid],  # ← one PRNGKey here
+                worker_keys[wid],  # One PRNGKey per worker
                 env_config,
                 ACTION_SET,
                 config.discount_factor,
@@ -519,6 +616,8 @@ def main():
             )
             for wid in range(args.num_workers)
         ]
+        
+        # Gather results from workers
         worker_trajs = []
         for wid, fut in enumerate(futures):
             try:
@@ -528,9 +627,11 @@ def main():
                 #  - raise   # to stop training immediately
                 #  - continue  # to skip this worker and merge the rest
                 raise
+                
+        # Merge trajectories from all workers
         traj = merge_trajs(worker_trajs)
 
-        # debugger logging
+        # Log progress
         steps_this_iter = len(traj[primary_agent_id]["observations"])
         total_steps = steps_this_iter * (update_idx + 1)
         logger.debug(
@@ -539,20 +640,16 @@ def main():
             total_steps,
         )
 
-        # collect per-agent cumulative reward
+        # Update cumulative rewards
         for agent in agent_list:
-            # traj[agent]['rewards'] is a list of length BATCH_SIZE
             for _, raw_r in enumerate(traj[agent]["rewards"]):
-                # convert to float
                 r = float(raw_r)
 
                 # update running total
                 cum_reward[agent] += r
-
-                # append the _running_ total at this step
                 reward_history[agent].append(cum_reward[agent])
 
-        # collect all agents zapping data
+        # Collect zapping statistics
         batch_zaps = np.stack(traj[primary_agent_id]["zapped"])
         batch_deaths = np.stack(traj[primary_agent_id]["death_zapped"])
         all_zaps.append(batch_zaps)
@@ -561,30 +658,32 @@ def main():
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug("Training iteration: %d", update_idx)
 
-        # PPO updates for each agent
+        # Perform PPO updates for each agent
         for agent in agent_list:
             # wandb logging
             params = network_parameters[agent]
             opt_state = optimizer_states[agent]
 
+            # Prepare trajectory data for updates
             o = jnp.stack(traj[agent]["observations"])
             a = jnp.stack(traj[agent]["actions"])
             lp = jnp.stack(traj[agent]["logp"])
             v = jnp.stack(traj[agent]["values"])
             G = jnp.stack(traj[agent]["returns"])
 
-            # prepare per‐agent metrics containers
+            # Track metrics for this agent's updates
             epoch_losses = []
             epoch_kls = []
 
+            # Run multiple epochs of PPO updates
             for epoch_idx in range(config.ppo_epochs):
-                # ppo upddate step
+                # Perform PPO update step
                 new_params, new_opt_state, loss = ppo_update_step(
                     params, opt_state, o, a, lp, v, G
                 )
                 epoch_losses.append(float(loss))
 
-                # compute avg KL divergence for early stopping
+                # Compute KL divergence between old and new policies
                 logits_old, _ = ActorCriticNetwork(action_dimension).apply(params, o)
                 logits_new, _ = ActorCriticNetwork(action_dimension).apply(
                     new_params, o
@@ -599,7 +698,7 @@ def main():
                 # **always capture the scalar** so it's in scope below
                 avg_kl_value = float(avg_kl.item())
 
-                # if KL exceeds threshold, stop early
+                # Early stopping if KL divergence too high
                 if avg_kl > config.kl_threshold:
                     logger.info(
                         f"Stopping PPO epochs for agent {agent} at epoch {epoch_idx} "
@@ -607,14 +706,16 @@ def main():
                     )
                     break
 
+                # Update parameters if continuing
                 params, opt_state = new_params, new_opt_state
                 network_parameters[agent] = params
                 optimizer_states[agent] = opt_state
 
+        # Log metrics
         rewards = [float(r) for r in traj[primary_agent_id]["rewards"]]
         mean_reward = sum(rewards) / len(rewards)
 
-        # log per‐epoch metrics to W&B
+        # Log to W&B if enabled
         if not args.no_wandb:
             # e.g. log the *last* epoch’s loss and avg_kl, plus some summary stats
             wandb.log(
@@ -629,7 +730,7 @@ def main():
 
     pool.shutdown(wait=True)
 
-    # TOTAL_TRAINING_UPDATES is done and all steps can be processed
+    # Process final metrics
     all_zaps = np.concatenate(all_zaps, axis=0)
     zap_through_time = jnp.cumsum(all_zaps, axis=0)
     zap_matrix = zap_through_time[-1]
@@ -637,46 +738,52 @@ def main():
     death_zap_through_time = jnp.cumsum(all_deaths, axis=0)
     death_zap_matrix = death_zap_through_time[-1]
 
-    # 4) Save checkpoints
+    # 4) Save checkpoints and metrics
     # -------------------------------------------------------------------
+    # Create checkpoint directory structure
     ckpt_root = pathlib.Path("checkpoints")
     ckpt_root.mkdir(exist_ok=True)
 
-    # Create a run-specific subdirectory using the current date/time
+    # Create a timestamped directory for this training run
     run_id = datetime.datetime.now().strftime("run_%Y%m%d_%H%M%S")
     run_dir = ckpt_root / run_id
     run_dir.mkdir()
 
-    # save model parameters
+    # Save neural network parameters for each agent
     for agent, params in network_parameters.items():
         path = run_dir / f"agent_{agent}_params.msgpack"
         with path.open("wb") as fp:
             fp.write(serialization.to_bytes(params))
 
-    # saves wandb logs as artifact
+    # Save run artifacts to W&B if enabled
     if not args.no_wandb:
         artifact = wandb.Artifact("commons_harvest_models", type="model")
         artifact.add_dir(str(run_dir))
         wandb.log_artifact(artifact)
 
-    # reward_history: dict[str, list[float]] → DataFrame with one column per agent
+    # Save reward history for each agent
+    # Convert reward_history from dict[str, list[float]] to DataFrame with one column per agent
     df_rewards = pd.DataFrame(reward_history)
     rewards_path = run_dir / "reward_history.csv"
     df_rewards.to_csv(rewards_path, index=False, header=False)
     logger.info("Saved reward history to %s", rewards_path)
 
-    # zap_matrix and death_zap_matrix: both are 2D arrays of shape [n_players, n_players]
+    # Save zapping interaction matrices
+    # zap_matrix: 2D array showing total zaps between each pair of agents
     df_zap = pd.DataFrame(np.array(zap_matrix))
     zap_path = run_dir / "zap_matrix.csv"
     df_zap.to_csv(zap_path, index=False, header=False)
     logger.info("Saved zap matrix to %s", zap_path)
 
+    # death_zap_matrix: 2D array showing total death zaps between each pair of agents
     df_death_zap = pd.DataFrame(np.array(death_zap_matrix))
     death_zap_path = run_dir / "death_zap_matrix.csv"
     df_death_zap.to_csv(death_zap_path, index=False, header=False)
     logger.info("Saved death-zap matrix to %s", death_zap_path)
 
-    # zap_through_time and death_zap_through_time: 3D arrays of shape [steps, n_players, n_players]
+    # Save temporal zapping data
+    # zap_through_time and death_zap_through_time: 3D arrays of shape [timesteps, n_players, n_players]
+    # showing how zapping interactions evolved over the training run
     zap_arr = np.array(zap_through_time)  # shape [T, N, N]
     death_arr = np.array(death_zap_through_time)  # shape [T, N, N]
     np.savez_compressed(
@@ -689,7 +796,7 @@ def main():
         death_arr.shape,
     )
 
-    # Collect hyperparameters into a dict
+    # Save hyperparameters used for this training run
     hyperparams = {
         "DISCOUNT_FACTOR": config.discount_factor,
         "LEARNING_RATE": config.learning_rate,
@@ -700,12 +807,13 @@ def main():
         "KL_THRESHOLD": config.kl_threshold,
     }
 
-    # Create a one‐row DataFrame and write it out
+    # Save hyperparameters as a single-row CSV
     df_hyper = pd.DataFrame([hyperparams])
     hp_path = run_dir / "hyperparameters.csv"
     df_hyper.to_csv(hp_path, index=False)
     logger.info("Saved hyperparameters to %s", hp_path)
 
+    # Clean up W&B
     if not args.no_wandb:
         wandb.finish()
 
