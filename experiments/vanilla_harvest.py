@@ -11,7 +11,8 @@ import numpy as np
 import optax
 import pandas as pd
 from flax import serialization
-from jax import jit, random, value_and_grad
+from flax.core import freeze
+from jax import random, value_and_grad
 from jax.lib import xla_bridge
 from ml_collections import config_dict
 
@@ -22,12 +23,12 @@ from meltingpot.utils.substrates import builder
 
 # ── Hyperparameters ─────────────────────────────────────────────────────────────
 DISCOUNT_FACTOR = 0.99
-LEARNING_RATE = 0.00238534447933878  # 3e-4
-PPO_CLIP_EPSILON = 0.1  # 0.2
+LEARNING_RATE = 5e-5  # 3e-4
+PPO_CLIP_EPSILON = 0.2  # 0.2
 BATCH_SIZE = 256  # 128
-PPO_EPOCHS = 10
+PPO_EPOCHS = 5
 TOTAL_TRAINING_UPDATES = 50
-KL_THRESHOLD = 0.01089358402136939  # 1e-2
+KL_THRESHOLD = 0.001089358402136939  # 1e-2
 # ────────────────────────────────────────────────────────────────────────────────
 
 # Utility Functions
@@ -187,6 +188,7 @@ def collect_trajectory_batch_per_agent(
     ACTION_SET,
     steps_per_worker,
     discount_factor,
+    network_model,
 ):
     buffer = {
         agent: {
@@ -214,9 +216,7 @@ def collect_trajectory_batch_per_agent(
             img = timestep.observation[f"{agent}.RGB"]
             x = jnp.asarray(img, jnp.float32).transpose(2, 0, 1)[None, ...]
 
-            logits, value = ActorCriticNetwork(action_dimension).apply(
-                network_parameters[agent], x
-            )
+            logits, value = network_model.apply(network_parameters[agent], x)
             dist = distrax.Categorical(logits=logits[0])
             rng_key_per_agent[agent], sub = random.split(rng_key_per_agent[agent])
             a = dist.sample(seed=sub)
@@ -280,6 +280,7 @@ def actor_worker(
     ACTION_SET,
     discount_factor,
     batch_size,
+    network_model,
 ):
     """Collect trajectory data in parallel using a worker process.
     
@@ -302,11 +303,8 @@ def actor_worker(
     """
     # rebuild env
     with env_config.unlocked() as cfg:
-        print('🔥🔥🔥🔥🔥🔥')
-        print(cfg.default_player_roles)
         cfg.default_player_roles = ["PLAYER_ROLE_HARVESTER"] * 7
         roles = cfg.default_player_roles
-        print(roles)
         cfg.lab2d_settings = commons_harvest__open.build(roles, cfg)
     env = builder.builder(**env_config)
 
@@ -333,6 +331,7 @@ def actor_worker(
         ACTION_SET=ACTION_SET,
         steps_per_worker=steps_per_worker,
         discount_factor=discount_factor,
+        network_model=network_model,
     )
 
 
@@ -484,12 +483,15 @@ def main():
     # Initialize network parameters and optimizer states for each agent
     network_parameters = {}
     optimizer_states = {}
+    
+    # Create a single network model instance to be used throughout
+    network_model = ActorCriticNetwork(action_dimension)
 
     for agent_id in agent_list:
         # Initialize network parameters with a dummy observation
         _, init_rng = random.split(global_rng_key)
         dummy_obs = jnp.zeros((1, *observation_shape), jnp.float32)
-        params = ActorCriticNetwork(action_dimension).init(init_rng, dummy_obs)
+        params = network_model.init(init_rng, dummy_obs)
         opt_state = optimizer.init(params)
 
         network_parameters[agent_id] = params
@@ -509,13 +511,14 @@ def main():
     # as argument due to @jax.jit restrictions, it has to come from
     # context
     # -------------------------------------------------------------------
-    def compute_ppo_loss(params, obs, acts, old_logp, old_val, rets):
+    def compute_ppo_loss(network_model, params, obs, acts, old_logp, old_val, rets):
         """Compute the PPO loss combining policy and value losses.
         
         This function implements the PPO-Clip objective, combining a clipped policy loss
         with a value function loss. The clipping prevents too large policy updates.
         
         Args:
+            network_model: The ActorCriticNetwork model
             params: Neural network parameters
             obs: Batch of observations
             acts: Batch of actions taken
@@ -527,7 +530,7 @@ def main():
             float: Combined PPO loss (policy loss + value loss)
         """
         # Forward pass through network to get new policy and values
-        logits, vals = ActorCriticNetwork(action_dimension).apply(params, obs)
+        logits, vals = network_model.apply(params, obs)
         dist = distrax.Categorical(logits=logits)
 
         # Compute log probabilities of actions under new policy
@@ -554,38 +557,24 @@ def main():
         # Return combined loss
         return policy_loss + 0.5 * value_loss
 
-    @jit
-    def ppo_update_step(params, opt_state, obs, acts, old_logp, old_val, rets):
-        """Perform one PPO update step using the provided batch of data.
-        
-        This function is JIT-compiled for efficiency. It computes the PPO loss and its
-        gradients, then applies the optimizer update.
-        
-        Args:
-            params: Current neural network parameters
-            opt_state: Current optimizer state
-            obs: Batch of observations
-            acts: Batch of actions
-            old_logp: Log probs of actions under old policy
-            old_val: Value estimates from old policy
-            rets: Discounted returns
+    # Create a JIT-compiled update function
+    def create_ppo_update_step(network_model):
+        def update_step(params, opt_state, obs, acts, old_logp, old_val, rets):
+            """Perform one PPO update step using the provided batch of data."""
+            # Compute loss and gradients
+            loss_fn = lambda p: compute_ppo_loss(network_model, p, obs, acts, old_logp, old_val, rets)
+            loss, grads = value_and_grad(loss_fn)(params)
             
-        Returns:
-            tuple: (new_params, new_opt_state, loss)
-                - new_params: Updated neural network parameters
-                - new_opt_state: Updated optimizer state
-                - loss: The loss value for this update
-        """
-        # Compute loss and gradients
-        loss, grads = value_and_grad(compute_ppo_loss)(
-            params, obs, acts, old_logp, old_val, rets
-        )
+            # Apply optimizer update
+            updates, new_opt_state = optimizer.update(grads, opt_state, params)
+            new_params = optax.apply_updates(params, updates)
+            
+            return new_params, new_opt_state, loss
         
-        # Apply optimizer update
-        updates, new_opt_state = optimizer.update(grads, opt_state, params)
-        new_params = optax.apply_updates(params, updates)
-        
-        return new_params, new_opt_state, loss
+        return jax.jit(update_step)
+    
+    # Create the JIT-compiled update function with our network model
+    ppo_update_step = create_ppo_update_step(network_model)
 
     for update_idx in range(config.total_training_updates):
         # Generate new RNG keys for each worker
@@ -595,11 +584,7 @@ def main():
 
         # make a one‐off, isolated copy of the current parameters
         # in order to avoid race conditions and overwriting
-        # TODO: possibly changing this to
-        # from flax.core import freeze
-        #     frozen_params = freeze(network_parameters)
-        # will make it faster?
-        network_params_snapshot = copy.deepcopy(network_parameters)
+        network_params_snapshot = freeze(network_parameters)
 
         # Collect trajectories in parallel
         futures = [
@@ -613,6 +598,7 @@ def main():
                 ACTION_SET,
                 config.discount_factor,
                 config.batch_size,
+                network_model,
             )
             for wid in range(args.num_workers)
         ]
@@ -678,16 +664,12 @@ def main():
             # Run multiple epochs of PPO updates
             for epoch_idx in range(config.ppo_epochs):
                 # Perform PPO update step
-                new_params, new_opt_state, loss = ppo_update_step(
-                    params, opt_state, o, a, lp, v, G
-                )
+                new_params, new_opt_state, loss = ppo_update_step(params, opt_state, o, a, lp, v, G)
                 epoch_losses.append(float(loss))
 
                 # Compute KL divergence between old and new policies
-                logits_old, _ = ActorCriticNetwork(action_dimension).apply(params, o)
-                logits_new, _ = ActorCriticNetwork(action_dimension).apply(
-                    new_params, o
-                )
+                logits_old, _ = network_model.apply(params, o)
+                logits_new, _ = network_model.apply(new_params, o)
                 avg_kl = jnp.mean(
                     distrax.Categorical(logits=logits_old).kl_divergence(
                         distrax.Categorical(logits=logits_new)
@@ -710,6 +692,19 @@ def main():
                 params, opt_state = new_params, new_opt_state
                 network_parameters[agent] = params
                 optimizer_states[agent] = opt_state
+            
+            # Store metrics for this agent to log later
+            if not args.no_wandb:
+                wandb.log(
+                    {
+                        f"{agent}/ppo_loss_final": epoch_losses[-1],
+                        f"{agent}/kl_final": epoch_kls[-1],
+                        f"{agent}/kl_max": max(epoch_kls),
+                        f"{agent}/kl_mean": sum(epoch_kls) / len(epoch_kls),
+                        f"{agent}/reward_mean": np.mean([float(r) for r in traj[agent]["rewards"]]),
+                    },
+                    step=update_idx,
+                )
 
         # Log metrics
         rewards = [float(r) for r in traj[primary_agent_id]["rewards"]]
@@ -717,13 +712,12 @@ def main():
 
         # Log to W&B if enabled
         if not args.no_wandb:
-            # e.g. log the *last* epoch’s loss and avg_kl, plus some summary stats
+            # e.g. log the *last* epoch's loss and avg_kl, plus some summary stats
             wandb.log(
                 {
-                    f"{agent}/ppo_loss_final": epoch_losses[-1],
-                    f"{agent}/kl_final": epoch_kls[-1],
-                    f"{agent}/kl_max": max(epoch_kls),
-                    f"{agent}/kl_mean": sum(epoch_kls) / len(epoch_kls),
+                    "global/mean_reward": mean_reward,
+                    "global/steps_collected": steps_this_iter,
+                    "global/total_steps": total_steps,
                 },
                 step=update_idx,
             )
