@@ -306,6 +306,9 @@ def main():
 
     args = parse_args()
 
+    # seed the global key
+    global_rng_key = random.PRNGKey(0)
+
     # ─────────────────────────────────────────────────────────────────────────
     # 1) Initialize Weights & Biases or hardcoded parameters
     # -------------------------------------------------------------------
@@ -410,20 +413,18 @@ def main():
         )
         return
 
-    global_rng_key = random.PRNGKey(0)
     network_parameters = {}
     optimizer_states = {}
     rng_key_per_agent = {}
 
     for agent_id in agent_list:
-        global_rng_key, init_rng = random.split(global_rng_key)
+        _, init_rng = random.split(global_rng_key) # throw away the dummy global_rng_key generated here
         dummy_obs = jnp.zeros((1, *observation_shape), jnp.float32)
         params = ActorCriticNetwork(action_dimension).init(init_rng, dummy_obs)
         opt_state = optimizer.init(params)
 
         network_parameters[agent_id] = params
         optimizer_states[agent_id] = opt_state
-        rng_key_per_agent[agent_id] = init_rng
 
     # 3) Main training loop
     # -------------------------------------------------------------------
@@ -463,27 +464,49 @@ def main():
         return new_params, new_opt_state, loss
 
     for update_idx in range(config.total_training_updates):
+        # num_workers+1 subkeys for different random initializations
+        subkeys = random.split(global_rng_key, num=args.num_workers + 1)
+        global_rng_key = subkeys[0]
+        worker_keys    = subkeys[1:]  # a list of length num_workers
+
+      # make a one‐off, isolated copy of the current parameters
+      # in order to avoid race conditions and overwriting
+      # TODO: possibly changing this to 
+      # from flax.core import freeze
+      #     frozen_params = freeze(network_parameters)
+      # will make it faster?
+      network_params_snapshot = copy.deepcopy(network_parameters)
+
         futures = [
                 pool.submit(
                     actor_worker,
                     wid,
                     args,
-                    network_parameters,
-                    global_rng_key,
+                    network_params_snapshot,
+                    worker_keys[wid],
                     env_config,
                     ACTION_SET,
                     config.discount_factor,
                     config.batch_size,
                 )
-                for wid in range(args.num_workers)
+              for wid in range(args.num_workers)
             ]
-        worker_trajs = [f.result() for f in futures]
+        worker_trajs = []
+        for wid, fut in enumerate(futures):
+            try:
+                worker_trajs.append(fut.result())
+            except Exception as e:
+                logger.error(f"actor_worker {wid} failed", exc_info=True)
+                #  - raise   # to stop training immediately
+                #  - continue  # to skip this worker and merge the rest
+                raise
         traj = merge_trajs(worker_trajs)
 
-        logger.debug(
-            "Collected %d environment steps",
-            len(traj[primary_agent_id]["observations"] * (update_idx + 1)),
-        )
+        # debugger logging
+        steps_this_iter = len(traj[primary_agent_id]["observations"])
+        total_steps     = steps_this_iter * (update_idx + 1)
+        logger.debug("Collected %d steps (this iter) and %d steps (total)",
+                     steps_this_iter, total_steps)
 
         # collect per-agent cumulative reward
         for agent in agent_list:
@@ -510,8 +533,8 @@ def main():
         # PPO updates for each agent
         for agent in agent_list:
             # wandb logging
-            network_parameters[agent] = params
-            optimizer_states[agent] = opt_state
+            params    = network_parameters[agent]
+            opt_state = optimizer_states[agent]
 
             o = jnp.stack(traj[agent]["observations"])
             a = jnp.stack(traj[agent]["actions"])
@@ -544,7 +567,6 @@ def main():
                     break
 
                 params, opt_state = new_params, new_opt_state
-
                 network_parameters[agent] = params
                 optimizer_states[agent] = opt_state
 
@@ -558,6 +580,8 @@ def main():
               "policy_loss": float(loss),     # from last epoch
               "avg_kl": float(avg_kl_value),   # from your last KL check
           }, step=update_idx)
+
+    pool.shutdown(wait=True)
 
     # TOTAL_TRAINING_UPDATES is done and all steps can be processed
     all_zaps = np.concatenate(all_zaps, axis=0)
