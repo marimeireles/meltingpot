@@ -17,8 +17,10 @@ uv pip install -e .
 Install the rest of the dependencies:
 
 ```bash
-uv pip install tqdm matplotlib shimmy gymnasium flax distrax
+uv pip install tqdm matplotlib shimmy gymnasium flax distrax wandb
 ```
+
+## Organizational
 
 Linting the repository:
 

@@ -2,6 +2,7 @@ import argparse
 import datetime
 import json
 import pathlib
+import wandb
 
 import distrax
 import flax.linen as nn
@@ -155,7 +156,6 @@ def get_multi_rewards(timestep):
                 rewards[prefix] = float(val)
     return rewards
 
-
 def collect_trajectory_batch_per_agent(
     agent_list,
     env,
@@ -288,11 +288,33 @@ def merge_trajs(worker_trajs):
 
     return merged
 
-
 def main():
-    # 1) Build the MeltingPot environment and initialize params
-    # -------------------------------------------------------------------
+
     args = parse_args()
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # 1) Initialize Weights & Biases
+    # -------------------------------------------------------------------
+    wandb.init(
+        project="commons_harvest_ppo",   # your W&B project name
+        config={
+            "discount_factor": DISCOUNT_FACTOR,
+            "learning_rate": LEARNING_RATE,
+            "ppo_clip_epsilon": PPO_CLIP_EPSILON,
+            "batch_size": BATCH_SIZE,
+            "ppo_epochs": PPO_EPOCHS,
+            "total_training_updates": TOTAL_TRAINING_UPDATES,
+            "kl_threshold": KL_THRESHOLD,
+            "num_workers": args.num_workers,
+        },
+        tags=["jax", "flax", "ppo", args.mode],
+        reinit=True,
+    )
+    config = wandb.config
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # 2) Build the MeltingPot environment and initialize params
+    # -------------------------------------------------------------------
     configure_logging(args.log_level)
     logger = logging.getLogger(__name__)
     logger.info("Launching in %s mode", args.mode)
@@ -374,7 +396,7 @@ def main():
         optimizer_states[agent_id] = opt_state
         rng_key_per_agent[agent_id] = init_rng
 
-    # 2) Main training loop
+    # 3) Main training loop
     # -------------------------------------------------------------------
     from concurrent.futures import ProcessPoolExecutor
     pool = ProcessPoolExecutor(max_workers=args.num_workers)
@@ -456,6 +478,10 @@ def main():
 
         # PPO updates
         for agent in agent_list:
+            # wandb logging
+            network_parameters[agent] = params
+            optimizer_states[agent] = opt_state
+
             o = jnp.stack(traj[agent]["observations"])
             a = jnp.stack(traj[agent]["actions"])
             lp = jnp.stack(traj[agent]["logp"])
@@ -463,33 +489,43 @@ def main():
             R = jnp.stack(traj[agent]["returns"])
 
             params, opt_state = network_parameters[agent], optimizer_states[agent]
-            for epoch_idx in range(PPO_EPOCHS):
-                new_params, new_opt_state, loss = ppo_update_step(
-                    params, opt_state, o, a, lp, v, R
+
+        for epoch_idx in range(PPO_EPOCHS):
+            new_params, new_opt_state, loss = ppo_update_step(
+                params, opt_state, o, a, lp, v, R
+            )
+
+            # compute avg KL divergence for early stopping
+            logits_old, _ = ActorCriticNetwork(action_dimension).apply(params, o)
+            logits_new, _ = ActorCriticNetwork(action_dimension).apply(new_params, o)
+            dist_old = distrax.Categorical(logits=logits_old)
+            dist_new = distrax.Categorical(logits=logits_new)
+            avg_kl = jnp.mean(dist_old.kl_divergence(dist_new))
+
+            # **always capture the scalar** so it's in scope below
+            avg_kl_value = float(avg_kl.item())
+
+            if avg_kl > KL_THRESHOLD:
+                logger.info(
+                    f"Stopping PPO epochs for agent {agent} at epoch {epoch_idx} "
+                    f"due to KL={avg_kl_value:.4f} > {KL_THRESHOLD:.4f}"
                 )
+                break
 
-                # compute avg KL divergence between old and new policies
-                logits_old, _ = ActorCriticNetwork(action_dimension).apply(params, o)
-                logits_new, _ = ActorCriticNetwork(action_dimension).apply(
-                    new_params, o
-                )
-                dist_old = distrax.Categorical(logits=logits_old)
-                dist_new = distrax.Categorical(logits=logits_new)
-                avg_kl = jnp.mean(dist_old.kl_divergence(dist_new))
-
-                if avg_kl > KL_THRESHOLD:
-                    avg_kl_value = avg_kl.item()
-                    logger.info(
-                        f"Stopping PPO epochs for agent {agent} at epoch {epoch_idx} "
-                        f"due to KL={avg_kl_value:.4f} > {KL_THRESHOLD:.4f}"
-                    )
-                    break
-
-                # otherwise accept the update and continue
-                params, opt_state = new_params, new_opt_state
+            params, opt_state = new_params, new_opt_state
 
             network_parameters[agent] = params
             optimizer_states[agent] = opt_state
+
+        rewards = [float(r) for r in traj[primary_agent_id]["rewards"]]
+        mean_reward = sum(rewards) / len(rewards)
+
+        wandb.log({
+            "update": update_idx,
+            "mean_reward": mean_reward,
+            "policy_loss": float(loss),     # from last epoch
+            "avg_kl": float(avg_kl_value),   # from your last KL check
+        }, step=update_idx)
 
     # TOTAL_TRAINING_UPDATES is done and all steps can be processed
     all_zaps = np.concatenate(all_zaps, axis=0)
@@ -499,7 +535,7 @@ def main():
     death_zap_through_time = jnp.cumsum(all_deaths, axis=0)
     death_zap_matrix = death_zap_through_time[-1]
 
-    # 3) Save checkpoints
+    # 4) Save checkpoints
     # -------------------------------------------------------------------
     ckpt_root = pathlib.Path("checkpoints")
     ckpt_root.mkdir(exist_ok=True)
@@ -509,11 +545,16 @@ def main():
     run_dir = ckpt_root / run_id
     run_dir.mkdir()
 
-    # 7a) Save model parameters
+    # save model parameters
     for agent, params in network_parameters.items():
         path = run_dir / f"agent_{agent}_params.msgpack"
         with path.open("wb") as fp:
             fp.write(serialization.to_bytes(params))
+
+    # saves wandb logs as artifact
+    artifact = wandb.Artifact("commons_harvest_models", type="model")
+    artifact.add_dir(str(run_dir))
+    wandb.log_artifact(artifact)
 
     # reward_history: dict[str, list[float]] → DataFrame with one column per agent
     df_rewards = pd.DataFrame(reward_history)
@@ -562,6 +603,7 @@ def main():
     df_hyper.to_csv(hp_path, index=False)
     logger.info("Saved hyperparameters to %s", hp_path)
 
+    wandb.finish()
 
 if __name__ == "__main__":
     main()
