@@ -57,12 +57,6 @@ def parse_args():
         help="which MeltingPot level to load",
     )
     p.add_argument(
-        "--settings",
-        type=json.loads,
-        default="{}",
-        help="JSON dict of overrides for the substrate",
-    )
-    p.add_argument(
         "--fps",
         type=int,
         default=15,
@@ -77,7 +71,7 @@ def parse_args():
     p.add_argument(
         "--log-level",
         default="INFO",
-        choices=("DEBUG", "INFO", "WARNING", "ERROR", "COMPLETE"),
+        choices=("DEBUG", "INFO", "WARNING", "ERROR"),
         help="Root logger verbosity",
     )
     p.add_argument(
@@ -109,11 +103,6 @@ def configure_logging(level: str) -> None:
         format="%(asctime)s | %(name)s | %(levelname)s | %(message)s",
         datefmt="%H:%M:%S",
     )
-    # Silence extremely chatty third‑party libraries unless debug is requested
-    if level != "COMPLETE":
-        for noisy in ("absl", "jaxlib", "jax"):
-            logging.getLogger(noisy).setLevel(logging.WARNING)
-
 
 def log_jax_devices():
     """Log available JAX backend and devices."""
@@ -275,6 +264,7 @@ def actor_worker(
 ):
     # rebuild env
     with env_config.unlocked() as cfg:
+        cfg.default_player_roles = ["PLAYER_ROLE_HARVESTER"] * 7
         roles = cfg.default_player_roles
         cfg.lab2d_settings = commons_harvest__open.build(roles, cfg)
     env = builder.builder(**env_config)
@@ -378,6 +368,7 @@ def main():
     env_config = commons_harvest__open.get_config()
     # Build the `lab2d_settings` key
     with env_config.unlocked() as cfg:
+        cfg.default_player_roles = ["PLAYER_ROLE_HARVESTER"] * 7
         roles = cfg.default_player_roles
         cfg.lab2d_settings = commons_harvest__open.build(roles, cfg)
 
@@ -427,6 +418,7 @@ def main():
         }
 
         with config_dict.ConfigDict(env_config).unlocked() as env_config:
+            cfg.default_player_roles = ["PLAYER_ROLE_HARVESTER"] * 7
             roles = env_config.default_player_roles
             env_config.lab2d_settings = commons_harvest__open.build(roles, env_config)
         level_playing_utils.run_episode(
