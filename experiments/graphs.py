@@ -112,10 +112,18 @@ def plot_cumulative_reward_per_step(
         if len(cumulative) != total_steps:
             logger.warning(
                 "Agent %d has %d steps of data (expected %d); skipping.",
-                idx, len(cumulative), total_steps
+                idx,
+                len(cumulative),
+                total_steps,
             )
             continue
-        plt.plot(steps, cumulative, marker=".", markevery=max(1, total_steps // 20), label=f"Agent {idx}")
+        plt.plot(
+            steps,
+            cumulative,
+            marker=".",
+            markevery=max(1, total_steps // 20),
+            label=f"Agent {idx}",
+        )
 
     plt.xlabel("Environment Step")
     plt.ylabel("Cumulative Reward")
@@ -189,13 +197,14 @@ def plot_zapping_through_time(
     plt.savefig(save_path)
     logger.info("Saved %s plot to %s", kind, save_path)
 
+
 def plot_average_reward_through_time(
     stats_dir: Path,
     save_dir,
     title: str = "Average Reward Through Time",
     xlabel: str = "Update",
     ylabel: str = "Average Reward",
-    log_level: str = "INFO"
+    log_level: str = "INFO",
 ) -> None:
     """
     Load reward_history.csv from stats_dir, compute the average reward
@@ -239,7 +248,7 @@ def plot_average_reward_through_time(
 
     # plot
     plt.figure(figsize=(8, 5))
-    plt.plot(updates, avg_rewards, marker=".", markevery=max(1, len(updates)//20))
+    plt.plot(updates, avg_rewards, marker=".", markevery=max(1, len(updates) // 20))
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
@@ -251,6 +260,7 @@ def plot_average_reward_through_time(
     out_path = out_dir / "average_reward_through_time.png"
     plt.savefig(out_path)
     logger.info("Saved average‐reward plot to %s", out_path)
+
 
 def plot_interaction_heatmap(
     df_matrix: pd.DataFrame, save_dir: Path, name: str, cmap: str = "viridis"
@@ -312,7 +322,11 @@ def main() -> None:
         n_updates = int(df_hparams["TOTAL_TRAINING_UPDATES"].iloc[0])
         batch_size = int(df_hparams["BATCH_SIZE"].iloc[0])
     except (KeyError, IndexError, ValueError) as e:
-        logger.error("Failed to read TOTAL_TRAINING_UPDATES or BATCH_SIZE from %s: %s", hyper_path, e)
+        logger.error(
+            "Failed to read TOTAL_TRAINING_UPDATES or BATCH_SIZE from %s: %s",
+            hyper_path,
+            e,
+        )
         return
 
     (
@@ -339,7 +353,7 @@ def main() -> None:
         title="Mean Reward per Update",
         xlabel="PPO Update",
         ylabel="Mean Cumulative Reward",
-        log_level=args.log_level
+        log_level=args.log_level,
     )
 
 
