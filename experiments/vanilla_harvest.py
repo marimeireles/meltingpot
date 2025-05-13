@@ -3,32 +3,32 @@ import copy
 import datetime
 import json
 import pathlib
-import wandb
 
 import distrax
 import flax.linen as nn
+import jax
 import jax.numpy as jnp
 import numpy as np
 import optax
 import pandas as pd
 from flax import serialization
 from jax import jit, random, value_and_grad
-import jax
 from jax.lib import xla_bridge
 from ml_collections import config_dict
 
 import meltingpot.human_players.level_playing_utils as level_playing_utils
+import wandb
 from meltingpot.configs.substrates import commons_harvest__open
 from meltingpot.utils.substrates import builder
 
 # ── Hyperparameters ─────────────────────────────────────────────────────────────
 DISCOUNT_FACTOR = 0.99
-LEARNING_RATE = 0.000238534447933878 #3e-4
-PPO_CLIP_EPSILON = 0.1 #0.2
-BATCH_SIZE = 256 #128
+LEARNING_RATE = 0.000238534447933878  # 3e-4
+PPO_CLIP_EPSILON = 0.1  # 0.2
+BATCH_SIZE = 256  # 128
 PPO_EPOCHS = 5
 TOTAL_TRAINING_UPDATES = 50
-KL_THRESHOLD = 0.04889358402136939 #1e-2
+KL_THRESHOLD = 0.04889358402136939  # 1e-2
 # ────────────────────────────────────────────────────────────────────────────────
 
 # Utils
@@ -75,34 +75,28 @@ def parse_args():
         help="random seed for JAX",
     )
     p.add_argument(
-        "--total‐updates",
-        type=int,
-        default=5,
-        help="number of PPO outer updates",
-    )
-    p.add_argument(
         "--log-level",
         default="INFO",
         choices=("DEBUG", "INFO", "WARNING", "ERROR", "COMPLETE"),
         help="Root logger verbosity",
     )
     p.add_argument(
-    "--num-workers",
-    type=int,
-    default=4,
-    help="Number of parallel actor processes for data collection",
+        "--num-workers",
+        type=int,
+        default=4,
+        help="Number of parallel actor processes for data collection",
     )
     p.add_argument(
         "--no-wandb",
         action="store_true",
         help="skip wandb.init and use hardcoded defaults",
     )
-    p.add_argument("--learning_rate",      type=float, default=LEARNING_RATE)
-    p.add_argument("--batch_size",         type=int,   default=BATCH_SIZE)
-    p.add_argument("--ppo_clip_epsilon",   type=float, default=PPO_CLIP_EPSILON)
-    p.add_argument("--ppo_epochs",         type=int,   default=PPO_EPOCHS)
-    p.add_argument("--kl_threshold",       type=float, default=KL_THRESHOLD)
-    p.add_argument("--discount_factor",       type=float, default=DISCOUNT_FACTOR)
+    p.add_argument("--learning_rate", type=float, default=LEARNING_RATE)
+    p.add_argument("--batch_size", type=int, default=BATCH_SIZE)
+    p.add_argument("--ppo_clip_epsilon", type=float, default=PPO_CLIP_EPSILON)
+    p.add_argument("--ppo_epochs", type=int, default=PPO_EPOCHS)
+    p.add_argument("--kl_threshold", type=float, default=KL_THRESHOLD)
+    p.add_argument("--discount_factor", type=float, default=DISCOUNT_FACTOR)
     p.add_argument("--total_training_updates", type=int, default=TOTAL_TRAINING_UPDATES)
     return p.parse_args()
 
@@ -120,6 +114,7 @@ def configure_logging(level: str) -> None:
         for noisy in ("absl", "jaxlib", "jax"):
             logging.getLogger(noisy).setLevel(logging.WARNING)
 
+
 def log_jax_devices():
     """Log available JAX backend and devices."""
     logger = logging.getLogger(__name__)
@@ -129,7 +124,9 @@ def log_jax_devices():
     for dev in devices:
         logger.info(
             "  Device: %s (id=%d, process_index=%d)",
-            dev.device_kind, dev.id, dev.process_index
+            dev.device_kind,
+            dev.id,
+            dev.process_index,
         )
 
 
@@ -168,6 +165,7 @@ def get_multi_rewards(timestep):
             if name == "REWARD":
                 rewards[prefix] = float(val)
     return rewards
+
 
 # Collects agent's trajectories
 # -------------------------------------------------------------------
@@ -259,15 +257,17 @@ def collect_trajectory_batch_per_agent(
 
     return buffer
 
+
 # Parallelization
 # -------------------------------------------------------------------
 import jax.random as jr
 
+
 def actor_worker(
     worker_id,
     args,
-    network_parameters,      # dict[str → PyTree] of params, keyed by agent ID
-    worker_key,              # a single PRNGKey for this worker
+    network_parameters,  # dict[str → PyTree] of params, keyed by agent ID
+    worker_key,  # a single PRNGKey for this worker
     env_config,
     ACTION_SET,
     discount_factor,
@@ -283,25 +283,26 @@ def actor_worker(
     local_key = jr.fold_in(worker_key, worker_id)
 
     # split into one subkey per agent:
-    agent_ids = list(network_parameters.keys())    # e.g. ["1","2","3",...]
+    agent_ids = list(network_parameters.keys())  # e.g. ["1","2","3",...]
     num_agents = len(agent_ids)
-    subkeys    = jr.split(local_key, num=num_agents)
+    subkeys = jr.split(local_key, num=num_agents)
 
     # build the rngs dict
     rngs = {agent_id: subkey for agent_id, subkey in zip(agent_ids, subkeys)}
 
     steps_per_worker = batch_size // args.num_workers
     return collect_trajectory_batch_per_agent(
-        agent_list         = agent_ids,
-        env                = env,
-        primary_agent_id   = agent_ids[0],
-        action_dimension   = len(ACTION_SET),
-        network_parameters = network_parameters,
-        rng_key_per_agent  = rngs,                # each agent has its own key now
-        ACTION_SET         = ACTION_SET,
-        steps_per_worker   = steps_per_worker,
-        discount_factor    = discount_factor,
+        agent_list=agent_ids,
+        env=env,
+        primary_agent_id=agent_ids[0],
+        action_dimension=len(ACTION_SET),
+        network_parameters=network_parameters,
+        rng_key_per_agent=rngs,  # each agent has its own key now
+        ACTION_SET=ACTION_SET,
+        steps_per_worker=steps_per_worker,
+        discount_factor=discount_factor,
     )
+
 
 def merge_trajs(worker_trajs):
     """Concatenate buffers from num_workers into one full batch."""
@@ -322,6 +323,7 @@ def merge_trajs(worker_trajs):
 
     return merged
 
+
 def main():
 
     args = parse_args()
@@ -334,33 +336,36 @@ def main():
     # -------------------------------------------------------------------
     if not args.no_wandb:
         wandb.init(
-          project="commons_harvest_ppo",
-          config={
-              "discount_factor":      args.discount_factor,
-              "learning_rate":        args.learning_rate,
-              "ppo_clip_epsilon":     args.ppo_clip_epsilon,
-              "batch_size":           args.batch_size,
-              "ppo_epochs":           args.ppo_epochs,
-              "total_training_updates": args.total_training_updates,
-              "kl_threshold":         args.kl_threshold,
-              "num_workers":          args.num_workers,
-          },
-          tags=["jax", "flax", "ppo", args.mode],
-          reinit=True,
+            project="commons_harvest_ppo",
+            config={
+                "discount_factor": args.discount_factor,
+                "learning_rate": args.learning_rate,
+                "ppo_clip_epsilon": args.ppo_clip_epsilon,
+                "batch_size": args.batch_size,
+                "ppo_epochs": args.ppo_epochs,
+                "total_training_updates": args.total_training_updates,
+                "kl_threshold": args.kl_threshold,
+                "num_workers": args.num_workers,
+            },
+            tags=["jax", "flax", "ppo", args.mode],
+            reinit=True,
         )
 
         config = wandb.config
     else:
-        class C: pass
+
+        class C:
+            pass
+
         config = C()
-        config.discount_factor      = DISCOUNT_FACTOR
-        config.learning_rate        = LEARNING_RATE
-        config.ppo_clip_epsilon     = PPO_CLIP_EPSILON
-        config.batch_size           = BATCH_SIZE
-        config.ppo_epochs           = PPO_EPOCHS
+        config.discount_factor = DISCOUNT_FACTOR
+        config.learning_rate = LEARNING_RATE
+        config.ppo_clip_epsilon = PPO_CLIP_EPSILON
+        config.batch_size = BATCH_SIZE
+        config.ppo_epochs = PPO_EPOCHS
         config.total_training_updates = TOTAL_TRAINING_UPDATES
-        config.kl_threshold         = KL_THRESHOLD
-        config.num_workers          = args.num_workers
+        config.kl_threshold = KL_THRESHOLD
+        config.num_workers = args.num_workers
 
     # ─────────────────────────────────────────────────────────────────────────
     # 2) Build the MeltingPot environment and initialize params
@@ -407,7 +412,7 @@ def main():
     all_deaths = []
 
     reward_history = {agent: [] for agent in agent_list}
-    cum_reward     = {agent: 0.0 for agent in agent_list}
+    cum_reward = {agent: 0.0 for agent in agent_list}
 
     # instantiate optimizer
     optimizer = optax.adam(config.learning_rate)
@@ -438,7 +443,9 @@ def main():
     rng_key_per_agent = {}
 
     for agent_id in agent_list:
-        _, init_rng = random.split(global_rng_key) # throw away the dummy global_rng_key generated here
+        _, init_rng = random.split(
+            global_rng_key
+        )  # throw away the dummy global_rng_key generated here
         dummy_obs = jnp.zeros((1, *observation_shape), jnp.float32)
         params = ActorCriticNetwork(action_dimension).init(init_rng, dummy_obs)
         opt_state = optimizer.init(params)
@@ -449,6 +456,7 @@ def main():
     # 3) Main training loop
     # -------------------------------------------------------------------
     from concurrent.futures import ProcessPoolExecutor
+
     pool = ProcessPoolExecutor(max_workers=args.num_workers)
     logger = logging.getLogger("train")
     log_jax_devices()
@@ -472,7 +480,10 @@ def main():
 
         # clipped surrogate objective
         unclipped = ratio * adv
-        clipped = jnp.clip(ratio, 1 - config.ppo_clip_epsilon, 1 + config.ppo_clip_epsilon) * adv
+        clipped = (
+            jnp.clip(ratio, 1 - config.ppo_clip_epsilon, 1 + config.ppo_clip_epsilon)
+            * adv
+        )
         policy_loss = -jnp.mean(jnp.minimum(unclipped, clipped))
 
         # value‐function loss on *raw* returns
@@ -492,26 +503,28 @@ def main():
         # num_workers+1 subkeys for different random initializations
         subkeys = random.split(global_rng_key, num=args.num_workers + 1)
         global_rng_key = subkeys[0]
-        worker_keys    = subkeys[1:]  # a list of length num_workers
+        worker_keys = subkeys[1:]  # a list of length num_workers
 
         # make a one‐off, isolated copy of the current parameters
         # in order to avoid race conditions and overwriting
-        # TODO: possibly changing this to 
+        # TODO: possibly changing this to
         # from flax.core import freeze
         #     frozen_params = freeze(network_parameters)
         # will make it faster?
         network_params_snapshot = copy.deepcopy(network_parameters)
 
         futures = [
-            pool.submit(actor_worker,
-                        wid,
-                        args,
-                        network_params_snapshot,
-                        worker_keys[wid],  # ← one PRNGKey here
-                        env_config,
-                        ACTION_SET,
-                        config.discount_factor,
-                        config.batch_size)
+            pool.submit(
+                actor_worker,
+                wid,
+                args,
+                network_params_snapshot,
+                worker_keys[wid],  # ← one PRNGKey here
+                env_config,
+                ACTION_SET,
+                config.discount_factor,
+                config.batch_size,
+            )
             for wid in range(args.num_workers)
         ]
         worker_trajs = []
@@ -527,9 +540,12 @@ def main():
 
         # debugger logging
         steps_this_iter = len(traj[primary_agent_id]["observations"])
-        total_steps     = steps_this_iter * (update_idx + 1)
-        logger.debug("Collected %d steps (this iter) and %d steps (total)",
-                     steps_this_iter, total_steps)
+        total_steps = steps_this_iter * (update_idx + 1)
+        logger.debug(
+            "Collected %d steps (this iter) and %d steps (total)",
+            steps_this_iter,
+            total_steps,
+        )
 
         # collect per-agent cumulative reward
         for agent in agent_list:
@@ -556,18 +572,18 @@ def main():
         # PPO updates for each agent
         for agent in agent_list:
             # wandb logging
-            params    = network_parameters[agent]
+            params = network_parameters[agent]
             opt_state = optimizer_states[agent]
 
             o = jnp.stack(traj[agent]["observations"])
             a = jnp.stack(traj[agent]["actions"])
             lp = jnp.stack(traj[agent]["logp"])
             v = jnp.stack(traj[agent]["values"])
-            G  = jnp.stack(traj[agent]["returns"])
+            G = jnp.stack(traj[agent]["returns"])
 
             # prepare per‐agent metrics containers
             epoch_losses = []
-            epoch_kls    = []
+            epoch_kls = []
 
             for epoch_idx in range(config.ppo_epochs):
                 # ppo upddate step
@@ -578,7 +594,9 @@ def main():
 
                 # compute avg KL divergence for early stopping
                 logits_old, _ = ActorCriticNetwork(action_dimension).apply(params, o)
-                logits_new, _ = ActorCriticNetwork(action_dimension).apply(new_params, o)
+                logits_new, _ = ActorCriticNetwork(action_dimension).apply(
+                    new_params, o
+                )
                 avg_kl = jnp.mean(
                     distrax.Categorical(logits=logits_old).kl_divergence(
                         distrax.Categorical(logits=logits_new)
@@ -607,13 +625,15 @@ def main():
         # log per‐epoch metrics to W&B
         if not args.no_wandb:
             # e.g. log the *last* epoch’s loss and avg_kl, plus some summary stats
-            wandb.log({
-                f"{agent}/ppo_loss_final": epoch_losses[-1],
-                f"{agent}/kl_final":        epoch_kls[-1],
-                f"{agent}/kl_max":          max(epoch_kls),
-                f"{agent}/kl_mean":         sum(epoch_kls) / len(epoch_kls),
-            }, step=update_idx)
-
+            wandb.log(
+                {
+                    f"{agent}/ppo_loss_final": epoch_losses[-1],
+                    f"{agent}/kl_final": epoch_kls[-1],
+                    f"{agent}/kl_max": max(epoch_kls),
+                    f"{agent}/kl_mean": sum(epoch_kls) / len(epoch_kls),
+                },
+                step=update_idx,
+            )
 
     pool.shutdown(wait=True)
 
@@ -643,9 +663,9 @@ def main():
 
     # saves wandb logs as artifact
     if not args.no_wandb:
-      artifact = wandb.Artifact("commons_harvest_models", type="model")
-      artifact.add_dir(str(run_dir))
-      wandb.log_artifact(artifact)
+        artifact = wandb.Artifact("commons_harvest_models", type="model")
+        artifact.add_dir(str(run_dir))
+        wandb.log_artifact(artifact)
 
     # reward_history: dict[str, list[float]] → DataFrame with one column per agent
     df_rewards = pd.DataFrame(reward_history)
@@ -679,13 +699,13 @@ def main():
 
     # Collect hyperparameters into a dict
     hyperparams = {
-        "DISCOUNT_FACTOR":           config.discount_factor,
-        "LEARNING_RATE":             config.learning_rate,
-        "PPO_CLIP_EPSILON":          config.ppo_clip_epsilon,
-        "BATCH_SIZE":                config.batch_size,
-        "PPO_EPOCHS":                config.ppo_epochs,
-        "TOTAL_TRAINING_UPDATES":    config.total_training_updates,
-        "KL_THRESHOLD":              config.kl_threshold,
+        "DISCOUNT_FACTOR": config.discount_factor,
+        "LEARNING_RATE": config.learning_rate,
+        "PPO_CLIP_EPSILON": config.ppo_clip_epsilon,
+        "BATCH_SIZE": config.batch_size,
+        "PPO_EPOCHS": config.ppo_epochs,
+        "TOTAL_TRAINING_UPDATES": config.total_training_updates,
+        "KL_THRESHOLD": config.kl_threshold,
     }
 
     # Create a one‐row DataFrame and write it out
@@ -695,7 +715,8 @@ def main():
     logger.info("Saved hyperparameters to %s", hp_path)
 
     if not args.no_wandb:
-      wandb.finish()
+        wandb.finish()
+
 
 if __name__ == "__main__":
     main()
