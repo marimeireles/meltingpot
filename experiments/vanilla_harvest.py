@@ -91,6 +91,17 @@ def parse_args():
     default=4,
     help="Number of parallel actor processes for data collection",
     )
+    p.add_argument(
+        "--no-wandb",
+        action="store_true",
+        help="skip wandb.init and use hardcoded defaults",
+    )
+    p.add_argument("--learning_rate",      type=float, default=LEARNING_RATE)
+    p.add_argument("--batch_size",         type=int,   default=BATCH_SIZE)
+    p.add_argument("--ppo_clip_epsilon",   type=float, default=PPO_CLIP_EPSILON)
+    p.add_argument("--ppo_epochs",         type=int,   default=PPO_EPOCHS)
+    p.add_argument("--kl_threshold",       type=float, default=KL_THRESHOLD)
+    p.add_argument("--total_training_updates", type=int, default=TOTAL_TRAINING_UPDATES)
     return p.parse_args()
 
 
@@ -164,7 +175,8 @@ def collect_trajectory_batch_per_agent(
     network_parameters,
     rng_key_per_agent,
     ACTION_SET,
-    steps_per_agent=BATCH_SIZE,
+    steps_per_worker,
+    discount_factor,
 ):
     buffer = {
         agent: {
@@ -183,7 +195,7 @@ def collect_trajectory_batch_per_agent(
     timestep = env.reset()
     current_ep_steps = 0
 
-    while len(buffer[primary_agent_id]["observations"]) < steps_per_agent:
+    while len(buffer[primary_agent_id]["observations"]) < steps_per_worker:
         action_dict = {}
 
         # for each agent: compute policy, sample, and store obs/action/logp/value
@@ -236,7 +248,7 @@ def collect_trajectory_batch_per_agent(
     for agent in agent_list:
         G, rets = 0.0, []
         for r in reversed(buffer[agent]["rewards"]):
-            G = r + DISCOUNT_FACTOR * G
+            G = r + discount_factor * G
             rets.insert(0, G)
         buffer[agent]["returns"] = rets
 
@@ -244,7 +256,7 @@ def collect_trajectory_batch_per_agent(
 
 # Parallelization
 # -------------------------------------------------------------------
-def actor_worker(worker_id, args, network_parameters, rng_key, env_config, ACTION_SET):
+def actor_worker(worker_id, args, network_parameters, rng_key, env_config, ACTION_SET, discount_factor, batch_size):
     """One actor: builds its own env+RNG, collects steps_per_worker trajectories."""
     # 1) Reconstruct env & roles
     with env_config.unlocked() as cfg:
@@ -257,7 +269,7 @@ def actor_worker(worker_id, args, network_parameters, rng_key, env_config, ACTIO
     rngs = {agent: local_key for agent in network_parameters.keys()}
 
     # 3) Collect a smaller chunk
-    steps_per_worker = BATCH_SIZE // args.num_workers
+    steps_per_worker = batch_size // args.num_workers
     return collect_trajectory_batch_per_agent(
         list(network_parameters.keys()),  # agent_list
         env,
@@ -266,7 +278,8 @@ def actor_worker(worker_id, args, network_parameters, rng_key, env_config, ACTIO
         network_parameters,
         rngs,
         ACTION_SET,
-        steps_per_agent=steps_per_worker,
+        steps_per_worker,
+        discount_factor,
     )
 
 def merge_trajs(worker_trajs):
@@ -293,24 +306,36 @@ def main():
     args = parse_args()
 
     # ─────────────────────────────────────────────────────────────────────────
-    # 1) Initialize Weights & Biases
+    # 1) Initialize Weights & Biases or hardcoded parameters
     # -------------------------------------------------------------------
-    wandb.init(
-        project="commons_harvest_ppo",   # your W&B project name
-        config={
-            "discount_factor": DISCOUNT_FACTOR,
-            "learning_rate": LEARNING_RATE,
-            "ppo_clip_epsilon": PPO_CLIP_EPSILON,
-            "batch_size": BATCH_SIZE,
-            "ppo_epochs": PPO_EPOCHS,
-            "total_training_updates": TOTAL_TRAINING_UPDATES,
-            "kl_threshold": KL_THRESHOLD,
-            "num_workers": args.num_workers,
-        },
-        tags=["jax", "flax", "ppo", args.mode],
-        reinit=True,
-    )
-    config = wandb.config
+    if not args.no_wandb:
+        wandb.init(
+            project="commons_harvest_ppo",   # your W&B project name
+            config={
+                "discount_factor": DISCOUNT_FACTOR,
+                "learning_rate": LEARNING_RATE,
+                "ppo_clip_epsilon": PPO_CLIP_EPSILON,
+                "batch_size": BATCH_SIZE,
+                "ppo_epochs": PPO_EPOCHS,
+                "total_training_updates": TOTAL_TRAINING_UPDATES,
+                "kl_threshold": KL_THRESHOLD,
+                "num_workers": args.num_workers,
+            },
+            tags=["jax", "flax", "ppo", args.mode],
+            reinit=True,
+        )
+        config = wandb.config
+    else:
+        class C: pass
+        config = C()
+        config.discount_factor      = DISCOUNT_FACTOR
+        config.learning_rate        = LEARNING_RATE
+        config.ppo_clip_epsilon     = PPO_CLIP_EPSILON
+        config.batch_size           = BATCH_SIZE
+        config.ppo_epochs           = PPO_EPOCHS
+        config.total_training_updates = TOTAL_TRAINING_UPDATES
+        config.kl_threshold         = KL_THRESHOLD
+        config.num_workers          = args.num_workers
 
     # ─────────────────────────────────────────────────────────────────────────
     # 2) Build the MeltingPot environment and initialize params
@@ -389,7 +414,7 @@ def main():
         global_rng_key, init_rng = random.split(global_rng_key)
         dummy_obs = jnp.zeros((1, *observation_shape), jnp.float32)
         params = ActorCriticNetwork(action_dimension).init(init_rng, dummy_obs)
-        opt = optax.adam(LEARNING_RATE)
+        opt = optax.adam(config.learning_rate)
         opt_state = opt.init(params)
 
         network_parameters[agent_id] = params
@@ -418,7 +443,7 @@ def main():
         adv = (adv - adv.mean()) / (adv.std() + 1e-8)
 
         unclipped = ratio * adv
-        clipped = jnp.clip(ratio, 1 - PPO_CLIP_EPSILON, 1 + PPO_CLIP_EPSILON) * adv
+        clipped = jnp.clip(ratio, 1 - config.ppo_clip_epsilon, 1 + config.ppo_clip_epsilon) * adv
 
         policy_loss = -jnp.mean(jnp.minimum(unclipped, clipped))
         value_loss = jnp.mean((rets - vals) ** 2)
@@ -429,11 +454,11 @@ def main():
         loss, grads = value_and_grad(compute_ppo_loss)(
             params, obs, acts, old_logp, old_val, rets
         )
-        updates, new_opt_state = optax.adam(LEARNING_RATE).update(grads, opt_state, params)
+        updates, new_opt_state = optax.adam(config.learning_rate).update(grads, opt_state, params)
         new_params = optax.apply_updates(params, updates)
         return new_params, new_opt_state, loss
 
-    for update_idx in range(TOTAL_TRAINING_UPDATES):
+    for update_idx in range(config.total_training_updates):
         futures = [
                 pool.submit(
                     actor_worker,
@@ -443,6 +468,8 @@ def main():
                     global_rng_key,
                     env_config,
                     ACTION_SET,
+                    config.discount_factor,
+                    config.batch_size,
                 )
                 for wid in range(args.num_workers)
             ]
@@ -490,7 +517,7 @@ def main():
 
             params, opt_state = network_parameters[agent], optimizer_states[agent]
 
-        for epoch_idx in range(PPO_EPOCHS):
+        for epoch_idx in range(config.ppo_epochs):
             new_params, new_opt_state, loss = ppo_update_step(
                 params, opt_state, o, a, lp, v, R
             )
@@ -505,10 +532,10 @@ def main():
             # **always capture the scalar** so it's in scope below
             avg_kl_value = float(avg_kl.item())
 
-            if avg_kl > KL_THRESHOLD:
+            if avg_kl > config.kl_threshold:
                 logger.info(
                     f"Stopping PPO epochs for agent {agent} at epoch {epoch_idx} "
-                    f"due to KL={avg_kl_value:.4f} > {KL_THRESHOLD:.4f}"
+                    f"due to KL={avg_kl_value:.4f} > {config.kl_threshold:.4f}"
                 )
                 break
 
@@ -588,13 +615,13 @@ def main():
 
     # Collect hyperparameters into a dict
     hyperparams = {
-        "DISCOUNT_FACTOR": DISCOUNT_FACTOR,
-        "LEARNING_RATE": LEARNING_RATE,
-        "PPO_CLIP_EPSILON": PPO_CLIP_EPSILON,
-        "BATCH_SIZE": BATCH_SIZE,
-        "PPO_EPOCHS": PPO_EPOCHS,
-        "TOTAL_TRAINING_UPDATES": TOTAL_TRAINING_UPDATES,
-        "KL_THRESHOLD": KL_THRESHOLD,
+        "DISCOUNT_FACTOR":           config.discount_factor,
+        "LEARNING_RATE":             config.learning_rate,
+        "PPO_CLIP_EPSILON":          config.ppo_clip_epsilon,
+        "BATCH_SIZE":                config.batch_size,
+        "PPO_EPOCHS":                config.ppo_epochs,
+        "TOTAL_TRAINING_UPDATES":    config.total_training_updates,
+        "KL_THRESHOLD":              config.kl_threshold,
     }
 
     # Create a one‐row DataFrame and write it out

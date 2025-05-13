@@ -32,6 +32,17 @@ uv pip install pyink isort
 pyink . && isort .
 ```
 
+## Sweeping values
+
+```bash
+wandb sweep experiments/wandb/sweep.yaml
+```
+
+And release agents with:
+
+```bash
+wandb agent --count n_agents --project project_name --entity entity_na,e sweep_ID
+```
 ---
 
 *Mongol General: Hao! Dai ye! We won again! This is good, but what is best in life?*
