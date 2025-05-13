@@ -189,6 +189,68 @@ def plot_zapping_through_time(
     plt.savefig(save_path)
     logger.info("Saved %s plot to %s", kind, save_path)
 
+def plot_average_reward_through_time(
+    stats_dir: Path,
+    save_dir,
+    title: str = "Average Reward Through Time",
+    xlabel: str = "Update",
+    ylabel: str = "Average Reward",
+    log_level: str = "INFO"
+) -> None:
+    """
+    Load reward_history.csv from stats_dir, compute the average reward
+    across all agents at each update, and plot it.
+
+    Parameters
+    ----------
+    stats_dir : Path
+        Directory containing `reward_history.csv` (no header, one column per agent).
+    save_dir : Optional[Path]
+        Directory where to save the figure. If None, defaults to stats_dir.
+    title : str
+        Plot title.
+    xlabel : str
+        Label for the x-axis (default: "Update").
+    ylabel : str
+        Label for the y-axis (default: "Average Reward").
+    log_level : str
+        Logging verbosity level.
+    """
+    # set up logging
+    logging.basicConfig(
+        level=getattr(logging, log_level),
+        format="%(asctime)s | %(levelname)s | %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    logger = logging.getLogger(__name__)
+
+    reward_path = stats_dir / "reward_history.csv"
+    if not reward_path.exists():
+        logger.error("Could not find reward_history.csv in %s", stats_dir)
+        return
+
+    # load as DataFrame, one column per agent
+    df = pd.read_csv(reward_path, header=None)
+    # compute row‐wise mean
+    avg_rewards = df.mean(axis=1)
+
+    # prepare x axis (1-based update count)
+    updates = avg_rewards.index.to_numpy() + 1
+
+    # plot
+    plt.figure(figsize=(8, 5))
+    plt.plot(updates, avg_rewards, marker=".", markevery=max(1, len(updates)//20))
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.tight_layout()
+
+    # decide where to save
+    out_dir = save_dir or stats_dir
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / "average_reward_through_time.png"
+    plt.savefig(out_path)
+    logger.info("Saved average‐reward plot to %s", out_path)
 
 def plot_interaction_heatmap(
     df_matrix: pd.DataFrame, save_dir: Path, name: str, cmap: str = "viridis"
@@ -270,6 +332,15 @@ def main() -> None:
     plot_interaction_heatmap(total_death_zap, args.stats_dir, "death_zap_matrix")
 
     plot_cumulative_reward_per_step(rewards_list, args.stats_dir)
+
+    plot_average_reward_through_time(
+        stats_dir=args.stats_dir,
+        save_dir=args.stats_dir,
+        title="Mean Reward per Update",
+        xlabel="PPO Update",
+        ylabel="Mean Cumulative Reward",
+        log_level=args.log_level
+    )
 
 
 if __name__ == "__main__":
