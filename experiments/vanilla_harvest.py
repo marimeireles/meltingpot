@@ -1,5 +1,4 @@
 import argparse
-import copy
 import datetime
 import pathlib
 
@@ -373,8 +372,11 @@ def main():
     """
     args = parse_args()
 
-    # seed the global key
-    global_rng_key = random.PRNGKey(0)
+    # seed the global key using the command line argument
+    global_rng_key = random.PRNGKey(args.seed)
+    
+    # Also set numpy random seed for consistency
+    np.random.seed(args.seed)
 
     # ─────────────────────────────────────────────────────────────────────────
     # 1) Initialize Weights & Biases for experiment tracking
@@ -391,6 +393,7 @@ def main():
                 "total_training_updates": args.total_training_updates,
                 "kl_threshold": args.kl_threshold,
                 "num_workers": args.num_workers,
+                "seed": args.seed,
             },
             tags=["jax", "flax", "ppo", args.mode],
             reinit=True,
@@ -418,6 +421,7 @@ def main():
     configure_logging(args.log_level)
     logger = logging.getLogger(__name__)
     logger.info("Launching in %s mode", args.mode)
+    logger.info("Using random seed: %d", args.seed)
 
     # Load and configure the environment
     env_config = commons_harvest__open.get_config()
@@ -799,6 +803,7 @@ def main():
         "PPO_EPOCHS": config.ppo_epochs,
         "TOTAL_TRAINING_UPDATES": config.total_training_updates,
         "KL_THRESHOLD": config.kl_threshold,
+        "SEED": args.seed,
     }
 
     # Save hyperparameters as a single-row CSV
