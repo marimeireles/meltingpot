@@ -27,7 +27,7 @@ LEARNING_RATE = 0.000238534447933878 #3e-4
 PPO_CLIP_EPSILON = 0.1 #0.2
 BATCH_SIZE = 256 #128
 PPO_EPOCHS = 5
-TOTAL_TRAINING_UPDATES = 100
+TOTAL_TRAINING_UPDATES = 50
 KL_THRESHOLD = 0.04889358402136939 #1e-2
 # ────────────────────────────────────────────────────────────────────────────────
 
@@ -446,11 +446,6 @@ def main():
         network_parameters[agent_id] = params
         optimizer_states[agent_id] = opt_state
 
-    # variable to auxiliate in normalizing return
-    running_mean   = {agent: 0.0    for agent in agent_list}
-    running_var    = {agent: 1.0    for agent in agent_list}
-    running_count  = {agent: 1e-4   for agent in agent_list}
-
     # 3) Main training loop
     # -------------------------------------------------------------------
     from concurrent.futures import ProcessPoolExecutor
@@ -464,18 +459,23 @@ def main():
     # context
     # -------------------------------------------------------------------
     def compute_ppo_loss(params, obs, acts, old_logp, old_val, rets):
+        # forward pass
         logits, vals = ActorCriticNetwork(action_dimension).apply(params, obs)
         dist = distrax.Categorical(logits=logits)
+
         logp = dist.log_prob(acts)
         ratio = jnp.exp(logp - old_logp)
 
-        adv = rets - old_val
+        # compute and normalize advantages
+        adv = rets - vals
         adv = (adv - adv.mean()) / (adv.std() + 1e-8)
 
+        # clipped surrogate objective
         unclipped = ratio * adv
         clipped = jnp.clip(ratio, 1 - config.ppo_clip_epsilon, 1 + config.ppo_clip_epsilon) * adv
-
         policy_loss = -jnp.mean(jnp.minimum(unclipped, clipped))
+
+        # value‐function loss on *raw* returns
         value_loss = jnp.mean((rets - vals) ** 2)
         return policy_loss + 0.5 * value_loss
 
@@ -525,42 +525,6 @@ def main():
                 raise
         traj = merge_trajs(worker_trajs)
 
-        # ——— Running‐moment update & normalization ——— #
-        for agent in agent_list:
-            # raw returns from the buffer (shape [BATCH_SIZE])
-            R = jnp.stack(traj[agent]["returns"])
-
-            # batch statistics
-            batch_mean  = float(R.mean())
-            batch_var   = float(R.var())
-            batch_count = R.shape[0]
-
-            # previous running stats
-            old_mean  = running_mean[agent]
-            old_var   = running_var[agent]
-            old_count = running_count[agent]
-
-            # Welford’s algorithm
-            delta = batch_mean - old_mean
-            tot   = old_count + batch_count
-            new_mean = old_mean + delta * batch_count / tot
-            m_a = old_var * old_count
-            m_b = batch_var * batch_count
-            M2 = m_a + m_b + delta**2 * old_count * batch_count / tot
-            new_var  = M2 / tot
-
-            # store updated running stats
-            running_mean[agent]  = new_mean
-            running_var[agent]   = new_var
-            running_count[agent] = tot
-
-            # normalize returns
-            R_norm = (R - new_mean) / (jnp.sqrt(new_var) + 1e-8)
-
-            # replace in the trajectory dict
-            traj[agent]["returns"] = R_norm
-        # ———————————————————————————————— #
-
         # debugger logging
         steps_this_iter = len(traj[primary_agent_id]["observations"])
         total_steps     = steps_this_iter * (update_idx + 1)
@@ -599,7 +563,7 @@ def main():
             a = jnp.stack(traj[agent]["actions"])
             lp = jnp.stack(traj[agent]["logp"])
             v = jnp.stack(traj[agent]["values"])
-            R = jnp.stack(traj[agent]["returns"])
+            G  = jnp.stack(traj[agent]["returns"])
 
             # prepare per‐agent metrics containers
             epoch_losses = []
@@ -608,8 +572,9 @@ def main():
             for epoch_idx in range(config.ppo_epochs):
                 # ppo upddate step
                 new_params, new_opt_state, loss = ppo_update_step(
-                    params, opt_state, o, a, lp, v, R
+                    params, opt_state, o, a, lp, v, G
                 )
+                epoch_losses.append(float(loss))
 
                 # compute avg KL divergence for early stopping
                 logits_old, _ = ActorCriticNetwork(action_dimension).apply(params, o)
