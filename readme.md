@@ -35,7 +35,7 @@ pyink . && isort .
 ## Sweeping values
 
 ```bash
-wandb sweep experiments/wandb/sweep.yaml
+wandb sweep experiments/sweep.yaml
 ```
 
 And release agents with:
