@@ -22,14 +22,12 @@ import reactivex
 from reactivex import subject
 
 from meltingpot.utils.substrates import builder
-from meltingpot.utils.substrates.wrappers import (
-    base,
-    collective_reward_wrapper,
-    discrete_action_wrapper,
-    multiplayer_wrapper,
-    observables,
-    observables_wrapper,
-)
+from meltingpot.utils.substrates.wrappers import (base,
+                                                  collective_reward_wrapper,
+                                                  discrete_action_wrapper,
+                                                  multiplayer_wrapper,
+                                                  observables,
+                                                  observables_wrapper)
 
 
 @chex.dataclass(frozen=True)

@@ -17,13 +17,9 @@ import functools
 
 from meltingpot import substrate
 from meltingpot.configs import bots as bot_configs
-from meltingpot.utils.policies import (
-    fixed_action_policy,
-    policy,
-    policy_factory,
-    puppet_policy,
-    saved_model_policy,
-)
+from meltingpot.utils.policies import (fixed_action_policy, policy,
+                                       policy_factory, puppet_policy,
+                                       saved_model_policy)
 from meltingpot.utils.substrates import specs
 
 NOOP_BOT_NAME = "noop_bot"

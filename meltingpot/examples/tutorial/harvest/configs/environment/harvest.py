@@ -17,25 +17,25 @@ from ml_collections import config_dict
 
 
 def get_config():
-  """Default configuration for the Harvest level."""
-  config = config_dict.ConfigDict()
+    """Default configuration for the Harvest level."""
+    config = config_dict.ConfigDict()
 
-  # Basic configuration.
-  config.individual_observation_names = []
-  config.global_observation_names = ["WORLD.RGB"]
+    # Basic configuration.
+    config.individual_observation_names = []
+    config.global_observation_names = ["WORLD.RGB"]
 
-  # Lua script configuration.
-  config.lab2d_settings = {
-      "levelName": "harvest",
-      "levelDirectory": "examples/tutorial/harvest/levels",
-      "maxEpisodeLengthFrames": 100,
-      "numPlayers": 0,
-      "spriteSize": 8,
-      "simulation": {
-          "map": " ",
-          "prefabs": {},
-          "charPrefabMap": {},
-      },
-  }
+    # Lua script configuration.
+    config.lab2d_settings = {
+        "levelName": "harvest",
+        "levelDirectory": "examples/tutorial/harvest/levels",
+        "maxEpisodeLengthFrames": 100,
+        "numPlayers": 0,
+        "spriteSize": 8,
+        "simulation": {
+            "map": " ",
+            "prefabs": {},
+            "charPrefabMap": {},
+        },
+    }
 
-  return config
+    return config

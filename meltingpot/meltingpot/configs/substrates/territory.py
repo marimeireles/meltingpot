@@ -21,7 +21,8 @@ from typing import Any, Mapping, Sequence
 
 from ml_collections import config_dict
 
-from meltingpot.utils.substrates import (colors, game_object_utils, shapes, specs)
+from meltingpot.utils.substrates import (colors, game_object_utils, shapes,
+                                         specs)
 
 PrefabConfig = game_object_utils.PrefabConfig
 

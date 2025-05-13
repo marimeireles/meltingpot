@@ -19,17 +19,17 @@ from . import self_play_train
 
 
 class TrainingTests(absltest.TestCase):
-  """Tests for MeltingPotEnv for RLLib."""
+    """Tests for MeltingPotEnv for RLLib."""
 
-  def test_training(self):
-    config = self_play_train.get_config(
-        num_rollout_workers=1,
-        rollout_fragment_length=10,
-        train_batch_size=20,
-        sgd_minibatch_size=20,
-        fcnet_hiddens=(4,),
-        post_fcnet_hiddens=(4,),
-        lstm_cell_size=2,
-    )
-    results = self_play_train.train(config, num_iterations=1)
-    self.assertEqual(results.num_errors, 0)
+    def test_training(self):
+        config = self_play_train.get_config(
+            num_rollout_workers=1,
+            rollout_fragment_length=10,
+            train_batch_size=20,
+            sgd_minibatch_size=20,
+            fcnet_hiddens=(4,),
+            post_fcnet_hiddens=(4,),
+            lstm_cell_size=2,
+        )
+        results = self_play_train.train(config, num_iterations=1)
+        self.assertEqual(results.num_errors, 0)

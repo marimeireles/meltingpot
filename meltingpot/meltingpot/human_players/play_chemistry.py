@@ -28,8 +28,7 @@ from meltingpot.configs.substrates import (
     chemistry__three_metabolic_cycles,
     chemistry__three_metabolic_cycles_with_plentiful_distractors,
     chemistry__two_metabolic_cycles,
-    chemistry__two_metabolic_cycles_with_distractors,
-)
+    chemistry__two_metabolic_cycles_with_distractors)
 from meltingpot.human_players import level_playing_utils
 
 MAX_SCREEN_WIDTH = 800

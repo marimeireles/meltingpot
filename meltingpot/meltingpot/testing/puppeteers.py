@@ -13,7 +13,8 @@
 # limitations under the License.
 """Puppeteer test utilities."""
 
-from typing import (Any, Iterable, Iterator, Mapping, Optional, Sequence, TypeVar)
+from typing import (Any, Iterable, Iterator, Mapping, Optional, Sequence,
+                    TypeVar)
 
 import dm_env
 

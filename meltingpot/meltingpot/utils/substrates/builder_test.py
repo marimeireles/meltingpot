@@ -18,7 +18,8 @@ import copy
 import numpy as np
 from absl.testing import absltest, parameterized
 
-from meltingpot.configs.substrates import running_with_scissors_in_the_matrix__repeated as test_substrate
+from meltingpot.configs.substrates import \
+    running_with_scissors_in_the_matrix__repeated as test_substrate
 from meltingpot.utils.substrates import builder
 
 

@@ -16,30 +16,17 @@
 import dataclasses
 import functools
 import os
-from typing import (
-    AbstractSet,
-    Callable,
-    Iterable,
-    Literal,
-    Mapping,
-    Optional,
-    Sequence,
-)
+from typing import (AbstractSet, Callable, Iterable, Literal, Mapping,
+                    Optional, Sequence)
 
 import immutabledict
 
-from meltingpot.utils.puppeteers import (
-    allelopathic_harvest,
-    alternator,
-    clean_up,
-    coins,
-    coordination_in_the_matrix,
-    fixed_goal,
-    gift_refinements,
-    in_the_matrix,
-    puppeteer,
-    running_with_scissors_in_the_matrix,
-)
+from meltingpot.utils.puppeteers import (allelopathic_harvest, alternator,
+                                         clean_up, coins,
+                                         coordination_in_the_matrix,
+                                         fixed_goal, gift_refinements,
+                                         in_the_matrix, puppeteer,
+                                         running_with_scissors_in_the_matrix)
 
 
 def _find_models_root() -> str:

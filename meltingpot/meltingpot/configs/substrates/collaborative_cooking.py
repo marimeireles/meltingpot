@@ -29,7 +29,8 @@ from typing import Any, Dict, Mapping, Sequence
 
 from ml_collections import config_dict as configdict
 
-from meltingpot.utils.substrates import (colors, game_object_utils, shapes, specs)
+from meltingpot.utils.substrates import (colors, game_object_utils, shapes,
+                                         specs)
 
 # Warning: setting `_ENABLE_DEBUG_OBSERVATIONS = True` may cause slowdown.
 _ENABLE_DEBUG_OBSERVATIONS = False

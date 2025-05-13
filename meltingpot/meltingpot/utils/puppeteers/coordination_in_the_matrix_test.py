@@ -20,7 +20,8 @@ import numpy as np
 from absl.testing import absltest, parameterized
 
 from meltingpot.testing import puppeteers
-from meltingpot.utils.puppeteers import (coordination_in_the_matrix, in_the_matrix)
+from meltingpot.utils.puppeteers import (coordination_in_the_matrix,
+                                         in_the_matrix)
 
 _RESOURCE_A = in_the_matrix.Resource(
     index=0,

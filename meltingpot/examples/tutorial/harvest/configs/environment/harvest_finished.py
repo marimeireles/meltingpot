@@ -13,8 +13,9 @@
 # limitations under the License.
 """Configuration for finished tutorial level: Harvest."""
 
-from meltingpot.utils.substrates import shapes
 from ml_collections import config_dict
+
+from meltingpot.utils.substrates import shapes
 
 SPAWN_POINT = {
     "name": "spawn_point",
@@ -23,10 +24,12 @@ SPAWN_POINT = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "spawnPoint",
-                "stateConfigs": [{
-                    "state": "spawnPoint",
-                    "groups": ["spawnPoints"],
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "spawnPoint",
+                        "groups": ["spawnPoints"],
+                    }
+                ],
             },
         },
         {
@@ -91,11 +94,13 @@ WALL = {
             "component": "StateManager",
             "kwargs": {
                 "initialState": "wall",
-                "stateConfigs": [{
-                    "state": "wall",
-                    "layer": "upperPhysical",
-                    "sprite": "Wall",
-                }],
+                "stateConfigs": [
+                    {
+                        "state": "wall",
+                        "layer": "upperPhysical",
+                        "sprite": "Wall",
+                    }
+                ],
             },
         },
         {
@@ -173,14 +178,14 @@ APPLE = {
 
 
 def get_config():
-  """Default configuration for the Harvest level."""
-  config = config_dict.ConfigDict()
+    """Default configuration for the Harvest level."""
+    config = config_dict.ConfigDict()
 
-  # Basic configuration.
-  config.individual_observation_names = ["RGB"]
-  config.global_observation_names = ["WORLD.RGB"]
+    # Basic configuration.
+    config.individual_observation_names = ["RGB"]
+    config.global_observation_names = ["WORLD.RGB"]
 
-  ascii_map = """
+    ascii_map = """
 **********************
 *      AAA       AAA *
 * AAA   A   AAA   A  *
@@ -194,24 +199,24 @@ def get_config():
 **********************
   """
 
-  # Lua script configuration.
-  config.lab2d_settings = {
-      "levelName": "harvest_finished",
-      "levelDirectory": "examples/tutorial/harvest/levels",
-      "maxEpisodeLengthFrames": 1000,
-      "numPlayers": 5,
-      "spriteSize": 8,
-      "simulation": {
-          "map": ascii_map,
-          "prefabs": {
-              "avatar": AVATAR,
-              "spawn_point": SPAWN_POINT,
-              "wall": WALL,
-              "apple": APPLE,
-          },
-          "charPrefabMap": {"_": "spawn_point", "*": "wall", "A": "apple"},
-          "playerPalettes": [],
-      },
-  }
+    # Lua script configuration.
+    config.lab2d_settings = {
+        "levelName": "harvest_finished",
+        "levelDirectory": "examples/tutorial/harvest/levels",
+        "maxEpisodeLengthFrames": 1000,
+        "numPlayers": 5,
+        "spriteSize": 8,
+        "simulation": {
+            "map": ascii_map,
+            "prefabs": {
+                "avatar": AVATAR,
+                "spawn_point": SPAWN_POINT,
+                "wall": WALL,
+                "apple": APPLE,
+            },
+            "charPrefabMap": {"_": "spawn_point", "*": "wall", "A": "apple"},
+            "playerPalettes": [],
+        },
+    }
 
-  return config
+    return config

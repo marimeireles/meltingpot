@@ -20,10 +20,8 @@ import numpy as np
 from absl.testing import absltest, parameterized
 
 from meltingpot.testing import puppeteers
-from meltingpot.utils.puppeteers import (
-    in_the_matrix,
-    running_with_scissors_in_the_matrix,
-)
+from meltingpot.utils.puppeteers import (in_the_matrix,
+                                         running_with_scissors_in_the_matrix)
 
 _ROCK = in_the_matrix.Resource(
     index=2,
