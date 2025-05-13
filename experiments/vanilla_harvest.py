@@ -243,7 +243,7 @@ def collect_trajectory_batch_per_agent(
         # if episode ended, reset
         if timestep.last():
             current_ep_steps = 0
-            timestep = env.reset
+            timestep = env.reset()
 
     # compute discounted returns
     for agent in agent_list:
@@ -386,6 +386,9 @@ def main():
     reward_history = {agent: [] for agent in agent_list}
     cum_reward     = {agent: 0.0 for agent in agent_list}
 
+    # instantiate optimizer
+    optimizer = optax.adam(config.learning_rate)
+
     # Defines human mode for debugging
     if args.mode == "human":
         _ACTION_MAP = {
@@ -416,8 +419,7 @@ def main():
         global_rng_key, init_rng = random.split(global_rng_key)
         dummy_obs = jnp.zeros((1, *observation_shape), jnp.float32)
         params = ActorCriticNetwork(action_dimension).init(init_rng, dummy_obs)
-        opt = optax.adam(config.learning_rate)
-        opt_state = opt.init(params)
+        opt_state = optimizer.init(params)
 
         network_parameters[agent_id] = params
         optimizer_states[agent_id] = opt_state
@@ -456,7 +458,7 @@ def main():
         loss, grads = value_and_grad(compute_ppo_loss)(
             params, obs, acts, old_logp, old_val, rets
         )
-        updates, new_opt_state = optax.adam(config.learning_rate).update(grads, opt_state, params)
+        updates, new_opt_state = optimizer.update(grads, opt_state, params)
         new_params = optax.apply_updates(params, updates)
         return new_params, new_opt_state, loss
 
@@ -505,7 +507,7 @@ def main():
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug("Training iteration: %d", update_idx)
 
-        # PPO updates
+        # PPO updates for each agent
         for agent in agent_list:
             # wandb logging
             network_parameters[agent] = params
@@ -517,44 +519,45 @@ def main():
             v = jnp.stack(traj[agent]["values"])
             R = jnp.stack(traj[agent]["returns"])
 
-            params, opt_state = network_parameters[agent], optimizer_states[agent]
-
-        for epoch_idx in range(config.ppo_epochs):
-            new_params, new_opt_state, loss = ppo_update_step(
-                params, opt_state, o, a, lp, v, R
-            )
-
-            # compute avg KL divergence for early stopping
-            logits_old, _ = ActorCriticNetwork(action_dimension).apply(params, o)
-            logits_new, _ = ActorCriticNetwork(action_dimension).apply(new_params, o)
-            dist_old = distrax.Categorical(logits=logits_old)
-            dist_new = distrax.Categorical(logits=logits_new)
-            avg_kl = jnp.mean(dist_old.kl_divergence(dist_new))
-
-            # **always capture the scalar** so it's in scope below
-            avg_kl_value = float(avg_kl.item())
-
-            if avg_kl > config.kl_threshold:
-                logger.info(
-                    f"Stopping PPO epochs for agent {agent} at epoch {epoch_idx} "
-                    f"due to KL={avg_kl_value:.4f} > {config.kl_threshold:.4f}"
+            for epoch_idx in range(config.ppo_epochs):
+                new_params, new_opt_state, loss = ppo_update_step(
+                    params, opt_state, o, a, lp, v, R
                 )
-                break
 
-            params, opt_state = new_params, new_opt_state
+                # compute avg KL divergence for early stopping
+                logits_old, _ = ActorCriticNetwork(action_dimension).apply(params, o)
+                logits_new, _ = ActorCriticNetwork(action_dimension).apply(new_params, o)
+                avg_kl = jnp.mean(
+                    distrax.Categorical(logits=logits_old).kl_divergence(
+                        distrax.Categorical(logits=logits_new)
+                    )
+                )
 
-            network_parameters[agent] = params
-            optimizer_states[agent] = opt_state
+                # **always capture the scalar** so it's in scope below
+                avg_kl_value = float(avg_kl.item())
+
+                if avg_kl > config.kl_threshold:
+                    logger.info(
+                        f"Stopping PPO epochs for agent {agent} at epoch {epoch_idx} "
+                        f"due to KL={avg_kl_value:.4f} > {config.kl_threshold:.4f}"
+                    )
+                    break
+
+                params, opt_state = new_params, new_opt_state
+
+                network_parameters[agent] = params
+                optimizer_states[agent] = opt_state
 
         rewards = [float(r) for r in traj[primary_agent_id]["rewards"]]
         mean_reward = sum(rewards) / len(rewards)
 
-        wandb.log({
-            "update": update_idx,
-            "mean_reward": mean_reward,
-            "policy_loss": float(loss),     # from last epoch
-            "avg_kl": float(avg_kl_value),   # from your last KL check
-        }, step=update_idx)
+        if not args.no_wandb:
+          wandb.log({
+              "update": update_idx,
+              "mean_reward": mean_reward,
+              "policy_loss": float(loss),     # from last epoch
+              "avg_kl": float(avg_kl_value),   # from your last KL check
+          }, step=update_idx)
 
     # TOTAL_TRAINING_UPDATES is done and all steps can be processed
     all_zaps = np.concatenate(all_zaps, axis=0)
@@ -581,9 +584,10 @@ def main():
             fp.write(serialization.to_bytes(params))
 
     # saves wandb logs as artifact
-    artifact = wandb.Artifact("commons_harvest_models", type="model")
-    artifact.add_dir(str(run_dir))
-    wandb.log_artifact(artifact)
+    if not args.no_wandb:
+      artifact = wandb.Artifact("commons_harvest_models", type="model")
+      artifact.add_dir(str(run_dir))
+      wandb.log_artifact(artifact)
 
     # reward_history: dict[str, list[float]] → DataFrame with one column per agent
     df_rewards = pd.DataFrame(reward_history)
@@ -632,7 +636,8 @@ def main():
     df_hyper.to_csv(hp_path, index=False)
     logger.info("Saved hyperparameters to %s", hp_path)
 
-    wandb.finish()
+    if not args.no_wandb:
+      wandb.finish()
 
 if __name__ == "__main__":
     main()
