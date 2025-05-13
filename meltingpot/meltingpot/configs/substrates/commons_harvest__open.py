@@ -590,9 +590,9 @@ def create_avatar_objects(num_players):
     avatar_objects = []
     for player_idx in range(0, num_players):
         spawn_group = "spawnPoints"
-        if player_idx < 2:
-            # The first two player slots always spawn closer to the apples.
-            spawn_group = "insideSpawnPoints"
+        # if player_idx < 2:
+        #     # The first two player slots always spawn closer to the apples.
+        #     spawn_group = "insideSpawnPoints"
 
         game_object = create_avatar_object(
             player_idx, TARGET_SPRITE_SELF, spawn_group=spawn_group
