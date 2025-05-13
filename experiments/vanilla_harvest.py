@@ -1,11 +1,14 @@
 import argparse
 import datetime
+import logging
 import pathlib
+import sys
 
 import distrax
 import flax.linen as nn
 import jax
 import jax.numpy as jnp
+import jax.random as jr
 import numpy as np
 import optax
 import pandas as pd
@@ -28,14 +31,11 @@ BATCH_SIZE = 256  # 128
 PPO_EPOCHS = 5
 TOTAL_TRAINING_UPDATES = 50
 KL_THRESHOLD = 0.001089358402136939  # 1e-2
+NUM_AGENTS = 7  # Number of harvester agents
 # ────────────────────────────────────────────────────────────────────────────────
 
 # Utility Functions
 # -------------------------------------------------------------------
-
-import logging
-import sys
-
 
 def parse_args():
     """Parse command line arguments for training or human play modes.
@@ -163,7 +163,6 @@ class ActorCriticNetwork(nn.Module):
 
 # Data-collection
 # -------------------------------------------------------------------
-# TODO: ACTION_SET should be properly global and be a default arg like steps_per_agent
 def get_multi_rewards(timestep):
     """Returns a dict mapping each 'prefix' → float reward."""
     rewards = {}
@@ -204,14 +203,12 @@ def collect_trajectory_batch_per_agent(
 
     # start in a fresh episode
     timestep = env.reset()
-    current_ep_steps = 0
 
     while len(buffer[primary_agent_id]["observations"]) < steps_per_worker:
         action_dict = {}
 
         # for each agent: compute policy, sample, and store obs/action/logp/value
         for agent in agent_list:
-            # agent = int(agent)
             img = timestep.observation[f"{agent}.RGB"]
             x = jnp.asarray(img, jnp.float32).transpose(2, 0, 1)[None, ...]
 
@@ -233,7 +230,6 @@ def collect_trajectory_batch_per_agent(
 
         # step the environment
         timestep = env.step(action_dict)
-        current_ep_steps += 1
 
         # extract all agents' rewards once, then distribute
         reward_dict = get_multi_rewards(timestep)
@@ -251,7 +247,6 @@ def collect_trajectory_batch_per_agent(
 
         # if episode ended, reset
         if timestep.last():
-            current_ep_steps = 0
             timestep = env.reset()
 
     # compute discounted returns
@@ -267,7 +262,6 @@ def collect_trajectory_batch_per_agent(
 
 # Parallelization
 # -------------------------------------------------------------------
-import jax.random as jr
 
 
 def actor_worker(
@@ -295,6 +289,7 @@ def actor_worker(
         ACTION_SET: Set of possible actions in the environment
         discount_factor: Gamma parameter for computing returns
         batch_size: Total batch size (will be divided among workers)
+        network_model: The shared ActorCriticNetwork model instance
         
     Returns:
         dict: Collected trajectory data for each agent containing observations,
@@ -302,7 +297,7 @@ def actor_worker(
     """
     # rebuild env
     with env_config.unlocked() as cfg:
-        cfg.default_player_roles = ["PLAYER_ROLE_HARVESTER"] * 7
+        cfg.default_player_roles = ["PLAYER_ROLE_HARVESTER"] * NUM_AGENTS
         roles = cfg.default_player_roles
         cfg.lab2d_settings = commons_harvest__open.build(roles, cfg)
     env = builder.builder(**env_config)
@@ -426,8 +421,8 @@ def main():
     # Load and configure the environment
     env_config = commons_harvest__open.get_config()
     with env_config.unlocked() as cfg:
-        # Set up 7 harvester agents
-        cfg.default_player_roles = ["PLAYER_ROLE_HARVESTER"] * 7
+        # Set up harvester agents
+        cfg.default_player_roles = ["PLAYER_ROLE_HARVESTER"] * NUM_AGENTS
         roles = cfg.default_player_roles
         cfg.lab2d_settings = commons_harvest__open.build(roles, cfg)
 
@@ -471,15 +466,15 @@ def main():
             "deathZap": level_playing_utils.get_enter_key_pressed,
         }
 
-        with config_dict.ConfigDict(env_config).unlocked() as env_config:
-            cfg.default_player_roles = ["PLAYER_ROLE_HARVESTER"] * 7
-            roles = env_config.default_player_roles
-            env_config.lab2d_settings = commons_harvest__open.build(roles, env_config)
+        with config_dict.ConfigDict(env_config).unlocked() as human_env_config:
+            human_env_config.default_player_roles = ["PLAYER_ROLE_HARVESTER"] * NUM_AGENTS
+            roles = human_env_config.default_player_roles
+            human_env_config.lab2d_settings = commons_harvest__open.build(roles, human_env_config)
         level_playing_utils.run_episode(
             "RGB",
             {},
             _ACTION_MAP,
-            env_config,
+            human_env_config,
             level_playing_utils.RenderType.PYGAME,
         )
         return
@@ -613,9 +608,8 @@ def main():
             try:
                 worker_trajs.append(fut.result())
             except Exception as e:
-                logger.error(f"actor_worker {wid} failed", exc_info=True)
-                #  - raise   # to stop training immediately
-                #  - continue  # to skip this worker and merge the rest
+                logger.error(f"actor_worker {wid} failed: {e}", exc_info=True)
+                # Stop training if any worker fails to ensure consistency
                 raise
                 
         # Merge trajectories from all workers
@@ -632,9 +626,8 @@ def main():
 
         # Update cumulative rewards
         for agent in agent_list:
-            for _, raw_r in enumerate(traj[agent]["rewards"]):
+            for raw_r in traj[agent]["rewards"]:
                 r = float(raw_r)
-
                 # update running total
                 cum_reward[agent] += r
                 reward_history[agent].append(cum_reward[agent])
@@ -729,9 +722,14 @@ def main():
     pool.shutdown(wait=True)
 
     # Process final metrics
+    # Concatenate all collected zap data along the first axis (time)
     all_zaps = np.concatenate(all_zaps, axis=0)
+    # Calculate cumulative zaps over time
     zap_through_time = jnp.cumsum(all_zaps, axis=0)
+    # Final cumulative zap count is the last element
     zap_matrix = zap_through_time[-1]
+    
+    # Do the same for death zaps
     all_deaths = np.concatenate(all_deaths, axis=0)
     death_zap_through_time = jnp.cumsum(all_deaths, axis=0)
     death_zap_matrix = death_zap_through_time[-1]
