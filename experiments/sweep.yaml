@@ -14,11 +14,11 @@ parameters:
   batch_size:
     values: [64, 128, 256]
   ppo_epochs:
-    values: [1, 3, 5]
+    values: [1, 5, 10]
   kl_threshold:
     distribution: uniform
     min: 1e-3
     max: 1e-1
   total_training_updates:
-    values: [10, 50, 100]
+    values: [50, 100, 150]
 

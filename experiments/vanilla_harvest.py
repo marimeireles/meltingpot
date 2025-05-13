@@ -25,8 +25,8 @@ DISCOUNT_FACTOR = 0.99
 LEARNING_RATE = 3e-4
 PPO_CLIP_EPSILON = 0.2
 BATCH_SIZE = 128
-PPO_EPOCHS = 3
-TOTAL_TRAINING_UPDATES = 1
+PPO_EPOCHS = 5
+TOTAL_TRAINING_UPDATES = 200
 KL_THRESHOLD = 1e-2
 # ────────────────────────────────────────────────────────────────────────────────
 
@@ -101,6 +101,7 @@ def parse_args():
     p.add_argument("--ppo_clip_epsilon",   type=float, default=PPO_CLIP_EPSILON)
     p.add_argument("--ppo_epochs",         type=int,   default=PPO_EPOCHS)
     p.add_argument("--kl_threshold",       type=float, default=KL_THRESHOLD)
+    p.add_argument("--discount_factor",       type=float, default=DISCOUNT_FACTOR)
     p.add_argument("--total_training_updates", type=int, default=TOTAL_TRAINING_UPDATES)
     return p.parse_args()
 
@@ -310,20 +311,21 @@ def main():
     # -------------------------------------------------------------------
     if not args.no_wandb:
         wandb.init(
-            project="commons_harvest_ppo",   # your W&B project name
-            config={
-                "discount_factor": DISCOUNT_FACTOR,
-                "learning_rate": LEARNING_RATE,
-                "ppo_clip_epsilon": PPO_CLIP_EPSILON,
-                "batch_size": BATCH_SIZE,
-                "ppo_epochs": PPO_EPOCHS,
-                "total_training_updates": TOTAL_TRAINING_UPDATES,
-                "kl_threshold": KL_THRESHOLD,
-                "num_workers": args.num_workers,
-            },
-            tags=["jax", "flax", "ppo", args.mode],
-            reinit=True,
+          project="commons_harvest_ppo",
+          config={
+              "discount_factor":      args.discount_factor,
+              "learning_rate":        args.learning_rate,
+              "ppo_clip_epsilon":     args.ppo_clip_epsilon,
+              "batch_size":           args.batch_size,
+              "ppo_epochs":           args.ppo_epochs,
+              "total_training_updates": args.total_training_updates,
+              "kl_threshold":         args.kl_threshold,
+              "num_workers":          args.num_workers,
+          },
+          tags=["jax", "flax", "ppo", args.mode],
+          reinit=True,
         )
+
         config = wandb.config
     else:
         class C: pass
