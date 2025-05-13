@@ -37,9 +37,10 @@ NUM_AGENTS = 7  # Number of harvester agents
 # Utility Functions
 # -------------------------------------------------------------------
 
+
 def parse_args():
     """Parse command line arguments for training or human play modes.
-    
+
     Returns:
         argparse.Namespace: Parsed command line arguments including:
             - mode: 'train' for PPO training or 'human' for interactive play
@@ -109,7 +110,7 @@ def parse_args():
 
 def configure_logging(level: str) -> None:
     """Configure root and library loggers for consistent output format.
-    
+
     Args:
         level: Logging level as string ('DEBUG', 'INFO', etc.)
     """
@@ -120,9 +121,10 @@ def configure_logging(level: str) -> None:
         datefmt="%H:%M:%S",
     )
 
+
 def log_jax_devices():
     """Log available JAX backend and devices for debugging.
-    
+
     Prints the XLA backend platform and details of each available device.
     """
     logger = logging.getLogger(__name__)
@@ -163,6 +165,7 @@ class ActorCriticNetwork(nn.Module):
 
 # Data-collection
 # -------------------------------------------------------------------
+# TODO: ACTION_SET should be properly global and be a default arg like steps_per_agent
 def get_multi_rewards(timestep):
     """Returns a dict mapping each 'prefix' → float reward."""
     rewards = {}
@@ -276,10 +279,10 @@ def actor_worker(
     network_model,
 ):
     """Collect trajectory data in parallel using a worker process.
-    
+
     This function rebuilds the environment and collects trajectories for a subset of the total
     batch size. It's designed to be run in parallel across multiple workers.
-    
+
     Args:
         worker_id: Integer ID of this worker process
         args: Parsed command line arguments
@@ -290,7 +293,7 @@ def actor_worker(
         discount_factor: Gamma parameter for computing returns
         batch_size: Total batch size (will be divided among workers)
         network_model: The shared ActorCriticNetwork model instance
-        
+
     Returns:
         dict: Collected trajectory data for each agent containing observations,
              actions, rewards, etc.
@@ -331,10 +334,10 @@ def actor_worker(
 
 def merge_trajs(worker_trajs):
     """Merge trajectory data from multiple workers into a single batch.
-    
+
     Args:
         worker_trajs: List of trajectory dictionaries from each worker
-        
+
     Returns:
         dict: Merged trajectory data with concatenated arrays for each field
     """
@@ -358,7 +361,7 @@ def merge_trajs(worker_trajs):
 
 def main():
     """Main training function implementing PPO algorithm for commons harvest.
-    
+
     This function:
     1. Initializes the environment and agents
     2. Sets up logging and metrics tracking
@@ -369,7 +372,7 @@ def main():
 
     # seed the global key using the command line argument
     global_rng_key = random.PRNGKey(args.seed)
-    
+
     # Also set numpy random seed for consistency
     np.random.seed(args.seed)
 
@@ -467,9 +470,13 @@ def main():
         }
 
         with config_dict.ConfigDict(env_config).unlocked() as human_env_config:
-            human_env_config.default_player_roles = ["PLAYER_ROLE_HARVESTER"] * NUM_AGENTS
+            human_env_config.default_player_roles = [
+                "PLAYER_ROLE_HARVESTER"
+            ] * NUM_AGENTS
             roles = human_env_config.default_player_roles
-            human_env_config.lab2d_settings = commons_harvest__open.build(roles, human_env_config)
+            human_env_config.lab2d_settings = commons_harvest__open.build(
+                roles, human_env_config
+            )
         level_playing_utils.run_episode(
             "RGB",
             {},
@@ -482,7 +489,7 @@ def main():
     # Initialize network parameters and optimizer states for each agent
     network_parameters = {}
     optimizer_states = {}
-    
+
     # Create a single network model instance to be used throughout
     network_model = ActorCriticNetwork(action_dimension)
 
@@ -501,6 +508,7 @@ def main():
     # -------------------------------------------------------------------
     # Set up parallel workers for data collection
     from concurrent.futures import ProcessPoolExecutor
+
     pool = ProcessPoolExecutor(max_workers=args.num_workers)
     logger = logging.getLogger("train")
     log_jax_devices()
@@ -512,10 +520,10 @@ def main():
     # -------------------------------------------------------------------
     def compute_ppo_loss(network_model, params, obs, acts, old_logp, old_val, rets):
         """Compute the PPO loss combining policy and value losses.
-        
+
         This function implements the PPO-Clip objective, combining a clipped policy loss
         with a value function loss. The clipping prevents too large policy updates.
-        
+
         Args:
             network_model: The ActorCriticNetwork model
             params: Neural network parameters
@@ -524,7 +532,7 @@ def main():
             old_logp: Log probabilities of actions under old policy
             old_val: Value estimates from old policy
             rets: Discounted returns
-            
+
         Returns:
             float: Combined PPO loss (policy loss + value loss)
         """
@@ -534,7 +542,7 @@ def main():
 
         # Compute log probabilities of actions under new policy
         logp = dist.log_prob(acts)
-        
+
         # Compute importance sampling ratio
         ratio = jnp.exp(logp - old_logp)
 
@@ -552,7 +560,7 @@ def main():
 
         # Compute value function loss on raw returns
         value_loss = jnp.mean((rets - vals) ** 2)
-        
+
         # Return combined loss
         return policy_loss + 0.5 * value_loss
 
@@ -561,17 +569,19 @@ def main():
         def update_step(params, opt_state, obs, acts, old_logp, old_val, rets):
             """Perform one PPO update step using the provided batch of data."""
             # Compute loss and gradients
-            loss_fn = lambda p: compute_ppo_loss(network_model, p, obs, acts, old_logp, old_val, rets)
+            loss_fn = lambda p: compute_ppo_loss(
+                network_model, p, obs, acts, old_logp, old_val, rets
+            )
             loss, grads = value_and_grad(loss_fn)(params)
-            
+
             # Apply optimizer update
             updates, new_opt_state = optimizer.update(grads, opt_state, params)
             new_params = optax.apply_updates(params, updates)
-            
+
             return new_params, new_opt_state, loss
-        
+
         return jax.jit(update_step)
-    
+
     # Create the JIT-compiled update function with our network model
     ppo_update_step = create_ppo_update_step(network_model)
 
@@ -601,7 +611,7 @@ def main():
             )
             for wid in range(args.num_workers)
         ]
-        
+
         # Gather results from workers
         worker_trajs = []
         for wid, fut in enumerate(futures):
@@ -611,7 +621,7 @@ def main():
                 logger.error(f"actor_worker {wid} failed: {e}", exc_info=True)
                 # Stop training if any worker fails to ensure consistency
                 raise
-                
+
         # Merge trajectories from all workers
         traj = merge_trajs(worker_trajs)
 
@@ -661,7 +671,9 @@ def main():
             # Run multiple epochs of PPO updates
             for epoch_idx in range(config.ppo_epochs):
                 # Perform PPO update step
-                new_params, new_opt_state, loss = ppo_update_step(params, opt_state, o, a, lp, v, G)
+                new_params, new_opt_state, loss = ppo_update_step(
+                    params, opt_state, o, a, lp, v, G
+                )
                 epoch_losses.append(float(loss))
 
                 # Compute KL divergence between old and new policies
@@ -689,7 +701,7 @@ def main():
                 params, opt_state = new_params, new_opt_state
                 network_parameters[agent] = params
                 optimizer_states[agent] = opt_state
-            
+
             # Store metrics for this agent to log later
             if not args.no_wandb:
                 wandb.log(
@@ -698,7 +710,9 @@ def main():
                         f"{agent}/kl_final": epoch_kls[-1],
                         f"{agent}/kl_max": max(epoch_kls),
                         f"{agent}/kl_mean": sum(epoch_kls) / len(epoch_kls),
-                        f"{agent}/reward_mean": np.mean([float(r) for r in traj[agent]["rewards"]]),
+                        f"{agent}/reward_mean": np.mean(
+                            [float(r) for r in traj[agent]["rewards"]]
+                        ),
                     },
                     step=update_idx,
                 )
@@ -728,7 +742,7 @@ def main():
     zap_through_time = jnp.cumsum(all_zaps, axis=0)
     # Final cumulative zap count is the last element
     zap_matrix = zap_through_time[-1]
-    
+
     # Do the same for death zaps
     all_deaths = np.concatenate(all_deaths, axis=0)
     death_zap_through_time = jnp.cumsum(all_deaths, axis=0)
